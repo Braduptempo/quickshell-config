@@ -1,0 +1,18 @@
+module MijnSysteem
+Bar 1.0 Bar.qml
+
+singleton Battery 1.0 Battery.qml
+BatteryAnimation 1.0 BatteryAnimation.qml
+BatteryWidget 1.0 BatteryWidget.qml
+BatteryDropdown 1.0 BatteryDropdown.qml
+
+
+singleton Sound 1.0 Sound.qml
+SoundWidget 1.0 SoundWidget.qml
+
+
+singleton Time 1.0 Time.qml
+ClockWidget 1.0 ClockWidget.qml
+
+singleton Network 1.0 Network.qml
+NetworkWidget 1.0 NetworkWidget.qml
