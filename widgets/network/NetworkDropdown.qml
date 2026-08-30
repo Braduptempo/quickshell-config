@@ -41,6 +41,7 @@ PopupWindow {
     command: ["bash", "-c", "/home/$USER/.config/quickshell/scripts/netstats.sh"]
     stdout: SplitParser {
       onRead: (data) => {
+        console.log("BASH OUTPUT:", data);
         let json = JSON.parse(data);
         if (json.connected) {
           if (popup.lastRx > 0) {
@@ -98,7 +99,8 @@ PopupWindow {
         Text {
           text: {
             if (networkData && networkData.isWiredConnected) return "󰈀";
-            if (networkData && networkData.activeNetwork) return networkData.getWifiIcon(networkData.activeNetwork.strength);
+            // GEFIXT: networkManager veranderd naar networkData
+            if (networkData && networkData.activeNetwork) return networkData.getWifiIcon(networkData.currentActiveSignal);
             return "󰤯";
           }
           font.family: "jetbrains mono"
@@ -140,7 +142,10 @@ PopupWindow {
       }
       Repeater {
         model: popup.knownNetworks
-        delegate: NetworkRowDelegate { networkData: popup.networkData }
+        delegate: NetworkRowDelegate {
+          networkData: popup.networkData
+          netStats: popup.netStats // <-- DEZE REGEL TOEGEVOEGD
+        }
       }
 
       // ANDERE NETWERKEN
@@ -152,7 +157,10 @@ PopupWindow {
       }
       Repeater {
         model: popup.unknownNetworks
-        delegate: NetworkRowDelegate { networkData: popup.networkData }
+        delegate: NetworkRowDelegate {
+          networkData: popup.networkData
+          netStats: popup.netStats // <-- DEZE REGEL TOEGEVOEGD
+        }
       }
     }
   }

@@ -40,9 +40,10 @@ Item {
     Text {
       id: textIcon
       text: {
-        if (networkManager.isWiredConnected) return "󰈀"; // Material Design Ethernet Icoon
-        if (networkManager.activeNetwork) return networkManager.getWifiIcon(networkManager.activeNetwork.strength);
-        return "󰤯"; // Geen verbinding icoon
+        if (networkManager.isWiredConnected) return "󰈀";
+        // GEFIXT: .activeNetwork.signal veranderd naar currentActiveSignal
+        if (networkManager.activeNetwork) return networkManager.getWifiIcon(networkManager.currentActiveSignal);
+        return "󰤯";
       }
       color: "#ffffff"
       font.family: "jetbrains mono"
@@ -61,21 +62,14 @@ Item {
       font.pixelSize: 11
     }
   }
-
   MouseArea {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
 
     onClicked: {
-      // GEFIXT: We koppelen de popup nu direct aan het 'barWindow' ID uit Bar.qml!
-      if (!networkMenu.anchor.window) {
-        networkMenu.anchor.window = barWindow;
-      }
-
-      // Geef de X, Y, Breedte en Hoogte van deze specifieke knop binnen het venster door
+      // Bepaal de X en Y coördinaten dynamisch
       networkMenu.anchor.rect = Qt.rect(root.x, root.y, root.width, root.height);
-
-      networkMenu.anchor.margins.top = 30;
+      networkMenu.anchor.margins.top = 30; // Ruimte onder je balk
 
       // Open of sluit de popup
       networkMenu.visible = !networkMenu.visible;
@@ -83,12 +77,11 @@ Item {
   }
 
   NetworkDropdown {
-    id:networkMenu
+    id: networkMenu
     visible: false
-
     networkData: networkManager
 
+    // GEFIXT: Eén strakke koppeling naar het id 'panel' (zorg dat je PanelWindow in Bar.qml het id 'panel' heeft!)
     anchor.window: panel
-    anchor.edges: panel.Edges.Bottom
   }
 }
