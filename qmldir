@@ -10,12 +10,13 @@ Time 1.0 widgets/clock/Time.qml
 # widgets/battery
 BatteryWidget 1.0 widgets/battery/BatteryWidget.qml
 BatteryDropdown 1.0 widgets/battery/BatteryDropdown.qml
-Battery 1.0 widgets/battery/Battery.qml
+singleton Battery 1.0 widgets/battery/Battery.qml
 BatteryAnimation 1.0 widgets/battery/BatteryAnimation.qml
 
 # widgets/sound
 SoundWidget 1.0 widgets/sound/SoundWidget.qml
-Sound 1.0 widgets/sound/Sound.qml
+singleton Sound 1.0 widgets/sound/Sound.qml
+SoundDropdown 1.0 widgets/sound/SoundDropdown.qml
 
 # widgets/network
 NetworkWidget 1.0 widgets/network/NetworkWidget.qml
