@@ -2,7 +2,12 @@
 
 import QtQuick
 import Quickshell
-import "."
+import Quickshell.Wayland
+
+import "./widgets/network"
+import "./widgets/battery"
+import "./widgets/sound"
+import "./widgets/clock"
 
 Scope {
   Variants {
@@ -12,6 +17,8 @@ Scope {
       id: panel
       required property var modelData
       color: "transparent"
+
+      WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
       screen: modelData
       implicitHeight: 30
@@ -31,13 +38,7 @@ Scope {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 10
-      }
-
-      NetworkWidget {
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 10
-      }
+      } 
 
       BatteryWidget{
         anchors.right: parent.right
@@ -45,6 +46,12 @@ Scope {
         anchors.rightMargin: 75
 
       }
+      
+      NetworkWidget {
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 135
+    }
 
       Rectangle {
         id: openButton
