@@ -41,6 +41,7 @@ PopupWindow {
     command: ["bash", "-c", "/home/$USER/.config/quickshell/scripts/netstats.sh"]
     stdout: SplitParser {
       onRead: (data) => {
+        console.log("BASH OUTPUT:", data);
         let json = JSON.parse(data);
         if (json.connected) {
           if (popup.lastRx > 0) {

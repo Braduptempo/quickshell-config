@@ -18,13 +18,16 @@ ColumnLayout {
   property bool isExpanded: false
   property bool isEditing: false
 
-  // NIEUW: Haal het signaal voor DIT specifieke netwerk uit de JSON
-  // GEFIXT: 'popup.' is weggehaald, hij gebruikt nu zijn eigen netStats property
-  property int networkSignal: {
+ // Standaard op 0
+  property int networkSignal: 0
+
+  // FORCEER een update zodra de data uit het script binnenkomt!
+  onNetStatsChanged: {
     if (netStats && netStats.all_signals && netStats.all_signals[modelData.name] !== undefined) {
-      return netStats.all_signals[modelData.name];
+      networkSignal = parseInt(netStats.all_signals[modelData.name]);
+    } else {
+      networkSignal = 0;
     }
-    return 0; // Geen signaal gevonden
   }
 
   opacity: 0
@@ -50,7 +53,7 @@ ColumnLayout {
       anchors.fill: parent
 
       Text {
-        text: networkData ? networkData.getWifiIcon(modelData.signal) : ""
+        text: networkData ? networkData.getWifiIcon(networkSignal) : ""
         color: modelData.connected ? "#a6e3a1" : "#a0a0a0"
         font.family: "jetbrains mono"
         font.pixelSize: 13
