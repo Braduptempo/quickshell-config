@@ -98,7 +98,8 @@ PopupWindow {
         Text {
           text: {
             if (networkData && networkData.isWiredConnected) return "󰈀";
-            if (networkData && networkData.activeNetwork) return networkData.getWifiIcon(networkData.activeNetwork.strength);
+            // GEFIXT: networkManager veranderd naar networkData
+            if (networkData && networkData.activeNetwork) return networkData.getWifiIcon(networkData.currentActiveSignal);
             return "󰤯";
           }
           font.family: "jetbrains mono"

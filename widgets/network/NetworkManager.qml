@@ -1,6 +1,7 @@
 import Quickshell
 import QtQuick
 import Quickshell.Networking
+import Quickshell.Io
 
 Item {
   id: root
@@ -28,6 +29,44 @@ Item {
     return null;
   }
 
+  // NIEUW: Houdt constant de sterkte van je huidige verbinding bij
+  property int currentActiveSignal: 0
+
+  Process {
+    id: activeSignalProcess
+    // Haal puur het signaalcijfer op van het netwerk waar 'active = yes' is
+    command: ["bash", "-c", "nmcli -t -f active,signal dev wifi 2>/dev/null | awk -F: '$1==\"yes\" {print $2; exit}'"]
+    stdout: SplitParser {
+      onRead: data => {
+        let sig = parseInt(data.trim());
+        if (!isNaN(sig)) root.currentActiveSignal = sig;
+      }
+    }
+  }
+
+  // Poll het actieve signaal elke 3 seconden
+  Timer {
+    interval: 3000
+    running: true
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: activeSignalProcess.running = true
+  }
+
+  // Blijft zoeken tot NetworkManager wakker is, en stopt dan!
+  Timer {
+    id: startupTimer
+    interval: 500
+    running: true
+    repeat: true
+    onTriggered: {
+      sortDevices();
+      if (wifiDevices.length > 0 || wiredDevices.length > 0) {
+        running = false;
+      }
+    }
+  }
+
   property int deviceCount: Networking.devices.values.length
 
   Component.onCompleted: {
@@ -35,13 +74,14 @@ Item {
   }
 
   // NIEUW: Helper-functie om het juiste icoontje te bepalen op basis van sterkte (0.0 tot 1.0)
-  function getWifiIcon(strength) {
-    if (strength === undefined || strength === null) return "󰤯"; // Offline of onbekend
-    if (strength > 0.8) return "󰤨"; // 4 streepjes
-    if (strength > 0.6) return "󰤥"; // 3 streepjes
-    if (strength > 0.4) return "󰤢"; // 2 streepjes
-    if (strength > 0.2) return "󰤟"; // 1 streepje
-    return "󰤯";                     // 0 streepjes
+  function getWifiIcon(signal) {
+    if (signal === undefined || signal === null) return "󰤯";
+    if (signal > 80) return "󰤨"; // 4 streepjes
+    if (signal > 60) return "󰤥"; // 3 streepjes
+    if (signal > 40) return "󰤢"; // 2 streepjes
+    if (signal > 20) return "󰤟"; // 1 streepje
+
+    return "󰤯"; // 0 streepjes
   }
 
   function sortDevices(){
@@ -75,7 +115,7 @@ Item {
       console.log("Gevonden netwerk:", network.name);
       console.log("Is verbonden:", network.connected);
       console.log("Is een bekend netwerk:", network.known);
-      console.log("Connection strength:" , network.WifiNetwork.signalStrength);
+      console.log("Connection strength:" , network.signal);
     }
   }
   property bool isWifiOn: true
