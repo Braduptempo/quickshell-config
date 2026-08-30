@@ -13,13 +13,13 @@ PopupWindow {
   implicitWidth: 300
   implicitHeight: contentColumn.implicitHeight + 20
 
-  property var networkData: null
-
   HyprlandFocusGrab {
     active: popup.visible
     windows: [popup]
     onCleared: popup.visible = false;
   }
+
+  property var networkData: null
 
   // Live stats logica
   property var netStats: ({ connected: false })
