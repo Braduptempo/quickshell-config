@@ -12,13 +12,17 @@ ColumnLayout {
   required property var modelData
   property var networkData
 
+  // NIEUW: We maken een property aan zodat we de data kunnen ontvangen
+  property var netStats
+
   property bool isExpanded: false
   property bool isEditing: false
 
   // NIEUW: Haal het signaal voor DIT specifieke netwerk uit de JSON
+  // GEFIXT: 'popup.' is weggehaald, hij gebruikt nu zijn eigen netStats property
   property int networkSignal: {
-    if (popup.netStats && popup.netStats.all_signals && popup.netStats.all_signals[modelData.name] !== undefined) {
-      return popup.netStats.all_signals[modelData.name];
+    if (netStats && netStats.all_signals && netStats.all_signals[modelData.name] !== undefined) {
+      return netStats.all_signals[modelData.name];
     }
     return 0; // Geen signaal gevonden
   }

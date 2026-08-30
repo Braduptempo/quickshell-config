@@ -141,7 +141,10 @@ PopupWindow {
       }
       Repeater {
         model: popup.knownNetworks
-        delegate: NetworkRowDelegate { networkData: popup.networkData }
+        delegate: NetworkRowDelegate {
+          networkData: popup.networkData
+          netStats: popup.netStats // <-- DEZE REGEL TOEGEVOEGD
+        }
       }
 
       // ANDERE NETWERKEN
@@ -153,7 +156,10 @@ PopupWindow {
       }
       Repeater {
         model: popup.unknownNetworks
-        delegate: NetworkRowDelegate { networkData: popup.networkData }
+        delegate: NetworkRowDelegate {
+          networkData: popup.networkData
+          netStats: popup.netStats // <-- DEZE REGEL TOEGEVOEGD
+        }
       }
     }
   }
