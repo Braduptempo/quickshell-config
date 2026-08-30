@@ -3,6 +3,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import QtQuick.Layouts
 
 import "./widgets/network"
 import "./widgets/battery"
@@ -34,24 +35,16 @@ Scope {
         color: "white"
       }
 
-      SoundWidget {
+      RowLayout {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         anchors.rightMargin: 10
-      } 
+        spacing: 8 // Vaste, mooie ruimte tussen de widgets onderling
 
-      BatteryWidget{
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 75
-
+        NetworkWidget {}
+        BatteryWidget {}
+        SoundWidget {}
       }
-      
-      NetworkWidget {
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.rightMargin: 135
-    }
 
       Rectangle {
         id: openButton

@@ -6,6 +6,7 @@ import Quickshell
 Item {
   id: root
 
+  visible: Battery.hasBattery
   implicitWidth: widgetLayout.implicitWidth + 20
   implicitHeight: widgetLayout.implicitHeight + 10
 
@@ -21,7 +22,7 @@ Item {
   RowLayout {
     id: widgetLayout
     anchors.fill: parent
-    spacing:8 
+    spacing:8
     anchors.leftMargin: 10   // Afstand vanaf de linker rand
     anchors.rightMargin: 10  // Afstand vanaf de rechter rand
     anchors.topMargin: 2     // Afstand vanaf de bovenrand
@@ -96,4 +97,3 @@ Item {
   // }
   //}
 }
-
