@@ -65,8 +65,12 @@ Item {
     id: batteryMenu
     visible: false
 
-    anchor.window: panel
-    anchor.edges: panel.Edges.Bottom
+   // GEFIXT: Eén strakke koppeling naar het id 'panel' (zorg dat je PanelWindow in Bar.qml het id 'panel' heeft!)
+    anchor.item: root
+    // Forceer uitlijning aan de rechterkant van de knop
+    anchor.edges: Edges.Bottom | Edges.Right
+    anchor.rect.y: 39 // Kleine ruimte onder de bar
+    anchor.rect.x: -140 
   }
 
   // PopupWindow {

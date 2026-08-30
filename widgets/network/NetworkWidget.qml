@@ -67,9 +67,6 @@ Item {
     cursorShape: Qt.PointingHandCursor
 
     onClicked: {
-      // Bepaal de X en Y coördinaten dynamisch
-      networkMenu.anchor.rect = Qt.rect(root.x, root.y, root.width, root.height);
-      networkMenu.anchor.margins.top = 30; // Ruimte onder je balk
 
       // Open of sluit de popup
       networkMenu.visible = !networkMenu.visible;
@@ -82,6 +79,10 @@ Item {
     networkData: networkManager
 
     // GEFIXT: Eén strakke koppeling naar het id 'panel' (zorg dat je PanelWindow in Bar.qml het id 'panel' heeft!)
-    anchor.window: panel
+    anchor.item: root
+    // Forceer uitlijning aan de rechterkant van de knop
+    anchor.edges: Edges.Bottom | Edges.Right
+    anchor.rect.y: 39 // Kleine ruimte onder de bar
+    anchor.rect.x: -140
   }
 }
