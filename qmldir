@@ -24,3 +24,6 @@ NetworkDropdown 1.0 widgets/network/NetworkDropdown.qml
 NetworkManager 1.0 widgets/network/NetworkManager.qml
 NetworkRowDelegate 1.0 widgets/network/NetworkRowDelegate.qml
 NetworkStatsPanel 1.0 widgets/network/NetworkStatsPanel.qml
+
+# widgets/workspaces
+WorkspaceWidget 1.0 widgets/WorkspaceWidget.qml
