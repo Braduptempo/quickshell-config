@@ -27,3 +27,10 @@ NetworkStatsPanel 1.0 widgets/network/NetworkStatsPanel.qml
 
 # widgets/workspaces
 WorkspaceWidget 1.0 widgets/WorkspaceWidget.qml
+
+# widgets/notifications
+NotificationWidget 1.0 widgets/notifications/NotificationWidget.qml
+NotificationDropwdown 1.0 widgets/notifications/NotificationDropwdown.qml
+NotificationCard 1.0 widgets/notifications/NotificationCard.qml
+ToastOverlay 1.0 widgets/notifications/ToastOverlay.qml
+ToastCard 1.0 widgets/notifications/ToastCard.qml
