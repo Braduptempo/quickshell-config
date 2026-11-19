@@ -7,7 +7,7 @@ Every push and every pull request into `develop` or `main` runs GitHub Actions (
 | Job | What it checks | Blocks a merge |
 |---|---|---|
 | Lint | `qmldir` entries point to existing files, no QML syntax errors, no missing imports, the number of qmllint warnings doesn't go up, `shellcheck` on the scripts | Yes |
-| Load test | Starts the config in a headless sway for 10 seconds and fails on load errors or JavaScript errors from our own files | Not yet (still being tuned) |
+| Load test | Starts the config in a headless sway for 10 seconds and fails on load errors or JavaScript errors from our own files | Yes |
 
 Run them locally:
 

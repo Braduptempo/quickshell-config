@@ -25,9 +25,6 @@ jobs:
     name: Load test (headless sway)
     runs-on: ubuntu-latest
     container: archlinux:latest
-    # New job: may still need tuning for the CI environment,
-    # so it does not block merges yet.
-    continue-on-error: true
     steps:
       - name: Install tools
         run: pacman -Syu --noconfirm --needed git quickshell qt6-declarative sway dbus libcap ttf-jetbrains-mono
