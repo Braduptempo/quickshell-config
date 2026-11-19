@@ -15,8 +15,6 @@ import "./widgets/notifications"
 Scope {
   id: rootBar
 
-  signal newToast(var notification)
-
   Variants {
     model: Quickshell.screens
 
@@ -59,12 +57,8 @@ Scope {
         NetworkWidget {}
         BatteryWidget {}
         SoundWidget {}
-        NotificationWidget{
+        NotificationWidget {
           mainWindow: panel
-
-          onNewToast: function(notification) {
-            rootBar.newToast(notification) // Stuur door naar boven!
-        }
         }
       }
     }

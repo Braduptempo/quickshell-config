@@ -46,9 +46,10 @@ Item {
     SoundDropdown {
         id: soundMenu
         visible: false
-        anchor.window: panel
+        // `Edges` is a global enum, not a property of the bar window;
+        // `panel.Edges` was undefined. anchor.item already implies the window.
         anchor.item: root
-        anchor.edges: panel.Edges.Bottom | panel.Edges.Right
+        anchor.edges: Edges.Bottom | Edges.Right
         anchor.rect.y: 35 
         anchor.rect.x: -10
     }

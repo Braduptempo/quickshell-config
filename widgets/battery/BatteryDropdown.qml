@@ -16,10 +16,21 @@ PopupWindow {
     // Eigenschappen om power profiles bij te houden
     property string activeProfile: "balanced"
 
+    // Only show power profiles when power-profiles-daemon is installed;
+    // otherwise the buttons silently did nothing.
+    property bool profilesAvailable: false
+
+    Process {
+        id: checkProfilesProcess
+        command: ["sh", "-c", "command -v powerprofilesctl"]
+        running: true
+        onExited: (exitCode) => popup.profilesAvailable = exitCode === 0
+    }
+
     Process {
         id: getProfileProcess
         command: ["powerprofilesctl", "get"]
-        running: popup.visible
+        running: popup.visible && popup.profilesAvailable
         stdout: SplitParser {
             onRead: (data) => {
                 activeProfile = data.trim();
@@ -35,7 +46,7 @@ PopupWindow {
 
     Timer {
         interval: 3000
-        running: popup.visible
+        running: popup.visible && popup.profilesAvailable
         repeat: true
         onTriggered: getProfileProcess.running = true
     }
@@ -76,6 +87,7 @@ PopupWindow {
 
         // --- POWER PROFILES SECTIE ---
         Text {
+            visible: popup.profilesAvailable
             text: "Power Profile"
             font.bold: true
             font.pixelSize: 10
@@ -83,6 +95,7 @@ PopupWindow {
         }
 
         RowLayout {
+            visible: popup.profilesAvailable
             Layout.fillWidth: true
             spacing: 4
 

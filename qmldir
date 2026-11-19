@@ -26,11 +26,12 @@ NetworkRowDelegate 1.0 widgets/network/NetworkRowDelegate.qml
 NetworkStatsPanel 1.0 widgets/network/NetworkStatsPanel.qml
 
 # widgets/workspaces
-WorkspaceWidget 1.0 widgets/WorkspaceWidget.qml
+WorkspaceWidget 1.0 widgets/workspaces/WorkspaceWidget.qml
 
 # widgets/notifications
+singleton Notifications 1.0 widgets/notifications/Notifications.qml
 NotificationWidget 1.0 widgets/notifications/NotificationWidget.qml
-NotificationDropwdown 1.0 widgets/notifications/NotificationDropwdown.qml
+NotificationDropdown 1.0 widgets/notifications/NotificationDropdown.qml
 NotificationCard 1.0 widgets/notifications/NotificationCard.qml
 ToastOverlay 1.0 widgets/notifications/ToastOverlay.qml
 ToastCard 1.0 widgets/notifications/ToastCard.qml

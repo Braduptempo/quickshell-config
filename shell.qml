@@ -6,15 +6,8 @@ import "./widgets/notifications"
 
 Scope {
 
-  Bar{
-    // Vang het op en stuur naar de overlay
-    onNewToast: function(notification) {
-      toasts.showToast(notification)
-    }
-  }
+  Bar {}
 
-  // Het popup venster
-  ToastOverlay {
-    id: toasts
-  }
+  // Het popup venster. Luistert zelf naar de Notifications-singleton.
+  ToastOverlay {}
 }

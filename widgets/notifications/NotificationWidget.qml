@@ -1,6 +1,6 @@
 // NotificationWidget.qml
 import QtQuick
-import Quickshell.Services.Notifications
+import Quickshell
 
 Item {
   id: root
@@ -8,23 +8,6 @@ Item {
   implicitHeight: 30
 
   property var mainWindow: null
-  signal newToast(var notification)
-
-  ListModel {
-    id: notifModel
-  }
-
-  NotificationServer {
-    id: server
-    onNotification: function(notification) {
-      root.newToast(notification);
-      notifModel.insert(0, {
-          "appName": notification.appName || "Systeem",
-          "summary": notification.summary || "",
-          "body": notification.body || ""
-      });
-    }
-  }
 
   Rectangle {
     anchors.fill: parent
@@ -35,7 +18,7 @@ Item {
 
     Text {
       anchors.centerIn: parent
-      text: ""
+      text: ""
       color: "white"
     }
 
@@ -55,12 +38,14 @@ Item {
     }
   }
 
-  // Roep hier het nieuwe externe bestand aan!
+  // The server and history now live in the Notifications singleton,
+  // so every monitor's bar shows the same list.
   NotificationDropdown {
     id: dropdown
     visible: false
-    listModel: notifModel // Geef het model door
+    listModel: Notifications.model
     anchor.window: root.mainWindow
-    anchor.edges: root.mainWindow ? root.mainWindow.Edges.Bottom : 0
+    // `Edges` is a global enum; `mainWindow.Edges` was undefined
+    anchor.edges: Edges.Bottom
   }
 }
