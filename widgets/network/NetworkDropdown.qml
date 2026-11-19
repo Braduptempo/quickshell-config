@@ -13,13 +13,13 @@ PopupWindow {
   implicitWidth: 300
   implicitHeight: contentColumn.implicitHeight + 20
 
-  property var networkData: null
-
   HyprlandFocusGrab {
     active: popup.visible
     windows: [popup]
     onCleared: popup.visible = false;
   }
+
+  property var networkData: null
 
   // Live stats logica
   property var netStats: ({ connected: false })
@@ -38,11 +38,17 @@ PopupWindow {
 
   Process {
     id: statsProcess
-    command: ["bash", "-c", "/home/$USER/.config/quickshell/scripts/netstats.sh"]
+    // Resolved relative to the running config, so a test copy (qs -p) uses its own script
+    command: ["bash", Quickshell.shellPath("scripts/netstats.sh")]
     stdout: SplitParser {
       onRead: (data) => {
-        console.log("BASH OUTPUT:", data);
-        let json = JSON.parse(data);
+        let json;
+        try {
+          json = JSON.parse(data);
+        } catch (e) {
+          console.warn("netstats.sh: invalid output:", data);
+          return;
+        }
         if (json.connected) {
           if (popup.lastRx > 0) {
             popup.downSpeed = (json.rx - popup.lastRx) / 2;

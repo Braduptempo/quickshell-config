@@ -6,6 +6,7 @@ import Quickshell
 Item {
   id: root
 
+  visible: Battery.hasBattery
   implicitWidth: widgetLayout.implicitWidth + 20
   implicitHeight: widgetLayout.implicitHeight + 10
 
@@ -21,7 +22,7 @@ Item {
   RowLayout {
     id: widgetLayout
     anchors.fill: parent
-    spacing:8 
+    spacing:8
     anchors.leftMargin: 10   // Afstand vanaf de linker rand
     anchors.rightMargin: 10  // Afstand vanaf de rechter rand
     anchors.topMargin: 2     // Afstand vanaf de bovenrand
@@ -44,28 +45,22 @@ Item {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
 
-    onClicked: {
-      // GEFIXT: We koppelen de popup nu direct aan het 'barWindow' ID uit Bar.qml!
-      if (!batteryMenu.anchor.window) {
-        batteryMenu.anchor.window = barWindow;
-      }
-
-      // Geef de X, Y, Breedte en Hoogte van deze specifieke knop binnen het venster door
-      batteryMenu.anchor.rect = Qt.rect(root.x, root.y, root.width, root.height);
-
-      batteryMenu.anchor.margins.top = 30;
-
-      // Open of sluit de popup
-      batteryMenu.visible = !batteryMenu.visible;
-    }
+    // The popup is anchored to this item below (anchor.item), so no window
+    // lookup is needed here. `barWindow` did not exist, and overwriting
+    // anchor.rect on every click undid the x/y offsets set on BatteryDropdown.
+    onClicked: batteryMenu.visible = !batteryMenu.visible
   }
 
   BatteryDropdown {
     id: batteryMenu
     visible: false
 
-    anchor.window: panel
-    anchor.edges: panel.Edges.Bottom
+   // GEFIXT: Eén strakke koppeling naar het id 'panel' (zorg dat je PanelWindow in Bar.qml het id 'panel' heeft!)
+    anchor.item: root
+    // Forceer uitlijning aan de rechterkant van de knop
+    anchor.edges: Edges.Bottom | Edges.Right
+    anchor.rect.y: 39 // Kleine ruimte onder de bar
+    anchor.rect.x: -140 
   }
 
   // PopupWindow {
@@ -96,4 +91,3 @@ Item {
   // }
   //}
 }
-

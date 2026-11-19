@@ -1,32 +1,18 @@
 // Time.qml
+pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
-pragma Singleton
 
 Singleton {
     id: root
 
-    property string time
+    // Formatted in QML instead of running `date` every second.
+    // `date` printed a trailing newline, which pushed the clock onto two lines.
+    readonly property string time: Qt.formatDateTime(clock.date, "HH:mm")
 
-    Process {
-        id: dateProc
-
-        command: ["date", "+%H:%M"]
-        running: true
-
-        stdout: StdioCollector {
-            onStreamFinished: root.time = this.text
-        }
-
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
     }
-
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: dateProc.running = true
-    }
-
 }

@@ -2,7 +2,12 @@
 
 import Quickshell
 import "."
+import "./widgets/notifications"
 
 Scope {
-    Bar{}
+
+  Bar {}
+
+  // Het popup venster. Luistert zelf naar de Notifications-singleton.
+  ToastOverlay {}
 }
