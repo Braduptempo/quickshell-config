@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Install tools
         run: pacman -Syu --noconfirm --needed git quickshell qt6-declarative shellcheck
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Trust the checkout
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Lint
@@ -30,8 +30,12 @@ jobs:
     continue-on-error: true
     steps:
       - name: Install tools
-        run: pacman -Syu --noconfirm --needed git quickshell qt6-declarative sway dbus ttf-jetbrains-mono
-      - uses: actions/checkout@v4
+        run: pacman -Syu --noconfirm --needed git quickshell qt6-declarative sway dbus libcap ttf-jetbrains-mono
+      - name: Drop sway's file capabilities
+        # Arch ships sway with cap_sys_nice; containers refuse to run such
+        # binaries ("Operation not permitted")
+        run: setcap -r "$(command -v sway)"
+      - uses: actions/checkout@v5
       - name: Create test user
         # sway refuses to run as root
         run: |

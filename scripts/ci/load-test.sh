@@ -34,7 +34,8 @@ if [ "${QS_TEST_HEADLESS:-0}" = "1" ] || [ -z "${WAYLAND_DISPLAY:-}" ]; then
     cat "$XDG_RUNTIME_DIR/sway.log"
     exit 1
   fi
-  export WAYLAND_DISPLAY="$(basename "$sock")"
+  WAYLAND_DISPLAY="$(basename "$sock")"
+  export WAYLAND_DISPLAY
   echo "Headless sway on $WAYLAND_DISPLAY"
 fi
 

@@ -11,7 +11,7 @@
 #        scripts/ci/lint.sh --update   write the current warning count as the new baseline
 
 set -uo pipefail
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../.." || exit 2
 
 QMLLINT="${QMLLINT:-/usr/lib/qt6/bin/qmllint}"
 BASELINE_FILE=".ci/qmllint-baseline"
@@ -26,7 +26,7 @@ fi
 
 # --- 1. qmldir paths ---------------------------------------------------------
 echo "== qmldir"
-while read -r first second third fourth; do
+while read -r first _ third fourth; do
   # skip comments, blank lines and the module line
   case "$first" in ''|'#'*|module) continue ;; esac
   # "singleton Name 1.0 path" or "Name 1.0 path"
