@@ -45,20 +45,10 @@ Item {
     anchors.fill: parent
     cursorShape: Qt.PointingHandCursor
 
-    onClicked: {
-      // GEFIXT: We koppelen de popup nu direct aan het 'barWindow' ID uit Bar.qml!
-      if (!batteryMenu.anchor.window) {
-        batteryMenu.anchor.window = barWindow;
-      }
-
-      // Geef de X, Y, Breedte en Hoogte van deze specifieke knop binnen het venster door
-      batteryMenu.anchor.rect = Qt.rect(root.x, root.y, root.width, root.height);
-
-      batteryMenu.anchor.margins.top = 30;
-
-      // Open of sluit de popup
-      batteryMenu.visible = !batteryMenu.visible;
-    }
+    // The popup is anchored to this item below (anchor.item), so no window
+    // lookup is needed here. `barWindow` did not exist, and overwriting
+    // anchor.rect on every click undid the x/y offsets set on BatteryDropdown.
+    onClicked: batteryMenu.visible = !batteryMenu.visible
   }
 
   BatteryDropdown {

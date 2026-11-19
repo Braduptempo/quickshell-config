@@ -102,21 +102,6 @@ Item {
 
     wifiDevices = wifis;
     wiredDevices = wireds;
-
-    console.log("Wi-Fi adapters gevonden:", wifiDevices.length);
-    console.log("Bedrade adapters gevonden:", wiredDevices.length);
-  }
-
-  onAvailableNetworksChanged: {
-    for (let i = 0; i < availableNetworks.length; i++) {
-      let network = availableNetworks[i];
-
-      // FIX 1: 'net' is overal veranderd naar 'network'
-      console.log("Gevonden netwerk:", network.name);
-      console.log("Is verbonden:", network.connected);
-      console.log("Is een bekend netwerk:", network.known);
-      console.log("Connection strength:" , network.signal);
-    }
   }
   property bool isWifiOn: true
 

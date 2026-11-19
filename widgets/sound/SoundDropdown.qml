@@ -116,7 +116,8 @@ PopupWindow {
             Layout.fillWidth: true
             implicitHeight: 28
             radius: 4
-            color: (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.id === modelData.id) ? "#3b4252" : "transparent"
+            // Hover is part of the binding, so the highlight follows the default device
+            color: (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.id === modelData.id) ? "#3b4252" : (sinkMouse.containsMouse ? "#20ffffff" : "transparent")
 
             RowLayout {
               anchors.fill: parent
@@ -132,12 +133,10 @@ PopupWindow {
             }
 
             MouseArea {
+              id: sinkMouse
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-
-              onEntered: parent.color = (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.id === modelData.id) ? "#3b4252" : "#20ffffff"
-              onExited: parent.color = (Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.id === modelData.id) ? "#3b4252" : "transparent"
 
               onClicked: {
                 changeDeviceProcess.targetId = modelData.id.toString();
@@ -170,7 +169,8 @@ PopupWindow {
             Layout.fillWidth: true
             implicitHeight: 28
             radius: 4
-            color: (Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.id === modelData.id) ? "#3b4252" : "transparent"
+            // Hover is part of the binding, so the highlight follows the default device
+            color: (Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.id === modelData.id) ? "#3b4252" : (sourceMouse.containsMouse ? "#20ffffff" : "transparent")
 
             RowLayout {
               anchors.fill: parent
@@ -186,12 +186,10 @@ PopupWindow {
             }
 
             MouseArea {
+              id: sourceMouse
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
-
-              onEntered: parent.color = (Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.id === modelData.id) ? "#3b4252" : "#20ffffff"
-              onExited: parent.color = (Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.id === modelData.id) ? "#3b4252" : "transparent"
 
               onClicked: {
                 // Werkt exact hetzelfde als bij luidsprekers!

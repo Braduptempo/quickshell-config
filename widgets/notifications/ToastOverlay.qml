@@ -17,6 +17,11 @@ PanelWindow {
     id: toastModel
   }
 
+  Connections {
+    target: Notifications
+    function onToast(notification) { root.showToast(notification) }
+  }
+
   function showToast(notification) {
     let incomingApp = notification.appName || "Systeem";
     let incomingSummary = notification.summary || "";
