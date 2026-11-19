@@ -1,5 +1,35 @@
 # quickshell-config
 
+## Structure
+
+| Folder | What's in it |
+|---|---|
+| `config/` | `Theme` (colours, sizes, spacing, animation timings), `Palettes` (the 12 themes), `Config` (settings from `settings.json`) |
+| `components/` | Building blocks from the design: `Button`, `IconButton`, `Toggle`, `Segmented`, `PillSlider`, `Chip`, `Kbd`, `ListRow`, `GlassPanel`, `Card`, `Label`, `Icon` |
+| `dev/` | `Gallery`: test window with every component |
+| `widgets/` | The current bar widgets (moving to the new components feature by feature) |
+
+Rules:
+- No hard-coded colours or sizes: always use `Theme`.
+- Every control is a pill: `radius: Theme.pill(height)`.
+- Animations use `Theme.anim.*`, so the speed setting and "Off" work everywhere.
+
+`settings.json` is created on first start, next to `shell.qml`. It is per machine and not in git.
+
+## Component gallery
+
+```bash
+QS_GALLERY=1 qs -p .
+```
+
+Or, with the shell already running:
+
+```bash
+qs ipc call gallery toggle
+```
+
+Theme and animation speed can be changed live at the top of the window.
+
 ## Checks
 
 Every push and every pull request into `develop` or `main` runs GitHub Actions (`.github/workflows/ci.yml`):
