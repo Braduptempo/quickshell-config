@@ -51,28 +51,35 @@ ColumnLayout {
     columnSpacing: 8
     rowSpacing: 8
 
+    // Ethernet first when the machine has a port; it carries the traffic
+    // whenever a cable is in (lowest route metric)
     Tile {
       Layout.fillWidth: true
-      visible: root.network.wifiDevices.length > 0
-      icon: Networking.wifiEnabled ? "wifi" : "wifi-off"
-      label: "Wi-Fi"
-      status: !Networking.wifiEnabled ? "Off" : root.network.activeNetwork ? root.network.activeNetwork.name : "Not connected"
-      checked: Networking.wifiEnabled
+      visible: root.network.hasWiredDevice
+      icon: "ethernet"
+      label: "Ethernet"
+      status: root.network.isWiredConnected ? "Connected" : "Unplugged"
+      statusColor: root.network.isWiredConnected ? Theme.subtext : Theme.warn
+      checked: root.network.primary === "ethernet"
       hasDetails: true
-      onToggled: Networking.wifiEnabled = !Networking.wifiEnabled
-      onDetailsRequested: Panels.quickSettingsPage = "wifi"
+      onToggled: Panels.quickSettingsPage = "network"
+      onDetailsRequested: Panels.quickSettingsPage = "network"
     }
 
     Tile {
       Layout.fillWidth: true
-      visible: root.network.wifiDevices.length === 0
-      icon: "ethernet"
-      label: "Network"
-      status: root.network.isWiredConnected ? "Ethernet" : "Offline"
-      checked: root.network.isWiredConnected
+      visible: root.network.hasWifiDevice
+      readonly property bool inStandby: Networking.wifiEnabled && root.network.activeNetwork !== null && root.network.primary !== "wifi"
+      icon: Networking.wifiEnabled ? "wifi" : "wifi-off"
+      label: "Wi-Fi"
+      status: !Networking.wifiEnabled ? "Off"
+            : !root.network.activeNetwork ? "Not connected"
+            : root.network.activeNetwork.name + (inStandby ? " · standby" : "")
+      checked: Networking.wifiEnabled
+      standby: inStandby
       hasDetails: true
-      onToggled: Panels.quickSettingsPage = "wifi"
-      onDetailsRequested: Panels.quickSettingsPage = "wifi"
+      onToggled: Networking.wifiEnabled = !Networking.wifiEnabled
+      onDetailsRequested: Panels.quickSettingsPage = "network"
     }
 
     Tile {

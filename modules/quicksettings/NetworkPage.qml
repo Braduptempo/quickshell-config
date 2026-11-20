@@ -1,5 +1,6 @@
-// WifiPage.qml
-// Wi-Fi details: toggle, current connection and nearby networks.
+// NetworkPage.qml
+// Network details: the connection in use (with IP, speeds and ping),
+// Ethernet when it is unplugged, and Wi-Fi with its networks.
 // Known networks connect with one click; new secured ones ask for a password.
 pragma ComponentBehavior: Bound
 
@@ -28,35 +29,100 @@ ColumnLayout {
 
   PageHeader {
     Layout.fillWidth: true
-    title: root.network.wifiDevices.length > 0 ? "Wi-Fi" : "Network"
-    showToggle: root.network.wifiDevices.length > 0
-    checked: Networking.wifiEnabled
-    onToggled: value => Networking.wifiEnabled = value
+    title: "Network"
   }
 
+  // --- In use: whichever connection carries the traffic ---------------------
   Label {
-    visible: root.network.isWiredConnected
-    text: "Ethernet is connected and used first"
-    kind: "muted"
-    Layout.fillWidth: true
+    visible: stats.visible
+    text: "In use"
+    kind: "label"
   }
 
   ConnectionStats {
+    id: stats
+    network: root.network
     Layout.fillWidth: true
   }
 
   Label {
-    visible: root.network.wifiDevices.length > 0 && !Networking.wifiEnabled
-    text: "Wi-Fi is off"
+    visible: root.network.primary === "none"
+    text: "No connection. IP, speed and ping show up here as soon as a cable or Wi-Fi is connected."
     kind: "muted"
-    horizontalAlignment: Text.AlignHCenter
+    wrapMode: Text.WordWrap
     Layout.fillWidth: true
-    Layout.topMargin: 8
-    Layout.bottomMargin: 8
+  }
+
+  // --- Ethernet, only when it's not the one in use ---------------------------
+  Label {
+    visible: root.network.hasWiredDevice && root.network.primary !== "ethernet"
+    text: "Ethernet"
+    kind: "label"
   }
 
   Card {
-    visible: Networking.wifiEnabled && root.sorted.length > 0
+    visible: root.network.hasWiredDevice && root.network.primary !== "ethernet"
+    Layout.fillWidth: true
+    implicitHeight: wiredRow.implicitHeight
+
+    ListRow {
+      id: wiredRow
+      width: parent.width
+      first: true
+      title: root.network.wiredName
+      subtitle: root.network.isWiredConnected ? "Connected" : "Plug in a cable to use it"
+
+      Icon {
+        name: "ethernet"
+        size: 16
+        color: Theme.subtext
+        anchors.verticalCenter: parent.verticalCenter
+      }
+
+      Chip {
+        text: root.network.isWiredConnected ? "Connected" : "Unplugged"
+        tone: root.network.isWiredConnected ? "neutral" : "warn"
+        anchors.verticalCenter: parent.verticalCenter
+      }
+    }
+  }
+
+  // --- Wi-Fi ---------------------------------------------------------------------
+  RowLayout {
+    visible: root.network.hasWifiDevice
+    Layout.fillWidth: true
+    Layout.topMargin: 4
+
+    Label {
+      text: "Wi-Fi"
+      kind: "label"
+      Layout.fillWidth: true
+    }
+
+    Toggle {
+      checked: Networking.wifiEnabled
+      accessibleName: "Wi-Fi"
+      onToggled: value => Networking.wifiEnabled = value
+    }
+  }
+
+  Label {
+    visible: root.network.hasWifiDevice && Networking.wifiEnabled && root.network.activeNetwork !== null && root.network.primary !== "wifi"
+    text: "Standby: Wi-Fi stays connected and takes over when the cable is unplugged."
+    kind: "muted"
+    wrapMode: Text.WordWrap
+    Layout.fillWidth: true
+  }
+
+  Label {
+    visible: root.network.hasWifiDevice && !Networking.wifiEnabled
+    text: "Wi-Fi is off"
+    kind: "muted"
+    Layout.fillWidth: true
+  }
+
+  Card {
+    visible: root.network.hasWifiDevice && Networking.wifiEnabled && root.sorted.length > 0
     Layout.fillWidth: true
     implicitHeight: list.implicitHeight
 
@@ -80,17 +146,18 @@ ColumnLayout {
             width: parent.width
             first: entry.index === 0
             title: entry.modelData.name
-            subtitle: entry.modelData.connected ? "Connected"
+            subtitle: entry.modelData.connected ? (root.network.primary === "wifi" ? "Connected · in use" : "Connected · standby")
                     : entry.modelData.stateChanging ? "Connecting…"
                     : entry.modelData.connectionFailed ? "Couldn't connect"
                     : entry.modelData.known ? "Saved" : entry.secured ? "Secured" : "Open"
-            subtitleColor: entry.modelData.connected ? Theme.good
+            // A connected network never shows red, even if an older attempt failed
+            subtitleColor: entry.modelData.connected ? (root.network.primary === "wifi" ? Theme.good : Theme.subtext)
                          : entry.modelData.connectionFailed ? Theme.error : Theme.subtext
 
             Icon {
               name: "wifi"
               size: 16
-              color: entry.modelData.connected ? Theme.good : Theme.text
+              color: entry.modelData.connected && root.network.primary === "wifi" ? Theme.good : Theme.text
               opacity: 0.4 + 0.6 * (entry.modelData.signalStrength ?? 0)
               anchors.verticalCenter: parent.verticalCenter
             }

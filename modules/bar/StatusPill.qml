@@ -20,8 +20,9 @@ BarItem {
   active: Panels.quickSettingsOpen && Panels.screen === screen
   accessibleName: "Quick settings. " + networkText + ", volume " + Sound.volume + " percent" + (Battery.hasBattery ? ", battery " + Battery.batteryLevel + " percent" : "")
 
-  readonly property string networkText: network.isWiredConnected ? "Ethernet"
-                                       : network.activeNetwork ? "Wi-Fi " + network.activeNetwork.name
+  // Follows the connection that carries the traffic, not just "a cable is in"
+  readonly property string networkText: network.primary === "ethernet" ? "Ethernet"
+                                       : network.primary === "wifi" ? "Wi-Fi " + (network.activeNetwork?.name ?? "")
                                        : "offline"
   readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter
   readonly property int btConnected: Bluetooth.devices.values.filter(d => d.connected).length
@@ -37,9 +38,9 @@ BarItem {
   }
 
   Icon {
-    name: network.isWiredConnected ? "ethernet" : network.activeNetwork ? "wifi" : "wifi-off"
+    name: network.primary === "ethernet" ? "ethernet" : network.primary === "wifi" ? "wifi" : "wifi-off"
     size: 15
-    color: network.isWiredConnected || network.activeNetwork ? Theme.text : Theme.subtext
+    color: network.primary !== "none" ? Theme.text : Theme.subtext
     anchors.verticalCenter: parent.verticalCenter
   }
 

@@ -12,6 +12,9 @@ Item {
   property string label
   property string status
   property bool checked: false
+  // On, but not the one in use (e.g. Wi-Fi while the cable carries traffic)
+  property bool standby: false
+  property color statusColor: Theme.subtext
   property bool hasDetails: false
 
   signal toggled()
@@ -23,10 +26,11 @@ Item {
   Rectangle {
     anchors.fill: parent
     radius: Theme.pill(height)
-    color: root.checked ? Theme.alpha(Theme.accent, 0.14)
+    color: root.checked && !root.standby ? Theme.alpha(Theme.accent, 0.14)
          : mainMouse.containsMouse ? Theme.hover(Theme.item) : Theme.item
     border.width: 1
-    border.color: root.checked ? Theme.alpha(Theme.accent, 0.5) : "transparent"
+    border.color: root.standby ? Theme.alpha(Theme.accent, 0.35)
+                : root.checked ? Theme.alpha(Theme.accent, 0.5) : "transparent"
 
     Behavior on color { ColorAnimation { duration: Theme.anim.toggle } }
     Behavior on border.color { ColorAnimation { duration: Theme.anim.toggle } }
@@ -51,7 +55,8 @@ Item {
       anchors.left: parent.left
       anchors.leftMargin: 8
       anchors.verticalCenter: parent.verticalCenter
-      color: root.checked ? Theme.accent : Theme.alpha(Theme.text, 0.08)
+      color: root.standby ? Theme.alpha(Theme.accent, 0.25)
+           : root.checked ? Theme.accent : Theme.alpha(Theme.text, 0.08)
 
       Behavior on color { ColorAnimation { duration: Theme.anim.toggle } }
 
@@ -60,7 +65,7 @@ Item {
         name: root.icon
         size: 16
         strokeWidth: 2.2
-        color: root.checked ? Theme.onAccent : Theme.text
+        color: root.standby ? Theme.accent : root.checked ? Theme.onAccent : Theme.text
       }
     }
 
@@ -80,6 +85,7 @@ Item {
       Label {
         text: root.status
         kind: "muted"
+        color: root.statusColor
         font.pixelSize: Theme.font.label
         width: parent.width
       }

@@ -100,7 +100,8 @@ PanelWindow {
         // Only the visible page exists, so detail pages stop scanning when closed
         sourceComponent: {
           switch (Panels.quickSettingsPage) {
-          case "wifi": return wifiPage;
+          case "network":
+          case "wifi": return networkPage;
           case "bluetooth": return bluetoothPage;
           case "audio": return audioPage;
           default: return mainPage;
@@ -124,7 +125,7 @@ PanelWindow {
   }
 
   Component { id: mainPage; MainPage { network: networkManager } }
-  Component { id: wifiPage; WifiPage { network: networkManager } }
+  Component { id: networkPage; NetworkPage { network: networkManager } }
   Component { id: bluetoothPage; BluetoothPage {} }
   Component { id: audioPage; AudioPage {} }
 }

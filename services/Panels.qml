@@ -11,7 +11,7 @@ Singleton {
   id: root
 
   property bool quickSettingsOpen: false
-  // "main", "wifi", "bluetooth" or "audio"
+  // "main", "network" (alias "wifi"), "bluetooth" or "audio"
   property string quickSettingsPage: "main"
   property ShellScreen screen: null
 
