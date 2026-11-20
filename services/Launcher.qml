@@ -18,6 +18,7 @@
 //   :laugh            emoji, typed into the window (wtype)
 //   ;qml              snippets from snippets/*.txt
 //   color             pick a colour from the screen (hyprpicker)
+//   clip ssh          clipboard history, pasted into the window (cliphist)
 //
 // Launch counts, favorites and hidden apps live in the shell's state folder.
 pragma Singleton
@@ -65,6 +66,11 @@ Singleton {
   Connections {
     target: LauncherTools
     function onUpdated() { root.revision++; }
+  }
+
+  Connections {
+    target: Clipboard
+    function onRevisionChanged() { if (root.open) root.revision++; }
   }
 
   // --- Stored state ---------------------------------------------------------------
@@ -203,6 +209,7 @@ Singleton {
     add(Session.caffeine ? "Turn caffeine off" : "Turn caffeine on", "Keep the screen awake", "activity", () => Session.caffeine = !Session.caffeine, "", ["awake", "idle", "sleep"]);
     if (Session.nightLightAvailable) add(Session.nightLight ? "Turn night light off" : "Turn night light on", "Display", "sun", () => Session.nightLight = !Session.nightLight, "", ["redshift", "warm", "blue light"]);
     if (LauncherTools.hasPicker) add("Pick a color", "From the screen, copies the hex code", "palette", () => LauncherTools.pickColor(), "", ["color", "colour", "hex", "picker", "hyprpicker"]);
+    if (Clipboard.available) add("Clipboard history", "Super + Shift + V", "clipboard", () => Clipboard.toggle(null), "", ["clipboard", "paste", "copied", "cliphist"]);
     add("Quick settings", "Open the panel", "settings", () => Panels.openQuickSettings(null, "main"), "", ["qs", "settings", "volume"]);
     add("Notifications", "Open the history", "bell", () => Panels.openClockPanel(null, "notifications"));
     add("Calendar", "Open the month view", "calendar", () => Panels.openClockPanel(null, "calendar"));
@@ -357,6 +364,23 @@ Singleton {
       const list = [{ key: "color:pick", section: "Color", title: "Pick a color from the screen", subtitle: "Click anywhere; the hex code is copied", icon: "palette", hint: "hyprpicker", run: () => LauncherTools.pickColor() }];
       for (const hex of LauncherTools.recentColors) {
         list.push({ key: "color:" + hex, section: "Recent colors", title: hex, subtitle: "RGB " + LauncherTools.rgb(hex), swatch: hex, icon: "palette", hint: "Copy", run: () => Quickshell.execDetached(["wl-copy", hex]) });
+      }
+      return list;
+    }
+
+    // clip <text>: clipboard history
+    if (Clipboard.available && (first === "clip" || first === "clipboard" || first === "cb")) {
+      const list = [{ key: "clip:open", section: "Clipboard", title: "Open clipboard history", subtitle: "Pins, images and previews · Super + Shift + V", icon: "clipboard", hint: "Window", run: () => Clipboard.toggle(root.screen) }];
+      for (const item of Clipboard.filtered("all", rest).slice(0, 8)) {
+        list.push({
+          key: "clip:" + item.id, section: rest === "" ? "Recent" : "Matches",
+          title: item.kind === "image" ? Clipboard.imageTitle(item) : item.preview, subtitle: Clipboard.meta(item),
+          icon: ({ text: "text", code: "code", link: "link", image: "image", color: "droplet" })[item.kind] ?? "text",
+          swatch: item.kind === "color" ? item.preview : "",
+          hint: item.pinned ? "Pinned" : "", altHint: "Enter paste · Ctrl + Enter copy",
+          run: () => Clipboard.paste(item),
+          runAlt: () => Clipboard.copy(item)
+        });
       }
       return list;
     }

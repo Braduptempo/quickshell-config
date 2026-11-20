@@ -1,6 +1,6 @@
 // Bar.qml
 // The floating pill bar from the design, on every monitor.
-// Left: workspaces and media. Centre: clock. Right: tray and status.
+// Left: workspaces and media. Centre: clock. Right: tray, clipboard and status.
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
@@ -70,6 +70,22 @@ Scope {
           Tray {
             window: panel
             anchors.verticalCenter: parent.verticalCenter
+          }
+
+          // Clipboard history
+          BarItem {
+            id: clipButton
+            visible: Clipboard.available
+            padding: 0
+            active: Clipboard.open
+            accessibleName: "Clipboard"
+            onClicked: Clipboard.toggle(panel.modelData)
+
+            Icon {
+              name: "clipboard"
+              size: 15
+              color: clipButton.active ? Theme.accent : Theme.text
+            }
           }
 
           StatusPill {

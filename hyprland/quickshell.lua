@@ -23,6 +23,8 @@ hl.layer_rule({
 hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc call quicksettings toggle"))
 hl.bind("SUPER + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("qs ipc call notifications dnd"))
+-- Clipboard history (Super + V stays "float window" from modules/keybinds.lua)
+hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("qs ipc call clipboard toggle"))
 
 -- On-screen pop-ups. Volume and microphone are picked up automatically.
 -- Brightness keys: tell the shell to re-read the level after brightnessctl.
