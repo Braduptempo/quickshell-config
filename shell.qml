@@ -16,6 +16,7 @@ import "./modules/polkit"
 import "./modules/media"
 import "./modules/capture"
 import "./modules/pickers"
+import "./modules/settings"
 import "./dev"
 
 Scope {
@@ -96,6 +97,20 @@ Scope {
     target: "media"
     function toggle(): void {
       Media.toggle(Panels.focusedScreen(), 180);
+    }
+  }
+
+  // Super + ,
+  SettingsWindow {}
+
+  // `qs ipc call settings toggle`, `open theme` (or wallpaper, font, animations, power, privacy, about)
+  IpcHandler {
+    target: "settings"
+    function toggle(): void {
+      Panels.toggleSettings(Panels.focusedScreen());
+    }
+    function open(page: string): void {
+      Panels.openSettings(Panels.focusedScreen(), page);
     }
   }
 

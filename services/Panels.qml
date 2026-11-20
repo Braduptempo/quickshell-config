@@ -89,4 +89,20 @@ Singleton {
       themePickerOpen = true;
     }
   }
+
+  // --- Settings (Super + ,) ------------------------------------------------------
+  property bool settingsOpen: false
+  property string settingsPage: "theme"
+  property ShellScreen settingsScreen: null
+
+  function openSettings(onScreen: ShellScreen, page: string): void {
+    settingsScreen = onScreen ?? focusedScreen();
+    if (page !== "") settingsPage = page;
+    settingsOpen = true;
+  }
+
+  function toggleSettings(onScreen: ShellScreen): void {
+    if (settingsOpen) settingsOpen = false;
+    else openSettings(onScreen, "");
+  }
 }
