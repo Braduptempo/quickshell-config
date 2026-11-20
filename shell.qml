@@ -2,7 +2,7 @@
 
 import Quickshell
 import Quickshell.Io
-import "."
+import "./modules/bar"
 import "./widgets/notifications"
 import "./dev"
 
