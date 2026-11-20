@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Wayland
 import "../../config"
 import "../../components"
+import "../../services"
 
 Scope {
   Variants {
@@ -27,6 +28,12 @@ Scope {
         right: true
       }
       implicitHeight: Theme.size.bar + 8
+
+      // Caffeine from quick settings: keep the screen awake
+      IdleInhibitor {
+        window: panel
+        enabled: Session.caffeine
+      }
 
       GlassPanel {
         id: bar
@@ -64,7 +71,9 @@ Scope {
             anchors.verticalCenter: parent.verticalCenter
           }
 
-          StatusPill {}
+          StatusPill {
+            screen: panel.modelData
+          }
         }
       }
     }

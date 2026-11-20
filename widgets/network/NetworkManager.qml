@@ -29,6 +29,58 @@ Item {
     return null;
   }
 
+  readonly property bool hasWiredDevice: wiredDevices.length > 0
+  readonly property bool hasWifiDevice: wifiDevices.length > 0
+  readonly property string wiredName: mainWiredDevice ? mainWiredDevice.name : ""
+  readonly property string wifiName: mainWifiDevice ? mainWifiDevice.name : ""
+
+  // Interface of the default route with the lowest metric: the connection
+  // that actually carries the traffic (e.g. enp6s0 while Wi-Fi is also up)
+  property string routeDevice: ""
+
+  // "ethernet", "wifi" or "none"
+  readonly property string primary: {
+    if (routeDevice !== "" && routeDevice === wiredName) return "ethernet";
+    if (routeDevice !== "" && routeDevice === wifiName) return "wifi";
+    // No route info yet, or a route over another interface (VPN, tether)
+    if (isWiredConnected) return "ethernet";
+    if (activeNetwork) return "wifi";
+    return "none";
+  }
+
+  Process {
+    id: routeProcess
+    command: ["ip", "-j", "route", "show", "default"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        let routes = [];
+        try {
+          routes = JSON.parse(text);
+        } catch (e) {
+          routes = [];
+        }
+        let best = null;
+        for (const r of routes) {
+          if (!best || (r.metric ?? 0) < (best.metric ?? 0)) best = r;
+        }
+        root.routeDevice = best ? best.dev : "";
+      }
+    }
+  }
+
+  // Routes change when a cable is (un)plugged or Wi-Fi connects; 5 s is enough
+  Timer {
+    interval: 5000
+    running: true
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: routeProcess.running = true
+  }
+
+  // Check right away when something visible changes
+  onIsWiredConnectedChanged: routeProcess.running = true
+  onActiveNetworkChanged: routeProcess.running = true
+
   // NIEUW: Houdt constant de sterkte van je huidige verbinding bij
   property int currentActiveSignal: 0
 

@@ -11,7 +11,8 @@ Singleton {
     // network and devices
     "wifi": "M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0M12 19h.01",
     "wifi-off": "M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0M3 3l18 18",
-    "ethernet": "M4 8h16v10H4zM8 8V5h8v3M8 18v2M16 18v2",
+    // Wired network (LAN): three linked boxes
+    "ethernet": "M9 2h6v6H9zM2 16h6v6H2zM16 16h6v6h-6zM5 16v-2a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M12 8v4",
     "bluetooth": "M7 7l10 10-5 5V2l5 5L7 17",
     "headphones": "M3 14v-2a9 9 0 0 1 18 0v2M3 14h3v6H3zM18 14h3v6h-3z",
     "monitor": "M3 4h18v12H3zM8 20h8M12 16v4",

@@ -1,12 +1,12 @@
 // StatusPill.qml
-// Network, Bluetooth, volume and battery in one pill. Until the quick
-// settings panel exists, each icon opens its existing dropdown.
-// Scroll: volume ±5%. Middle click: mute.
+// Network, Bluetooth, volume and battery in one pill. Click opens quick
+// settings on this monitor. Scroll: volume ±5%. Middle click: mute.
 import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
 import "../../config"
 import "../../components"
+import "../../services"
 import "../../widgets/network"
 import "../../widgets/sound"
 import "../../widgets/battery"
@@ -14,119 +14,64 @@ import "../../widgets/battery"
 BarItem {
   id: root
 
-  padding: 6
-  accessibleName: "Status: " + networkText + ", volume " + Sound.volume + " percent" + (Battery.hasBattery ? ", battery " + Battery.batteryLevel + " percent" : "")
-  active: networkMenu.visible || soundMenu.visible || batteryMenu.visible
+  required property ShellScreen screen
 
-  readonly property string networkText: network.isWiredConnected ? "Ethernet"
-                                       : network.activeNetwork ? "Wi-Fi " + network.activeNetwork.name
+  padding: 12
+  active: Panels.quickSettingsOpen && Panels.screen === screen
+  accessibleName: "Quick settings. " + networkText + ", volume " + Sound.volume + " percent" + (Battery.hasBattery ? ", battery " + Battery.batteryLevel + " percent" : "")
+
+  // Follows the connection that carries the traffic, not just "a cable is in"
+  readonly property string networkText: network.primary === "ethernet" ? "Ethernet"
+                                       : network.primary === "wifi" ? "Wi-Fi " + (network.activeNetwork?.name ?? "")
                                        : "offline"
   readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter
   readonly property int btConnected: Bluetooth.devices.values.filter(d => d.connected).length
 
+  onClicked: mouse => {
+    if (mouse.button === Qt.MiddleButton) Sound.toggleMute();
+    else Panels.toggleQuickSettings(root.screen);
+  }
   onScrolled: wheel => Sound.setVolume(Sound.volume / 100 + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))
-  onClicked: mouse => { if (mouse.button === Qt.MiddleButton) Sound.toggleMute(); }
 
   NetworkManager {
     id: network
   }
 
-  component Segment: Item {
-    id: seg
-    property string icon
-    property color iconColor: Theme.text
-    property bool clickable: true
-    signal activated()
-
-    width: 26
-    height: 26
+  Icon {
+    name: network.primary === "ethernet" ? "ethernet" : network.primary === "wifi" ? "wifi" : "wifi-off"
+    size: 15
+    color: network.primary !== "none" ? Theme.text : Theme.subtext
     anchors.verticalCenter: parent.verticalCenter
-
-    Rectangle {
-      anchors.fill: parent
-      radius: 13
-      color: segMouse.containsMouse && seg.clickable ? Theme.item : "transparent"
-      Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
-    }
-
-    Icon {
-      anchors.centerIn: parent
-      name: seg.icon
-      size: 15
-      color: seg.iconColor
-    }
-
-    MouseArea {
-      id: segMouse
-      anchors.fill: parent
-      hoverEnabled: true
-      enabled: seg.clickable
-      cursorShape: Qt.PointingHandCursor
-      onClicked: seg.activated()
-    }
   }
 
-  Segment {
-    id: netSeg
-    icon: network.isWiredConnected ? "ethernet" : network.activeNetwork ? "wifi" : "wifi-off"
-    iconColor: network.isWiredConnected || network.activeNetwork ? Theme.text : Theme.subtext
-    onActivated: networkMenu.visible = !networkMenu.visible
-  }
-
-  Segment {
+  Icon {
     visible: root.adapter !== null && root.adapter.enabled
-    icon: "bluetooth"
-    iconColor: root.btConnected > 0 ? Theme.accent : Theme.text
-    // Bluetooth details come with the quick settings panel
-    clickable: false
+    name: "bluetooth"
+    size: 15
+    color: root.btConnected > 0 ? Theme.accent : Theme.text
+    anchors.verticalCenter: parent.verticalCenter
   }
 
-  Segment {
-    id: soundSeg
-    icon: Sound.isMuted ? "volume-off" : Sound.volume > 60 ? "volume-high" : "volume"
-    iconColor: Sound.isMuted ? Theme.subtext : Theme.text
-    onActivated: soundMenu.visible = !soundMenu.visible
+  Icon {
+    name: Sound.isMuted ? "volume-off" : Sound.volume > 60 ? "volume-high" : "volume"
+    size: 15
+    color: Sound.isMuted ? Theme.subtext : Theme.text
+    anchors.verticalCenter: parent.verticalCenter
   }
 
-  Segment {
-    id: batterySeg
+  Icon {
+    visible: Sound.isMicMuted
+    name: "mic-off"
+    size: 15
+    color: Theme.error
+    anchors.verticalCenter: parent.verticalCenter
+  }
+
+  Icon {
     visible: Battery.hasBattery
-    icon: "battery"
-    iconColor: Battery.charging ? Theme.good : Battery.batteryLevel <= 15 ? Theme.error : Theme.text
-    onActivated: batteryMenu.visible = !batteryMenu.visible
-  }
-
-  NetworkDropdown {
-    id: networkMenu
-    visible: false
-    networkData: network
-    anchor.item: netSeg
-    anchor.rect.width: netSeg.width
-    anchor.rect.height: netSeg.height
-    anchor.edges: Edges.Bottom | Edges.Right
-    anchor.gravity: Edges.Bottom | Edges.Left
-    anchor.margins.top: 14
-  }
-
-  SoundDropdown {
-    id: soundMenu
-    visible: false
-    anchor.item: soundSeg
-    anchor.rect.width: soundSeg.width
-    anchor.rect.height: soundSeg.height
-    anchor.edges: Edges.Bottom | Edges.Right
-    anchor.gravity: Edges.Bottom | Edges.Left
-    anchor.margins.top: 14
-  }
-
-  BatteryDropdown {
-    id: batteryMenu
-    visible: false
-    anchor.item: batterySeg
-    anchor.rect.width: batterySeg.width
-    anchor.rect.height: batterySeg.height
-    anchor.edges: Edges.Bottom | Edges.Right
-    anchor.gravity: Edges.Bottom | Edges.Left
-    anchor.margins.top: 14
+    name: "battery"
+    size: 15
+    color: Battery.charging ? Theme.good : Battery.batteryLevel <= 15 ? Theme.error : Theme.text
+    anchors.verticalCenter: parent.verticalCenter
   }
 }

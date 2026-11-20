@@ -22,4 +22,8 @@ PING=$(echo "$PING_RES" | grep -oP 'time=\K[\d.]+' || echo "0")
 LOSS=$(echo "$PING_RES" | grep -oP '\d+(?=% packet loss)' || echo "100")
 
 # Stuur alles inclusief de all_signals array naar QML
-echo "{\"connected\": true, \"ip\":\"$IP\", \"gw\":\"$GW\", \"rx\":$RX, \"tx\":$TX, \"ping\":$PING, \"loss\":$LOSS, \"all_signals\":{$SIGNALS_JSON}}"
+# Link speed in Mbit/s (Ethernet; Wi-Fi reports nothing here)
+SPEED=$(cat "/sys/class/net/$IFACE/speed" 2>/dev/null || echo 0)
+case "$SPEED" in ''|*[!0-9]*) SPEED=0 ;; esac
+
+echo "{\"connected\": true, \"iface\":\"$IFACE\", \"speed\":$SPEED, \"ip\":\"$IP\", \"gw\":\"$GW\", \"rx\":$RX, \"tx\":$TX, \"ping\":$PING, \"loss\":$LOSS, \"all_signals\":{$SIGNALS_JSON}}"
