@@ -1,5 +1,5 @@
 // MediaPill.qml
-// What's playing. Only visible while a player is active.
+// What's playing: title · artist. Only visible while a player is active.
 // Click: the media menu. Middle click: play/pause. Right click: next.
 // Scroll: the player's volume. Follows the player chosen in the media menu.
 import QtQuick
@@ -46,6 +46,16 @@ BarItem {
   Label {
     text: root.player ? root.player.trackTitle : ""
     width: Math.min(implicitWidth, 220)
+    elide: Text.ElideRight
+    anchors.verticalCenter: parent.verticalCenter
+  }
+
+  // The artist (or channel), dimmer, when the player tells it
+  Label {
+    visible: text !== ""
+    text: root.player ? root.player.trackArtist : ""
+    kind: "muted"
+    width: Math.min(implicitWidth, 160)
     elide: Text.ElideRight
     anchors.verticalCenter: parent.verticalCenter
   }
