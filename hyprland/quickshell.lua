@@ -30,3 +30,8 @@ hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("sleep 0.05; qs ipc call osd brig
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("sleep 0.05; qs ipc call osd brightness"), { locked = true, repeating = true, non_consuming = true })
 -- Caps Lock has no event; this bind doesn't swallow the key
 hl.bind("Caps_Lock", hl.dsp.exec_cmd("qs ipc call osd caps"), { non_consuming = true })
+
+-- Launcher: takes Super + Space over from the menu in modules/keybinds.lua
+-- (this file is loaded after it). Remove these two lines to get rofi back.
+hl.unbind("SUPER + space")
+hl.bind("SUPER + space", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
