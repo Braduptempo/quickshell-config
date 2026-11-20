@@ -29,13 +29,13 @@ PanelWindow {
     { key: "network", label: "Network & Bluetooth", icon: "wifi", group: "System", soon: "Saved networks and devices. Quick settings handles connecting for now." },
     { key: "notifications", label: "Notifications", icon: "bell", group: "System" },
     { key: "calendars", label: "Calendars", icon: "calendar", group: "System", soon: "Syncing online calendars into the clock panel." },
-    { key: "displays", label: "Displays", icon: "monitor", group: "System", soon: "Resolution, scale and arrangement of your monitors." },
+    { key: "displays", label: "Displays", icon: "monitor", group: "System" },
     { key: "nightlight", label: "Night light", icon: "moon", group: "System" },
     { key: "input", label: "Keyboard & mouse", icon: "keyboard", group: "System", soon: "Layouts, repeat rate and pointer speed." },
     { key: "power", label: "Power & idle", icon: "power", group: "System" },
     { key: "privacy", label: "Privacy & lock", icon: "shield", group: "System" },
     { key: "keybinds", label: "Keybinds", icon: "keyboard", group: "System" },
-    { key: "apps", label: "Default apps", icon: "window", group: "System", soon: "Browser, terminal, file manager and editor." },
+    { key: "apps", label: "Default apps", icon: "window", group: "System" },
     { key: "about", label: "About", icon: "info", group: "System" }
   ]
   readonly property var current: sections.find(s => s.key === Panels.settingsPage) ?? sections[0]
@@ -202,6 +202,8 @@ PanelWindow {
             case "notifications": return notificationsPage;
             case "nightlight": return nightLightPage;
             case "keybinds": return keybindsPage;
+            case "displays": return displaysPage;
+            case "apps": return appsPage;
             case "power": return powerPage;
             case "privacy": return privacyPage;
             case "about": return aboutPage;
@@ -264,6 +266,8 @@ PanelWindow {
   Component { id: notificationsPage; NotificationsPage {} }
   Component { id: nightLightPage; NightLightPage {} }
   Component { id: keybindsPage; KeybindsPage {} }
+  Component { id: displaysPage; DisplaysPage {} }
+  Component { id: appsPage; DefaultAppsPage {} }
   Component { id: powerPage; PowerPage {} }
   Component { id: privacyPage; PrivacyPage {} }
   Component { id: aboutPage; AboutPage {} }

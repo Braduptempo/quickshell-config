@@ -44,7 +44,7 @@ SettingsPage {
   SettingRow {
     visible: Quickshell.screens.length > 1
     title: "Other monitors"
-    subtitle: "The first monitor (" + (Quickshell.screens[0]?.name ?? "") + ") always has the full bar. Light: workspaces and the clock."
+    subtitle: "The main monitor (" + (Config.displays.primary || Quickshell.screens[0]?.name || "") + ", set in Displays) always has the full bar. Light: workspaces and the clock."
     Segmented {
       model: ["Full bar", "Light bar", "No bar"]
       currentIndex: Math.max(0, ["full", "light", "none"].indexOf(Config.bar.otherMonitors))

@@ -158,6 +158,6 @@ SettingsPage {
     Button { text: "Reload shell"; variant: "ghost"; onClicked: Quickshell.reload(false) }
     Button { text: "Copy system info"; variant: "ghost"; onClicked: Quickshell.execDetached(["wl-copy", page.systemInfo()]) }
     Button { text: "Open config folder"; variant: "ghost"; onClicked: Qt.openUrlExternally("file://" + page.folder) }
-    Button { text: "Show logs"; variant: "ghost"; onClicked: Quickshell.execDetached(["sh", "-c", "kitty -e qs log -p \"$1\" -f", "sh", page.folder]) }
+    Button { text: "Show logs"; variant: "ghost"; onClicked: DefaultApps.inTerminal("qs log -p \"$1\" -f", [page.folder]) }
   }
 }

@@ -42,6 +42,16 @@ Singleton {
     property string otherMonitors: "full"
   }
 
+  component DisplaySettings: JsonObject {
+    // The monitor with the full bar; "" = the first one
+    property string primary: ""
+  }
+
+  component AppSettings: JsonObject {
+    // What the shell opens files and folders in a terminal with
+    property string terminal: "kitty"
+  }
+
   component NightLightSettings: JsonObject {
     // Kelvin while on: lower is warmer
     property int temperature: 4000
@@ -86,6 +96,8 @@ Singleton {
   property alias lock: adapter.lock
   property alias notifications: adapter.notifications
   property alias nightLight: adapter.nightLight
+  property alias displays: adapter.displays
+  property alias apps: adapter.apps
 
   FileView {
     id: file
@@ -112,6 +124,10 @@ Singleton {
       property NotificationSettings notifications: NotificationSettings {}
 
       property NightLightSettings nightLight: NightLightSettings {}
+
+      property DisplaySettings displays: DisplaySettings {}
+
+      property AppSettings apps: AppSettings {}
     }
   }
 }

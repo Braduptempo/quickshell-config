@@ -12,6 +12,7 @@ import Quickshell
 import Quickshell.Io
 import "../../config"
 import "../../components"
+import "../../services"
 
 SettingsPage {
   id: page
@@ -197,13 +198,13 @@ SettingsPage {
       text: "Your keybinds"
       variant: "ghost"
       size: Theme.size.buttonList
-      onClicked: Quickshell.execDetached(["sh", "-c", "kitty -e \"${EDITOR:-nvim}\" \"$1\"", "sh", page.hyprDir + "/modules/keybinds.lua"])
+      onClicked: DefaultApps.inTerminal("${EDITOR:-nvim} \"$1\"", [page.hyprDir + "/modules/keybinds.lua"])
     }
     Button {
       text: "Shell keybinds"
       variant: "ghost"
       size: Theme.size.buttonList
-      onClicked: Quickshell.execDetached(["sh", "-c", "kitty -e \"${EDITOR:-nvim}\" \"$1\"", "sh", page.shellFile])
+      onClicked: DefaultApps.inTerminal("${EDITOR:-nvim} \"$1\"", [page.shellFile])
     }
   }
 

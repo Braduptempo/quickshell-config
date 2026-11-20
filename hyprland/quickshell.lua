@@ -63,3 +63,8 @@ hl.bind("Caps_Lock", hl.dsp.exec_cmd("qs ipc call osd caps"), { non_consuming = 
 -- (this file is loaded after it). Remove these two lines to get rofi back.
 hl.unbind("SUPER + space")
 hl.bind("SUPER + space", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
+
+-- Monitor settings made in Settings → Displays (per machine, not in git).
+-- Loaded last, so they win over modules/monitors.lua; delete the file to
+-- go back to your own.
+pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/monitors.lua")

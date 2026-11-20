@@ -315,7 +315,7 @@ Singleton {
       key: "script:" + s.path, section: "Scripts", icon: "arrow-right", hint: "Script",
       title: s.name, subtitle: s.file,
       run: () => Quickshell.execDetached(["sh", "-c", "cd \"$1\" && \"$2\"", "sh", root.scriptsDir, s.path]),
-      runAlt: () => Quickshell.execDetached(["sh", "-c", "kitty -e \"${EDITOR:-nvim}\" \"$1\"", "sh", s.path]),
+      runAlt: () => DefaultApps.inTerminal("${EDITOR:-nvim} \"$1\"", [s.path]),
       altHint: "Ctrl + Enter: edit"
     }));
   }
@@ -356,7 +356,7 @@ Singleton {
         key: "snip:" + sn.path, section: "Snippets", title: sn.name, subtitle: LauncherTools.hasWtype ? "Typed into your window and copied" : "Copied",
         icon: "clipboard", hint: "Snippet", altHint: "Ctrl + Enter: edit",
         run: () => LauncherTools.typeFile(sn.path),
-        runAlt: () => Quickshell.execDetached(["sh", "-c", "kitty -e \"${EDITOR:-nvim}\" \"$1\"", "sh", sn.path])
+        runAlt: () => DefaultApps.inTerminal("${EDITOR:-nvim} \"$1\"", [sn.path])
       }));
     }
 
