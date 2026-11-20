@@ -49,6 +49,11 @@ PanelWindow {
   // --- What to watch -----------------------------------------------------------
   function showVolume(): void {
     if (quiet) return;
+    // A short click, when chosen in Settings → Sound (at most a few per second)
+    if (Config.sound.feedback && !clickThrottle.running) {
+      Quickshell.execDetached(["sh", "-c", "canberra-gtk-play -i audio-volume-change 2>/dev/null || pw-play /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga 2>/dev/null"]);
+      clickThrottle.restart();
+    }
     Osd.show({
       icon: Sound.isMuted ? "volume-off" : Sound.volume > 60 ? "volume-high" : "volume",
       title: Sound.isMuted ? "Muted" : "Volume",
@@ -56,6 +61,11 @@ PanelWindow {
       valueText: Sound.isMuted ? "" : Sound.volume + "%",
       tone: Sound.isMuted ? "error" : "accent"
     });
+  }
+
+  Timer {
+    id: clickThrottle
+    interval: 150
   }
 
   Connections {
