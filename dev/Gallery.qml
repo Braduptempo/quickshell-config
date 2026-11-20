@@ -170,8 +170,8 @@ FloatingWindow {
             anchors.margins: 18
             spacing: 12
             Label { text: "Sliders"; kind: "title" }
-            PillSlider { Layout.fillWidth: true; icon: "volume"; label: "Volume"; value: 0.45 }
-            PillSlider { Layout.fillWidth: true; icon: "sun"; label: "Brightness"; value: 0.7; fillColor: Theme.warn }
+            PillSlider { Layout.fillWidth: true; icon: "volume"; label: "Volume"; value: 0.45; onMoved: v => value = v }
+            PillSlider { Layout.fillWidth: true; icon: "sun"; label: "Brightness"; value: 0.7; fillColor: Theme.warn; onMoved: v => value = v }
             PillSlider {
               Layout.fillWidth: true
               icon: "settings"
