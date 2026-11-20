@@ -7,6 +7,7 @@ import "./modules/quicksettings"
 import "./services"
 import "./modules/notifications"
 import "./modules/clockpanel"
+import "./modules/osd"
 import "./dev"
 
 Scope {
@@ -17,6 +18,9 @@ Scope {
   Toasts {}
 
   ClockPanel {}
+
+  // Volume, microphone, brightness, keyboard layout and Caps Lock pop-up
+  OsdWindow {}
 
   // `qs ipc call notifications toggle` (Super + N), `dnd`, `clear`
   IpcHandler {
