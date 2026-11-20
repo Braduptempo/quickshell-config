@@ -1,6 +1,8 @@
 // Segmented.qml
 // One choice out of a few, as pills in a track. The selection slides over.
 // model: list of labels. Emits activated(index) when the user picks one.
+// It doesn't change currentIndex itself: bind currentIndex to your state and
+// update that state in onActivated, so the two can never disagree.
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -19,21 +21,21 @@ Item {
   readonly property real itemWidth: model.length > 0 ? (width - 6 - (model.length - 1) * 3) / model.length : 0
 
   implicitHeight: itemHeight + 6
-  implicitWidth: measure.implicitWidth
+  // Every segment as wide as the widest label, so a longer one
+  // ("Notifications · 12") never runs out of its pill
+  implicitWidth: model.length > 0 ? 6 + model.length * measure.implicitWidth + (model.length - 1) * 3 : 0
 
   Accessible.role: Accessible.Grouping
   Accessible.name: accessibleName
 
-  // Natural width: widest label + padding, for every segment
-  Row {
+  // Widest label + padding (a Column is as wide as its widest child);
+  // bold, because the selected label is bold
+  Column {
     id: measure
     visible: false
-    spacing: 3
-    leftPadding: 3
-    rightPadding: 3
     Repeater {
       model: root.model
-      Label { required property string modelData; text: modelData; kind: "small"; leftPadding: 14; rightPadding: 14 }
+      Label { required property string modelData; text: modelData; kind: "small"; font.weight: Font.Bold; leftPadding: 14; rightPadding: 14 }
     }
   }
 
@@ -88,10 +90,7 @@ Item {
         MouseArea {
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
-          onClicked: {
-            root.currentIndex = segment.index;
-            root.activated(segment.index);
-          }
+          onClicked: root.activated(segment.index)
         }
       }
     }
