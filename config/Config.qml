@@ -137,12 +137,27 @@ Singleton {
   property alias weather: adapter.weather
   property alias apps: adapter.apps
 
+  property double lastWrite: 0
+
+  Timer {
+    id: writeDelay
+    interval: 60
+    onTriggered: {
+      root.lastWrite = Date.now();
+      file.writeAdapter();
+    }
+  }
+
   FileView {
     id: file
     path: Quickshell.shellPath("settings.json")
     watchChanges: true
-    onFileChanged: reload()
-    onAdapterUpdated: writeAdapter()
+    // Edits by hand are picked up; our own writes are not read back, or a
+    // reload in the middle of setting several values (place, latitude,
+    // longitude) would undo the ones set after the first write
+    onFileChanged: if (Date.now() - root.lastWrite > 1000) reload()
+    // Several changes in a row become one write
+    onAdapterUpdated: writeDelay.restart()
     onLoadFailed: error => {
       // First start: write the defaults so there is a file to edit
       if (error === FileViewError.FileNotFound) writeAdapter();

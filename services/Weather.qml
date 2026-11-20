@@ -17,7 +17,8 @@ import "../config"
 Singleton {
   id: root
 
-  readonly property bool configured: Config.weather.place !== ""
+  // A place, with coordinates (0, 0 is in the ocean: never a real choice)
+  readonly property bool configured: Config.weather.place !== "" && Config.weather.latitude !== 0 && Config.weather.longitude !== 0
   readonly property bool fahrenheit: Config.weather.units === "fahrenheit"
   property var current: null
   property var days: []
@@ -197,9 +198,10 @@ Singleton {
   }
 
   function choose(place: var): void {
-    Config.weather.place = place.name + (place.detail ? ", " + place.detail.split(", ").pop() : "");
+    // Coordinates first: the place name is what turns the weather on
     Config.weather.latitude = place.latitude;
     Config.weather.longitude = place.longitude;
+    Config.weather.place = place.name + (place.detail ? ", " + place.detail.split(", ").pop() : "");
     places = [];
   }
 }
