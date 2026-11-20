@@ -69,6 +69,11 @@ Scope {
           anchors.verticalCenter: parent.verticalCenter
           spacing: 6
 
+          // While recording
+          RecordingPill {
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
           Tray {
             window: panel
             anchors.verticalCenter: parent.verticalCenter

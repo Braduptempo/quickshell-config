@@ -215,6 +215,9 @@ Singleton {
     add("Calendar", "Open the month view", "calendar", () => Panels.openClockPanel(null, "calendar"));
     add("Reload shell", "Restart Quickshell, apps stay open", "restart", () => Quickshell.reload(false), "", ["restart shell", "quickshell"]);
     add("Show hidden apps again", state.hidden.length + " hidden", "image", () => { state.hidden = []; root.revision++; });
+    add("Screenshot", "Print · choose an area, window or screen", "photo", () => Capture.toggle(null), "", ["screenshot", "capture", "print", "snip"]);
+    if (Capture.hasRecorder && !Capture.recording) add("Record screen", "Choose what to record", "record", () => { Capture.mode = "record"; Capture.toggle(null); }, "", ["record", "video", "screencast"]);
+    if (Capture.recording) add("Stop recording", Capture.elapsedText + " recorded", "stop", () => Capture.stop(), "", ["stop", "record"]);
     add("Power menu", "Super + Esc", "power", () => Power.toggle(null), "", ["power", "shutdown", "reboot", "logout"]);
     if (Power.scheduled) add("Cancel scheduled " + (Power.action(Power.scheduledId)?.label ?? "").toLowerCase(), "At " + Power.scheduledTime, "close", () => Power.cancelSchedule(), "", ["cancel", "power"]);
     add("Lock screen", "Super + L", "lock", () => Lock.lock(), "", ["lock", "away"]);

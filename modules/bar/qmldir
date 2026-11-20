@@ -5,3 +5,4 @@ MediaPill 1.0 MediaPill.qml
 StatusPill 1.0 StatusPill.qml
 Tray 1.0 Tray.qml
 Workspaces 1.0 Workspaces.qml
+RecordingPill 1.0 RecordingPill.qml
