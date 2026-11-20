@@ -92,6 +92,21 @@ Scope {
   // Below the media pill
   MediaMenu {}
 
+  // Under the privacy, updates and drives pills
+  ExtrasMenu {}
+
+  // `qs ipc call extras open privacy|updates|drives`, `check` (updates now)
+  IpcHandler {
+    target: "extras"
+    function open(kind: string): void {
+      const screen = Panels.focusedScreen();
+      Panels.toggleExtras(kind, screen, screen ? screen.width - 200 : 1700);
+    }
+    function check(): void {
+      Updates.check();
+    }
+  }
+
   // `qs ipc call media toggle`
   IpcHandler {
     target: "media"

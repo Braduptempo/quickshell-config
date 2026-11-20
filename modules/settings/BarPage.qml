@@ -18,6 +18,9 @@ SettingsPage {
     Config.bar.collapseTray = true;
     Config.bar.showDate = false;
     Config.bar.otherMonitors = "full";
+    Config.bar.showPrivacy = true;
+    Config.bar.showUpdates = true;
+    Config.bar.showDrives = true;
   }
 
   SettingRow {
@@ -74,6 +77,21 @@ SettingsPage {
     title: "Tray behind an arrow"
     subtitle: "App icons stay hidden until you click the arrow. Off: always shown."
     Toggle { checked: Config.bar.collapseTray; accessibleName: "Tray behind an arrow"; onToggled: value => Config.bar.collapseTray = value }
+  }
+  SettingRow {
+    title: "Privacy"
+    subtitle: "A red pill while an app uses the microphone, camera or your screen."
+    Toggle { checked: Config.bar.showPrivacy; accessibleName: "Privacy"; onToggled: value => Config.bar.showPrivacy = value }
+  }
+  SettingRow {
+    title: "Updates"
+    subtitle: "How many package updates are waiting (pacman and AUR), checked every hour."
+    Toggle { checked: Config.bar.showUpdates; accessibleName: "Updates"; onToggled: value => Config.bar.showUpdates = value }
+  }
+  SettingRow {
+    title: "Drives"
+    subtitle: "USB sticks and other removable drives, to open and eject."
+    Toggle { checked: Config.bar.showDrives; accessibleName: "Drives"; onToggled: value => Config.bar.showDrives = value }
   }
   SettingRow {
     title: "Date next to the clock"

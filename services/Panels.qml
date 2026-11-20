@@ -105,4 +105,23 @@ Singleton {
     if (settingsOpen) settingsOpen = false;
     else openSettings(onScreen, "");
   }
+
+  // --- Bar extras menu: "privacy", "updates" or "drives" ---------------------------
+  property string extrasMenu: ""
+  property ShellScreen extrasScreen: null
+  // Right edge of the pill that opened it
+  property real extrasRight: 0
+  property double extrasClosedAt: 0
+
+  onExtrasMenuChanged: if (extrasMenu === "") extrasClosedAt = Date.now()
+
+  function toggleExtras(kind: string, onScreen: ShellScreen, right: real): void {
+    if (extrasMenu === kind) {
+      extrasMenu = "";
+    } else if (extrasMenu !== "" || Date.now() - extrasClosedAt > 250) {
+      extrasScreen = onScreen;
+      extrasRight = right;
+      extrasMenu = kind;
+    }
+  }
 }
