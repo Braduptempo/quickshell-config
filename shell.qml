@@ -16,6 +16,7 @@ import "./modules/polkit"
 import "./modules/media"
 import "./modules/capture"
 import "./modules/pickers"
+import "./modules/windows"
 import "./modules/settings"
 import "./dev"
 
@@ -112,6 +113,30 @@ Scope {
     target: "media"
     function toggle(): void {
       Media.toggle(Panels.focusedScreen(), 180);
+    }
+  }
+
+  // Alt + Tab and Super + Tab
+  WindowSwitcher {}
+  Overview {}
+
+  // `qs ipc call windows next|previous|commit|cancel` (Alt + Tab), `overview` (Super + Tab)
+  IpcHandler {
+    target: "windows"
+    function next(): void {
+      Windows.switcherStep(1);
+    }
+    function previous(): void {
+      Windows.switcherStep(-1);
+    }
+    function commit(): void {
+      Windows.switcherCommit();
+    }
+    function cancel(): void {
+      Windows.switcherCancel();
+    }
+    function overview(): void {
+      Windows.toggleOverview(Panels.focusedScreen());
     }
   }
 
