@@ -210,6 +210,7 @@ Singleton {
     if (Session.nightLightAvailable) add(Session.nightLight ? "Turn night light off" : "Turn night light on", "Display", "sun", () => Session.nightLight = !Session.nightLight, "", ["redshift", "warm", "blue light"]);
     if (LauncherTools.hasPicker) add("Pick a color", "From the screen, copies the hex code", "palette", () => LauncherTools.pickColor(), "", ["color", "colour", "hex", "picker", "hyprpicker"]);
     if (Clipboard.available) add("Clipboard history", "Super + Shift + V", "clipboard", () => Clipboard.toggle(null), "", ["clipboard", "paste", "copied", "cliphist"]);
+    add("System monitor", "CPU, GPU, memory, disk, network, processes", "activity", () => Panels.openQuickSettings(null, "system"), "", ["system", "monitor", "cpu", "ram", "memory", "gpu", "task manager", "htop", "temperature"]);
     add("Quick settings", "Open the panel", "settings", () => Panels.openQuickSettings(null, "main"), "", ["qs", "settings", "volume"]);
     add("Notifications", "Open the history", "bell", () => Panels.openClockPanel(null, "notifications"));
     add("Calendar", "Open the month view", "calendar", () => Panels.openClockPanel(null, "calendar"));

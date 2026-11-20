@@ -104,6 +104,7 @@ PanelWindow {
           case "wifi": return networkPage;
           case "bluetooth": return bluetoothPage;
           case "audio": return audioPage;
+          case "system": return systemPage;
           default: return mainPage;
           }
         }
@@ -128,4 +129,5 @@ PanelWindow {
   Component { id: networkPage; NetworkPage { network: networkManager } }
   Component { id: bluetoothPage; BluetoothPage {} }
   Component { id: audioPage; AudioPage {} }
+  Component { id: systemPage; SystemPage {} }
 }
