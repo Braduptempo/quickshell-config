@@ -162,6 +162,8 @@ ColumnLayout {
     label: "Brightness"
     fillColor: Theme.warn
     value: Session.brightness
+    // brightnessctl runs on every step
+    throttle: 60
     onMoved: v => Session.setBrightness(v)
   }
 

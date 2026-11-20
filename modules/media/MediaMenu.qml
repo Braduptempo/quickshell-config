@@ -381,6 +381,8 @@ PanelWindow {
         icon: "volume"
         label: Media.nameOf(window.player)
         value: window.player?.volume ?? 0
+        // Players apply volume over D-Bus; too many steps make the sound stutter
+        throttle: 80
         onMoved: value => window.player.volume = value
       }
 
