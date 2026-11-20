@@ -44,6 +44,9 @@ hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs ipc call capture shot screen"))
 -- toolbar, Super + Ctrl + R stops a recording
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs ipc call capture toggle"))
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("qs ipc call capture stop"))
+-- Theme and wallpaper pickers
+hl.bind("SUPER + T", hl.dsp.exec_cmd("qs ipc call pickers theme"))
+hl.bind("SUPER + W", hl.dsp.exec_cmd("qs ipc call pickers wallpaper"))
 -- Clipboard history (Super + V stays "float window" from modules/keybinds.lua)
 hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("qs ipc call clipboard toggle"))
 

@@ -29,6 +29,7 @@ import Quickshell.Io
 import Quickshell.Bluetooth
 import Quickshell.Networking
 import Quickshell.Hyprland
+import "../config"
 
 Singleton {
   id: root
@@ -210,6 +211,9 @@ Singleton {
     if (Session.nightLightAvailable) add(Session.nightLight ? "Turn night light off" : "Turn night light on", "Display", "sun", () => Session.nightLight = !Session.nightLight, "", ["redshift", "warm", "blue light"]);
     if (LauncherTools.hasPicker) add("Pick a color", "From the screen, copies the hex code", "palette", () => LauncherTools.pickColor(), "", ["color", "colour", "hex", "picker", "hyprpicker"]);
     if (Clipboard.available) add("Clipboard history", "Super + Shift + V", "clipboard", () => Clipboard.toggle(null), "", ["clipboard", "paste", "copied", "cliphist"]);
+    add("Change theme", "Super + T · " + Config.appearance.theme, "palette", () => Panels.toggleThemePicker(null), "", ["theme", "colors", "colours", "dark", "light"]);
+    add("Change wallpaper", "Super + W", "image", () => Wallpapers.toggle(null), "", ["wallpaper", "background"]);
+    if (Wallpapers.items.length > 1) add("Random wallpaper", "From ~/Pictures/wallpapers", "shuffle", () => Wallpapers.set(Wallpapers.random()), "", ["random", "wallpaper", "shuffle"]);
     add("System monitor", "CPU, GPU, memory, disk, network, processes", "activity", () => Panels.openQuickSettings(null, "system"), "", ["system", "monitor", "cpu", "ram", "memory", "gpu", "task manager", "htop", "temperature"]);
     add("Quick settings", "Open the panel", "settings", () => Panels.openQuickSettings(null, "main"), "", ["qs", "settings", "volume"]);
     add("Notifications", "Open the history", "bell", () => Panels.openClockPanel(null, "notifications"));

@@ -13,3 +13,4 @@ singleton Polkit 1.0 Polkit.qml
 singleton Media 1.0 Media.qml
 singleton Capture 1.0 Capture.qml
 singleton SystemStats 1.0 SystemStats.qml
+singleton Wallpapers 1.0 Wallpapers.qml
