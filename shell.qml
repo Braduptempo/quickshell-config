@@ -14,6 +14,7 @@ import "./modules/lock"
 import "./modules/power"
 import "./modules/polkit"
 import "./modules/media"
+import "./modules/capture"
 import "./dev"
 
 Scope {
@@ -94,6 +95,29 @@ Scope {
     target: "media"
     function toggle(): void {
       Media.toggle(Panels.focusedScreen(), 180);
+    }
+  }
+
+  // Print: screenshot and recording toolbar
+  CaptureToolbar {}
+
+  // `qs ipc call capture toggle`, `shot region|window|screen`, `record …`, `stop`, `pause`
+  IpcHandler {
+    target: "capture"
+    function toggle(): void {
+      Capture.toggle(Panels.focusedScreen());
+    }
+    function shot(what: string): void {
+      Capture.shoot(what);
+    }
+    function record(what: string): void {
+      Capture.record(what);
+    }
+    function stop(): void {
+      Capture.stop();
+    }
+    function pause(): void {
+      Capture.pause();
     }
   }
 
