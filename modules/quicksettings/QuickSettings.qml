@@ -28,12 +28,17 @@ PanelWindow {
   exclusionMode: ExclusionMode.Normal
   exclusiveZone: 0
 
+  // Opens from the bar: at the top, or at the bottom when the bar is there
+  readonly property bool fromBottom: Config.bar.position === "bottom"
+
   anchors {
-    top: true
+    top: !window.fromBottom
+    bottom: window.fromBottom
     right: true
   }
   margins {
     top: 6
+    bottom: 6
     right: 8
   }
   implicitWidth: 390 + 24
@@ -56,12 +61,12 @@ PanelWindow {
     width: 390
     implicitHeight: pages.implicitHeight + 28
     height: implicitHeight
-    transformOrigin: Item.TopRight
+    transformOrigin: window.fromBottom ? Item.BottomRight : Item.TopRight
     focus: true
 
     // Open: slide / fade / scale from Config; close a bit faster
     opacity: window.shown ? 1 : 0
-    y: 12 + (window.shown || window.style !== "slide" ? 0 : -14)
+    y: 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
     scale: window.shown || window.style !== "scale" ? 1 : 0.92
 
     Behavior on opacity {

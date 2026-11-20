@@ -1,5 +1,6 @@
 // ClockPill.qml
-// Centre of the bar. Red dot = unread notifications, moon = Do not disturb.
+// Centre of the bar. Red dot = unread notifications, moon = Do not disturb
+// (also while the daily quiet hours are on).
 // Click: calendar (or the notifications, when there are unread ones).
 // Right click: Do not disturb. Middle click: clear all notifications.
 import QtQuick
@@ -17,7 +18,7 @@ BarItem {
   active: Panels.clockPanelOpen && Panels.clockScreen === screen
   accessibleName: "Clock " + Time.time
                   + (Notifications.unread > 0 ? ", " + Notifications.unread + " unread notifications" : "")
-                  + (Notifications.dnd ? ", do not disturb" : "")
+                  + (Notifications.quiet ? ", do not disturb" : "")
                   + (Power.scheduled ? ", " + (Power.action(Power.scheduledId)?.label ?? "") + " at " + Power.scheduledTime : "")
 
   onClicked: mouse => {
@@ -28,6 +29,15 @@ BarItem {
     } else {
       Panels.toggleClockPanel(root.screen, Notifications.unread > 0 ? "notifications" : "calendar");
     }
+  }
+
+  // "Fri 20 Nov", when chosen in Settings → Bar & panels
+  Label {
+    visible: Config.bar.showDate
+    text: Qt.formatDateTime(Time.date, "ddd d MMM")
+    color: Theme.subtext
+    font.pixelSize: Theme.font.body
+    anchors.verticalCenter: parent.verticalCenter
   }
 
   Label {
@@ -46,8 +56,9 @@ BarItem {
     Label { text: Power.scheduledTime; color: Theme.warn; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
   }
 
+  // Do not disturb, by hand or by the schedule
   Icon {
-    visible: Notifications.dnd
+    visible: Notifications.quiet
     name: "moon"
     size: 13
     color: Theme.subtext
@@ -55,7 +66,7 @@ BarItem {
   }
 
   Rectangle {
-    visible: Notifications.unread > 0 && !Notifications.dnd
+    visible: Notifications.unread > 0 && !Notifications.quiet
     width: 7
     height: 7
     radius: 4

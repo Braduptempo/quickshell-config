@@ -9,3 +9,5 @@ PowerPage 1.0 PowerPage.qml
 PrivacyPage 1.0 PrivacyPage.qml
 AboutPage 1.0 AboutPage.qml
 SoonPage 1.0 SoonPage.qml
+BarPage 1.0 BarPage.qml
+NotificationsPage 1.0 NotificationsPage.qml

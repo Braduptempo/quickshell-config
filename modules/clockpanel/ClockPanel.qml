@@ -31,9 +31,14 @@ PanelWindow {
   exclusionMode: ExclusionMode.Normal
   exclusiveZone: 0
 
-  // Only anchored to the top: the compositor centres it under the clock
-  anchors.top: true
+  // Only anchored to the top (or bottom): the compositor centres it under the clock
+  // Opens from the bar: at the top, or at the bottom when the bar is there
+  readonly property bool fromBottom: Config.bar.position === "bottom"
+
+  anchors.top: !window.fromBottom
+  anchors.bottom: window.fromBottom
   margins.top: 6
+  margins.bottom: 6
   implicitWidth: 720 + 24
   implicitHeight: card.implicitHeight + 24
 
@@ -53,10 +58,10 @@ PanelWindow {
     implicitHeight: content.implicitHeight + 32
     height: implicitHeight
     focus: true
-    transformOrigin: Item.Top
+    transformOrigin: window.fromBottom ? Item.Bottom : Item.Top
 
     opacity: window.shown ? 1 : 0
-    y: 12 + (window.shown || window.style !== "slide" ? 0 : -14)
+    y: 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
     scale: window.shown || window.style !== "scale" ? 1 : 0.94
 
     Behavior on opacity {

@@ -1,21 +1,34 @@
 // Bar.qml
-// The floating pill bar from the design, on every monitor.
-// Left: workspaces and media. Centre: clock. Right: tray, clipboard and status.
+// The bar, on every monitor (see Config.bar and Settings → Bar & panels).
+// Left: workspaces, window title, media. Centre: clock. Right: tray,
+// clipboard and status. At the top or bottom, as a floating pill or attached
+// to the edge. Other monitors can get the full bar, a light one (workspaces
+// and clock) or none.
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "../../config"
 import "../../components"
 import "../../services"
 
 Scope {
+  id: root
+
+  readonly property bool bottom: Config.bar.position === "bottom"
+  readonly property bool attached: Config.bar.style === "attached"
+
   Variants {
-    model: Quickshell.screens
+    // The first monitor always has a bar; the others unless set to "none"
+    model: Quickshell.screens.filter((s, i) => i === 0 || Config.bar.otherMonitors !== "none")
 
     PanelWindow {
       id: panel
 
       required property ShellScreen modelData
+      readonly property bool light: modelData !== Quickshell.screens[0] && Config.bar.otherMonitors === "light"
 
       screen: modelData
       color: "transparent"
@@ -23,11 +36,12 @@ Scope {
       WlrLayershell.namespace: "quickshell-bar"
 
       anchors {
-        top: true
+        top: !root.bottom
+        bottom: root.bottom
         left: true
         right: true
       }
-      implicitHeight: Theme.size.bar + 8
+      implicitHeight: Theme.size.bar + (root.attached ? 0 : 8)
 
       // Caffeine from quick settings: keep the screen awake
       IdleInhibitor {
@@ -38,10 +52,11 @@ Scope {
       GlassPanel {
         id: bar
         anchors.fill: parent
-        anchors.topMargin: 8
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
-        radius: Theme.pill(height)
+        anchors.topMargin: root.attached || root.bottom ? 0 : 8
+        anchors.bottomMargin: root.attached || !root.bottom ? 0 : 8
+        anchors.leftMargin: root.attached ? 0 : 8
+        anchors.rightMargin: root.attached ? 0 : 8
+        radius: root.attached ? 0 : Theme.pill(height)
 
         Row {
           anchors.left: parent.left
@@ -53,8 +68,26 @@ Scope {
             screen: panel.modelData
           }
 
+          // What the focused window is called
+          BarItem {
+            id: titleItem
+            readonly property string title: Hyprland.activeToplevel?.title ?? ""
+            visible: Config.bar.showWindowTitle && !panel.light && title !== ""
+            flat: true
+            accessibleName: "Window: " + title
+
+            Label {
+              text: titleItem.title
+              kind: "muted"
+              width: Math.min(implicitWidth, 300)
+              elide: Text.ElideRight
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
+
           MediaPill {
             screen: panel.modelData
+            visible: Config.bar.showMedia && !panel.light && player !== null && player.trackTitle !== ""
           }
         }
 
@@ -64,6 +97,7 @@ Scope {
         }
 
         Row {
+          visible: !panel.light
           anchors.right: parent.right
           anchors.rightMargin: 7
           anchors.verticalCenter: parent.verticalCenter
@@ -82,7 +116,7 @@ Scope {
           // Clipboard history
           BarItem {
             id: clipButton
-            visible: Clipboard.available
+            visible: Clipboard.available && Config.bar.showClipboard
             padding: 0
             active: Clipboard.open
             accessibleName: "Clipboard"

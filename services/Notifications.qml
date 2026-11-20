@@ -7,6 +7,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import "../config"
 
 Singleton {
   id: root
@@ -14,6 +15,31 @@ Singleton {
   // Do not disturb: everything still goes into the history, but only
   // critical notifications pop up
   property bool dnd: false
+  // Do not disturb by hand, or the daily quiet hours from Settings
+  readonly property bool quiet: dnd || inQuietHours
+  readonly property bool inQuietHours: {
+    const from = Config.notifications.quietFrom, to = Config.notifications.quietTo;
+    if (from === "" || to === "") return false;
+    const toMinutes = t => {
+      const m = t.match(/^(\d{1,2}):(\d{2})$/);
+      return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : -1;
+    };
+    const a = toMinutes(from), b = toMinutes(to);
+    if (a < 0 || b < 0 || a === b) return false;
+    const d = Time.date;
+    const now = d.getHours() * 60 + d.getMinutes();
+    // "22:00" to "07:00" runs over midnight
+    return a < b ? now >= a && now < b : now >= a || now < b;
+  }
+
+  function isMuted(app: string): bool {
+    return Config.notifications.mutedApps.indexOf(app) >= 0;
+  }
+
+  function setMuted(app: string, muted: bool): void {
+    const list = Config.notifications.mutedApps.filter(a => a !== app);
+    Config.notifications.mutedApps = muted ? list.concat([app]) : list;
+  }
 
   // Red dot on the clock until the history is opened
   property int unread: 0
@@ -98,7 +124,20 @@ Singleton {
       root.receivedAt = times;
       root.unread++;
 
-      const show = !root.dnd || n.urgency === NotificationUrgency.Critical;
+      // Remember the app, for the per-app list in Settings
+      const app = n.appName || "Unknown app";
+      if (Config.notifications.knownApps.indexOf(app) < 0) {
+        Config.notifications.knownApps = Config.notifications.knownApps.concat([app]).sort((a, b) => a.localeCompare(b));
+      }
+
+      // Critical always gets through; the rest only with pop-ups on, not
+      // muted, and outside do not disturb
+      const critical = n.urgency === NotificationUrgency.Critical;
+      const show = critical || (Config.notifications.popups && !root.isMuted(app) && !root.quiet);
+      if (show && Config.notifications.sound) {
+        Quickshell.execDetached(["sh", "-c", "canberra-gtk-play -i \"$1\" 2>/dev/null || pw-play /usr/share/sounds/freedesktop/stereo/message.oga 2>/dev/null",
+                                 "sh", critical ? "dialog-warning" : "message-new-instant"]);
+      }
       // A replaced notification (same id) moves back to the top
       if (show) root.popups = [n].concat(root.popups.filter(p => p !== n));
 

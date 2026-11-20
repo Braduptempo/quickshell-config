@@ -33,12 +33,17 @@ PanelWindow {
   exclusionMode: ExclusionMode.Normal
   exclusiveZone: 0
 
+  // Opens from the bar: at the top, or at the bottom when the bar is there
+  readonly property bool fromBottom: Config.bar.position === "bottom"
+
   anchors {
-    top: true
+    top: !window.fromBottom
+    bottom: window.fromBottom
     left: true
   }
   margins {
     top: 6
+    bottom: 6
     left: Math.max(0, Media.anchorX - 12)
   }
   implicitWidth: 400 + 24
@@ -73,12 +78,12 @@ PanelWindow {
     width: 400
     implicitHeight: column.implicitHeight + 24
     height: implicitHeight
-    transformOrigin: Item.TopLeft
+    transformOrigin: window.fromBottom ? Item.BottomLeft : Item.TopLeft
     focus: true
     clip: true
 
     opacity: window.shown ? 1 : 0
-    y: 12 + (window.shown || window.style !== "slide" ? 0 : -14)
+    y: 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
     scale: window.shown || window.style !== "scale" ? 1 : 0.92
 
     Behavior on opacity { NumberAnimation { duration: window.shown ? Theme.anim.panelIn : Theme.anim.panelOut; easing.type: Easing.BezierSpline; easing.bezierCurve: window.shown ? Theme.anim.emphasized : Theme.anim.accelerate } }

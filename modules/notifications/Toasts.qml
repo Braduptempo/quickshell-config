@@ -1,7 +1,9 @@
 // Toasts.qml
-// Notification pop-ups at the top right, under the bar. More than one
-// stacks into a pile; hover the pile to fan it out. Critical notifications
-// sit on top and stay until you dismiss them. Hovering pauses the timers.
+// Notification pop-ups, top right by default (Settings → Notifications:
+// top right, top centre or bottom right). More than one stacks into a pile
+// (unless stacking is off); hover the pile to fan it out. Critical
+// notifications sit on top and stay until you dismiss them. Hovering pauses
+// the timers.
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -17,7 +19,8 @@ PanelWindow {
 
   readonly property var critical: Notifications.popups.filter(n => n.urgency === NotificationUrgency.Critical)
   readonly property var normal: Notifications.popups.filter(n => n.urgency !== NotificationUrgency.Critical)
-  readonly property bool expanded: hover.hovered || normal.length <= 1
+  readonly property bool expanded: hover.hovered || normal.length <= 1 || !Config.notifications.stack
+  readonly property string position: Config.notifications.position
 
   screen: Panels.focusedScreen()
   visible: Notifications.popups.length > 0
@@ -29,11 +32,14 @@ PanelWindow {
   exclusiveZone: 0
 
   anchors {
-    top: true
-    right: true
+    top: window.position !== "bottom-right"
+    bottom: window.position === "bottom-right"
+    // Top centre: no side anchor, the compositor centres it
+    right: window.position !== "top-center"
   }
   margins {
     top: 6
+    bottom: 6
     right: 8
   }
   implicitWidth: 380 + 24
@@ -121,9 +127,10 @@ PanelWindow {
           }
         }
 
-        // 5 s on screen (or the app's own timeout); paused while hovered
+        // Settings → Notifications (5 s by default), or the app's own timeout;
+        // paused while hovered
         Timer {
-          interval: slot.modelData.expireTimeout > 0 ? slot.modelData.expireTimeout * 1000 : 5000
+          interval: slot.modelData.expireTimeout > 0 ? slot.modelData.expireTimeout * 1000 : Config.notifications.duration * 1000
           running: !hover.hovered
           onTriggered: Notifications.hidePopup(slot.modelData)
         }
