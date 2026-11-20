@@ -42,6 +42,17 @@ Singleton {
     property string otherMonitors: "full"
   }
 
+  component NightLightSettings: JsonObject {
+    // Kelvin while on: lower is warmer
+    property int temperature: 4000
+    // "manual" (quick settings only) or "custom" (on and off at these times)
+    property string schedule: "manual"
+    property string from: "20:00"
+    property string to: "07:00"
+    // Real colours in screen recordings
+    property bool pauseWhileRecording: true
+  }
+
   component NotificationSettings: JsonObject {
     property bool popups: true
     // Several pop-ups fold into one pile
@@ -74,6 +85,7 @@ Singleton {
   property alias bar: adapter.bar
   property alias lock: adapter.lock
   property alias notifications: adapter.notifications
+  property alias nightLight: adapter.nightLight
 
   FileView {
     id: file
@@ -98,6 +110,8 @@ Singleton {
       property LockSettings lock: LockSettings {}
 
       property NotificationSettings notifications: NotificationSettings {}
+
+      property NightLightSettings nightLight: NightLightSettings {}
     }
   }
 }

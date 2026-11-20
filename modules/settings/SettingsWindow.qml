@@ -30,11 +30,11 @@ PanelWindow {
     { key: "notifications", label: "Notifications", icon: "bell", group: "System" },
     { key: "calendars", label: "Calendars", icon: "calendar", group: "System", soon: "Syncing online calendars into the clock panel." },
     { key: "displays", label: "Displays", icon: "monitor", group: "System", soon: "Resolution, scale and arrangement of your monitors." },
-    { key: "nightlight", label: "Night light", icon: "moon", group: "System", soon: "Schedule and colour temperature. Quick settings can turn it on already." },
+    { key: "nightlight", label: "Night light", icon: "moon", group: "System" },
     { key: "input", label: "Keyboard & mouse", icon: "keyboard", group: "System", soon: "Layouts, repeat rate and pointer speed." },
     { key: "power", label: "Power & idle", icon: "power", group: "System" },
     { key: "privacy", label: "Privacy & lock", icon: "shield", group: "System" },
-    { key: "keybinds", label: "Keybinds", icon: "keyboard", group: "System", soon: "A list of every shortcut, and changing them." },
+    { key: "keybinds", label: "Keybinds", icon: "keyboard", group: "System" },
     { key: "apps", label: "Default apps", icon: "window", group: "System", soon: "Browser, terminal, file manager and editor." },
     { key: "about", label: "About", icon: "info", group: "System" }
   ]
@@ -200,6 +200,8 @@ PanelWindow {
             case "animations": return animationsPage;
             case "bar": return barPage;
             case "notifications": return notificationsPage;
+            case "nightlight": return nightLightPage;
+            case "keybinds": return keybindsPage;
             case "power": return powerPage;
             case "privacy": return privacyPage;
             case "about": return aboutPage;
@@ -260,6 +262,8 @@ PanelWindow {
   Component { id: animationsPage; AnimationsPage {} }
   Component { id: barPage; BarPage {} }
   Component { id: notificationsPage; NotificationsPage {} }
+  Component { id: nightLightPage; NightLightPage {} }
+  Component { id: keybindsPage; KeybindsPage {} }
   Component { id: powerPage; PowerPage {} }
   Component { id: privacyPage; PrivacyPage {} }
   Component { id: aboutPage; AboutPage {} }
