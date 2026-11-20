@@ -38,6 +38,7 @@ while read -r first _ third fourth; do
 done < qmldir
 
 # --- 2. qmllint --------------------------------------------------------------
+# Tracked and new (untracked, not ignored) files, so a local run sees what CI will see
 echo "== qmllint"
 warnings=0
 while IFS= read -r file; do
@@ -55,7 +56,7 @@ while IFS= read -r file; do
   fi
   count="$(echo "$out" | grep -c '^Warning:' || true)"
   warnings=$((warnings + count))
-done < <(git ls-files '*.qml')
+done < <(git ls-files --cached --others --exclude-standard '*.qml')
 
 echo "qmllint warnings: $warnings"
 
@@ -74,7 +75,7 @@ fi
 # --- 3. shell scripts ---------------------------------------------------------
 echo "== shellcheck"
 if command -v shellcheck >/dev/null; then
-  mapfile -t scripts < <(git ls-files '*.sh')
+  mapfile -t scripts < <(git ls-files --cached --others --exclude-standard '*.sh')
   if [ ${#scripts[@]} -gt 0 ] && ! shellcheck -S warning "${scripts[@]}"; then
     fail "shellcheck found problems"
   fi

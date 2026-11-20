@@ -10,6 +10,7 @@ import "./modules/clockpanel"
 import "./modules/osd"
 import "./modules/launcher"
 import "./modules/clipboard"
+import "./modules/lock"
 import "./dev"
 
 Scope {
@@ -35,6 +36,36 @@ Scope {
     // `qs ipc call launcher search "2*21"` opens with that text already typed
     function search(text: string): void {
       Launcher.openWith(Panels.focusedScreen(), text);
+    }
+  }
+
+  // Super + L, and after Config.lock.idleMinutes without input
+  LockScreen {}
+
+  // `qs ipc call lock lock`; `preview` shows it without locking (development)
+  IpcHandler {
+    target: "lock"
+    function lock(): void {
+      Lock.lock();
+    }
+    function suspend(): void {
+      Lock.suspend();
+    }
+    function preview(): void {
+      Lock.showPreview();
+    }
+    // Only with QS_LOCK_TEST=1, for testing the real lock
+    function unlock(): void {
+      if (Lock.testMode) Lock.locked = false;
+    }
+    // Preview only: type text into the field, then try it
+    function previewType(text: string): void {
+      if (!Lock.preview) return;
+      Lock.wake();
+      Lock.typed = text;
+    }
+    function previewSubmit(): void {
+      if (Lock.preview) Lock.submit(Lock.typed);
     }
   }
 
