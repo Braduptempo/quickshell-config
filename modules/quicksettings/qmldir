@@ -6,3 +6,4 @@ NetworkPage 1.0 NetworkPage.qml
 PageHeader 1.0 PageHeader.qml
 QuickSettings 1.0 QuickSettings.qml
 Tile 1.0 Tile.qml
+SystemPage 1.0 SystemPage.qml

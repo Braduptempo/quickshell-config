@@ -167,6 +167,49 @@ ColumnLayout {
     onMoved: v => Session.setBrightness(v)
   }
 
+  // --- System: a one-line summary, opens the system monitor ---------------------
+  Rectangle {
+    Layout.fillWidth: true
+    implicitHeight: 40
+    radius: Theme.pill(height)
+    color: systemMouse.containsMouse ? Theme.hover(Theme.item) : Theme.item
+
+    Accessible.role: Accessible.Button
+    Accessible.name: "System monitor. CPU " + Math.round(SystemStats.cpu * 100) + " percent, memory " + SystemStats.bytes(SystemStats.memUsed)
+
+    RowLayout {
+      anchors.fill: parent
+      anchors.leftMargin: 14
+      anchors.rightMargin: 10
+      spacing: 14
+
+      Icon { name: "activity"; size: 15; color: Theme.accent }
+      Label { text: "CPU " + Math.round(SystemStats.cpu * 100) + "%"; font.pixelSize: Theme.font.small }
+      Label {
+        visible: SystemStats.gpuKind !== ""
+        text: "GPU " + Math.round(SystemStats.gpu * 100) + "%"
+        font.pixelSize: Theme.font.small
+      }
+      Label { text: "RAM " + SystemStats.bytes(SystemStats.memUsed); font.pixelSize: Theme.font.small }
+      Label {
+        visible: SystemStats.cpuTemp >= 0
+        text: Math.round(SystemStats.cpuTemp) + "°C"
+        color: SystemStats.cpuTemp >= 80 ? Theme.error : SystemStats.cpuTemp >= 65 ? Theme.warn : Theme.subtext
+        font.pixelSize: Theme.font.small
+      }
+      Item { Layout.fillWidth: true }
+      Icon { name: "chevron-right"; size: 14; color: Theme.subtext }
+    }
+
+    MouseArea {
+      id: systemMouse
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+      onClicked: Panels.quickSettingsPage = "system"
+    }
+  }
+
   // --- Power profile -----------------------------------------------------------
   Segmented {
     Layout.fillWidth: true
