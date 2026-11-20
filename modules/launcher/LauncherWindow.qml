@@ -332,6 +332,7 @@ PanelWindow {
                 text: row.modelData.title
                 font.weight: Font.Bold
                 font.pixelSize: row.modelData.big ? Theme.font.title + 4 : Theme.font.body
+                elide: Text.ElideRight
                 Layout.fillWidth: true
               }
               Label {
@@ -392,7 +393,7 @@ PanelWindow {
         Row { spacing: 6; Kbd { text: "Ctrl + K" } Label { text: "actions"; kind: "muted"; anchors.verticalCenter: parent.verticalCenter } }
         Item { Layout.fillWidth: true }
         Label {
-          text: ": emoji · ; snippets · / files · yt · kill · >"
+          text: ": emoji · ; snippets · / files · clip · kill · >"
           kind: "muted"
         }
       }

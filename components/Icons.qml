@@ -52,6 +52,12 @@ Singleton {
     "image": "M3 5h18v14H3zM21 16l-5-5-9 8",
     "folder": "M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z",
     "file": "M6 2h8l5 5v15H6zM14 2v5h5",
+    "text": "M4 6h16M4 12h16M4 18h10",
+    "link": "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
+    "code": "M8 7l-5 5 5 5M16 7l5 5-5 5",
+    "droplet": "M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z",
+    "pin": "M12 17v5M9 3h6l-1 7 4 3H6l4-3z",
+    "trash": "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
     // generic
     "chevron-left": "M15 6l-6 6 6 6",
     "chevron-right": "M9 6l6 6-6 6",

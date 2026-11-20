@@ -6,3 +6,4 @@ singleton Osd 1.0 Osd.qml
 singleton Panels 1.0 Panels.qml
 singleton Session 1.0 Session.qml
 singleton Time 1.0 Time.qml
+singleton Clipboard 1.0 Clipboard.qml

@@ -9,6 +9,7 @@ import "./modules/notifications"
 import "./modules/clockpanel"
 import "./modules/osd"
 import "./modules/launcher"
+import "./modules/clipboard"
 import "./dev"
 
 Scope {
@@ -34,6 +35,17 @@ Scope {
     // `qs ipc call launcher search "2*21"` opens with that text already typed
     function search(text: string): void {
       Launcher.openWith(Panels.focusedScreen(), text);
+    }
+  }
+
+  // Super + Shift + V
+  ClipboardWindow {}
+
+  // `qs ipc call clipboard toggle`
+  IpcHandler {
+    target: "clipboard"
+    function toggle(): void {
+      Clipboard.toggle(Panels.focusedScreen());
     }
   }
 
