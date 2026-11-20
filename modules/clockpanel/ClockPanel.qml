@@ -132,7 +132,44 @@ PanelWindow {
             kind: "section"
           }
 
+          readonly property var dayEvents: Calendar.eventsOn(month.selected)
+
+          // That day's events
+          Repeater {
+            model: parent.dayEvents
+
+            Rectangle {
+              id: eventRow
+              required property var modelData
+              Layout.fillWidth: true
+              implicitHeight: eventColumn.implicitHeight + 18
+              radius: Theme.radiusCard
+              color: Theme.item
+
+              Rectangle { x: 8; y: 9; width: 4; height: parent.height - 18; radius: 2; color: eventRow.modelData.color }
+
+              ColumnLayout {
+                id: eventColumn
+                x: 22
+                y: 9
+                width: parent.width - 32
+                spacing: 2
+                Label { text: eventRow.modelData.title; font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
+                Label {
+                  text: (eventRow.modelData.allDay ? "All day" : Qt.formatDateTime(new Date(eventRow.modelData.start), "HH:mm") + " – " + Qt.formatDateTime(new Date(eventRow.modelData.end), "HH:mm"))
+                      + (eventRow.modelData.location !== "" ? " · " + eventRow.modelData.location : "")
+                  kind: "muted"
+                  font.pixelSize: Theme.font.small
+                  elide: Text.ElideRight
+                  Layout.fillWidth: true
+                }
+                Label { text: eventRow.modelData.calendar; color: eventRow.modelData.color; font.pixelSize: Theme.font.label }
+              }
+            }
+          }
+
           Card {
+            visible: parent.dayEvents.length === 0
             Layout.fillWidth: true
             implicitHeight: noEvents.implicitHeight + 32
 
@@ -154,11 +191,22 @@ PanelWindow {
                 Layout.fillWidth: true
               }
               Label {
-                text: "Calendars you connect will show their events here."
+                text: Config.calendar.sources.length === 0 ? "Add a calendar in Settings → Calendars and its events show here." : "Nothing on this day."
                 kind: "muted"
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
                 Layout.fillWidth: true
+              }
+              Button {
+                visible: Config.calendar.sources.length === 0
+                Layout.alignment: Qt.AlignHCenter
+                text: "Add a calendar"
+                variant: "ghost"
+                size: Theme.size.buttonRow
+                onClicked: {
+                  Panels.closeClockPanel();
+                  Panels.openSettings(null, "calendars");
+                }
               }
             }
           }

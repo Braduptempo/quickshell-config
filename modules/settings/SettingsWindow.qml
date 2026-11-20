@@ -26,9 +26,9 @@ PanelWindow {
     { key: "bar", label: "Bar & panels", icon: "window", group: "Appearance" },
     { key: "animations", label: "Animations", icon: "activity", group: "Appearance" },
     { key: "sound", label: "Sound", icon: "volume", group: "System" },
-    { key: "network", label: "Network & Bluetooth", icon: "wifi", group: "System", soon: "Saved networks and devices. Quick settings handles connecting for now." },
+    { key: "network", label: "Network & Bluetooth", icon: "wifi", group: "System" },
     { key: "notifications", label: "Notifications", icon: "bell", group: "System" },
-    { key: "calendars", label: "Calendars", icon: "calendar", group: "System", soon: "Syncing online calendars into the clock panel." },
+    { key: "calendars", label: "Calendars", icon: "calendar", group: "System" },
     { key: "displays", label: "Displays", icon: "monitor", group: "System" },
     { key: "nightlight", label: "Night light", icon: "moon", group: "System" },
     { key: "input", label: "Keyboard & mouse", icon: "keyboard", group: "System" },
@@ -204,6 +204,8 @@ PanelWindow {
             case "keybinds": return keybindsPage;
             case "displays": return displaysPage;
             case "sound": return soundPage;
+            case "network": return networkPage;
+            case "calendars": return calendarsPage;
             case "input": return inputPage;
             case "apps": return appsPage;
             case "power": return powerPage;
@@ -270,6 +272,8 @@ PanelWindow {
   Component { id: keybindsPage; KeybindsPage {} }
   Component { id: displaysPage; DisplaysPage {} }
   Component { id: soundPage; SoundPage {} }
+  Component { id: networkPage; NetworkSettingsPage {} }
+  Component { id: calendarsPage; CalendarsPage {} }
   Component { id: inputPage; InputPage {} }
   Component { id: appsPage; DefaultAppsPage {} }
   Component { id: powerPage; PowerPage {} }
