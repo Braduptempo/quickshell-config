@@ -40,6 +40,10 @@ hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs ipc call power toggle"))
 hl.bind("Print", hl.dsp.exec_cmd("qs ipc call capture toggle"))
 hl.bind("SHIFT + Print", hl.dsp.exec_cmd("qs ipc call capture shot region"))
 hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs ipc call capture shot screen"))
+-- For keyboards without Print (75% and smaller): Super + Shift + R opens the
+-- toolbar, Super + Ctrl + R stops a recording
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs ipc call capture toggle"))
+hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("qs ipc call capture stop"))
 -- Clipboard history (Super + V stays "float window" from modules/keybinds.lua)
 hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("qs ipc call clipboard toggle"))
 

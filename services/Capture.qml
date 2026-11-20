@@ -2,7 +2,7 @@
 // Screenshots and screen recording. The work is done by scripts/capture.sh
 // (grim + slurp, gpu-screen-recorder); this keeps the toolbar's choices and
 // follows a running recording.
-//   Capture.toggle(screen)    the toolbar (Print)
+//   Capture.toggle(screen)    the toolbar (Print, or Super + Shift + R)
 //   Capture.shoot("region")   a screenshot with the saved options
 //   Capture.stop() / pause()  the recording
 // A recording keeps running when the shell reloads: its state is a file in

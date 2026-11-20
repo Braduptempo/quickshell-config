@@ -1,5 +1,6 @@
 // CaptureToolbar.qml
-// The capture toolbar at the bottom of the screen (Print): what to capture,
+// The capture toolbar at the bottom of the screen (Print, or Super + Shift + R
+// on keyboards without Print): what to capture,
 // screenshot or recording, a few options, and go.
 //   R W S        region, window, screen       Tab     screenshot / record
 //   Enter        capture / start recording    Esc     close
