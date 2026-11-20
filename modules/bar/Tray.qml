@@ -15,14 +15,17 @@ Row {
   id: root
 
   required property QsWindow window
+  // Settings → Bar & panels: icons hidden behind the arrow, or always shown
+  readonly property bool collapsible: Config.bar.collapseTray
   property bool expanded: false
+  readonly property bool showIcons: expanded || !collapsible
 
   spacing: 6
   visible: SystemTray.items.values.length > 0
 
   BarItem {
     id: icons
-    visible: root.expanded
+    visible: root.showIcons
     padding: 6
 
     Repeater {
@@ -69,6 +72,7 @@ Row {
   }
 
   BarItem {
+    visible: root.collapsible
     flat: true
     padding: 0
     accessibleName: root.expanded ? "Collapse system tray" : "Expand system tray"

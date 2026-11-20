@@ -23,11 +23,11 @@ PanelWindow {
     { key: "theme", label: "Theme", icon: "palette", group: "Appearance" },
     { key: "wallpaper", label: "Wallpaper", icon: "image", group: "Appearance" },
     { key: "font", label: "Font", icon: "text", group: "Appearance" },
-    { key: "bar", label: "Bar & panels", icon: "window", group: "Appearance", soon: "Bar position, style and which pills show." },
+    { key: "bar", label: "Bar & panels", icon: "window", group: "Appearance" },
     { key: "animations", label: "Animations", icon: "activity", group: "Appearance" },
     { key: "sound", label: "Sound", icon: "volume", group: "System", soon: "Devices, per-app volume and sounds. Quick settings has the volume sliders already." },
     { key: "network", label: "Network & Bluetooth", icon: "wifi", group: "System", soon: "Saved networks and devices. Quick settings handles connecting for now." },
-    { key: "notifications", label: "Notifications", icon: "bell", group: "System", soon: "Per-app rules, sounds and how long pop-ups stay." },
+    { key: "notifications", label: "Notifications", icon: "bell", group: "System" },
     { key: "calendars", label: "Calendars", icon: "calendar", group: "System", soon: "Syncing online calendars into the clock panel." },
     { key: "displays", label: "Displays", icon: "monitor", group: "System", soon: "Resolution, scale and arrangement of your monitors." },
     { key: "nightlight", label: "Night light", icon: "moon", group: "System", soon: "Schedule and colour temperature. Quick settings can turn it on already." },
@@ -198,6 +198,8 @@ PanelWindow {
             case "wallpaper": return wallpaperPage;
             case "font": return fontPage;
             case "animations": return animationsPage;
+            case "bar": return barPage;
+            case "notifications": return notificationsPage;
             case "power": return powerPage;
             case "privacy": return privacyPage;
             case "about": return aboutPage;
@@ -256,6 +258,8 @@ PanelWindow {
   Component { id: wallpaperPage; WallpaperPage {} }
   Component { id: fontPage; FontPage {} }
   Component { id: animationsPage; AnimationsPage {} }
+  Component { id: barPage; BarPage {} }
+  Component { id: notificationsPage; NotificationsPage {} }
   Component { id: powerPage; PowerPage {} }
   Component { id: privacyPage; PrivacyPage {} }
   Component { id: aboutPage; AboutPage {} }

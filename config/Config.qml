@@ -28,8 +28,36 @@ Singleton {
   }
 
   component BarSettings: JsonObject {
+    // "top" or "bottom"
     property string position: "top"
+    // "floating" (a pill with a gap) or "attached" (edge to edge)
     property string style: "floating"
+    property bool showMedia: true
+    property bool showWindowTitle: false
+    property bool showClipboard: true
+    // Tray icons hidden behind an arrow until clicked
+    property bool collapseTray: true
+    property bool showDate: false
+    // Monitors other than the first: "full", "light" (workspaces and clock) or "none"
+    property string otherMonitors: "full"
+  }
+
+  component NotificationSettings: JsonObject {
+    property bool popups: true
+    // Several pop-ups fold into one pile
+    property bool stack: true
+    // "top-right", "top-center" or "bottom-right"
+    property string position: "top-right"
+    // Seconds a pop-up stays when the app doesn't say
+    property int duration: 5
+    property bool sound: false
+    // Do not disturb every day between these times ("22:00", "07:00"); "" = off
+    property string quietFrom: ""
+    property string quietTo: ""
+    // Apps whose pop-ups are hidden (they still land in the clock panel)
+    property var mutedApps: []
+    // Apps that sent something, so the settings can list them
+    property var knownApps: []
   }
 
   component LockSettings: JsonObject {
@@ -45,6 +73,7 @@ Singleton {
   property alias animations: adapter.animations
   property alias bar: adapter.bar
   property alias lock: adapter.lock
+  property alias notifications: adapter.notifications
 
   FileView {
     id: file
@@ -67,6 +96,8 @@ Singleton {
       property BarSettings bar: BarSettings {}
 
       property LockSettings lock: LockSettings {}
+
+      property NotificationSettings notifications: NotificationSettings {}
     }
   }
 }
