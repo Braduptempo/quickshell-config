@@ -12,6 +12,7 @@ import "./modules/launcher"
 import "./modules/clipboard"
 import "./modules/lock"
 import "./modules/power"
+import "./modules/polkit"
 import "./dev"
 
 Scope {
@@ -67,6 +68,20 @@ Scope {
     }
     function previewSubmit(): void {
       if (Lock.preview) Lock.submit(Lock.typed);
+    }
+  }
+
+  // Password prompt when an app needs administrator rights (polkit agent)
+  PolkitDialog {}
+
+  // `qs ipc call polkit preview` (development), `cancel`
+  IpcHandler {
+    target: "polkit"
+    function preview(): void {
+      Polkit.showPreview();
+    }
+    function cancel(): void {
+      Polkit.cancel();
     }
   }
 
