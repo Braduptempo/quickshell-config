@@ -57,6 +57,7 @@ Scope {
         }
 
         ClockPill {
+          screen: panel.modelData
           anchors.centerIn: parent
         }
 

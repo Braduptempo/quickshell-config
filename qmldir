@@ -1,8 +1,6 @@
 module MijnSysteem
 
 
-# widgets/clock
-Time 1.0 widgets/clock/Time.qml
 
 # widgets/battery
 singleton Battery 1.0 widgets/battery/Battery.qml
@@ -13,11 +11,3 @@ singleton Sound 1.0 widgets/sound/Sound.qml
 
 # widgets/network
 NetworkManager 1.0 widgets/network/NetworkManager.qml
-
-
-# widgets/notifications
-singleton Notifications 1.0 widgets/notifications/Notifications.qml
-NotificationDropdown 1.0 widgets/notifications/NotificationDropdown.qml
-NotificationCard 1.0 widgets/notifications/NotificationCard.qml
-ToastOverlay 1.0 widgets/notifications/ToastOverlay.qml
-ToastCard 1.0 widgets/notifications/ToastCard.qml

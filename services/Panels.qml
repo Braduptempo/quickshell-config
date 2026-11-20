@@ -46,4 +46,31 @@ Singleton {
       openQuickSettings(onScreen, "main");
     }
   }
+
+  // --- Clock panel (calendar + notifications) ------------------------------
+  property bool clockPanelOpen: false
+  // "calendar" or "notifications"
+  property string clockTab: "calendar"
+  property ShellScreen clockScreen: null
+  property double clockClosedAt: 0
+
+  function openClockPanel(onScreen: ShellScreen, tab: string): void {
+    clockScreen = onScreen ?? focusedScreen();
+    clockTab = tab !== "" ? tab : "calendar";
+    clockPanelOpen = true;
+  }
+
+  function closeClockPanel(): void {
+    if (!clockPanelOpen) return;
+    clockPanelOpen = false;
+    clockClosedAt = Date.now();
+  }
+
+  function toggleClockPanel(onScreen: ShellScreen, tab: string): void {
+    if (clockPanelOpen) {
+      closeClockPanel();
+    } else if (Date.now() - clockClosedAt > 250) {
+      openClockPanel(onScreen, tab);
+    }
+  }
 }
