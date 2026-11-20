@@ -8,6 +8,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../config"
 
 Singleton {
   id: root
@@ -16,9 +17,13 @@ Singleton {
   property bool caffeine: false
 
   // --- Night light (hyprsunset) ---------------------------------------------
+  // Turned on by hand (quick settings) or by the schedule in Settings →
+  // Night light; paused during a screen recording when that's chosen.
   property bool nightLightAvailable: false
   property bool nightLight: false
-  property int nightLightTemperature: 4000
+  readonly property int nightLightTemperature: Config.nightLight.temperature
+  readonly property bool nightLightPaused: Config.nightLight.pauseWhileRecording && Capture.recording
+  readonly property bool nightLightActive: nightLightAvailable && nightLight && !nightLightPaused
 
   Process {
     command: ["sh", "-c", "command -v hyprsunset"]
@@ -27,10 +32,44 @@ Singleton {
   }
 
   Process {
+    id: sunset
     // Runs while night light is on; stopping it restores normal colours
     command: ["hyprsunset", "-t", String(root.nightLightTemperature)]
-    running: root.nightLightAvailable && root.nightLight
+    running: root.nightLightActive
   }
+
+  // A new temperature: start hyprsunset again with it
+  onNightLightTemperatureChanged: if (nightLightActive) sunsetRestart.restart()
+
+  Timer {
+    id: sunsetRestart
+    interval: 250
+    onTriggered: {
+      sunset.running = false;
+      sunset.running = Qt.binding(() => root.nightLightActive);
+    }
+  }
+
+  // "20:00" -> minutes after midnight, or -1
+  function minutesOf(text: string): int {
+    const m = text.match(/^(\d{1,2}):(\d{2})$/);
+    return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : -1;
+  }
+
+  // Inside the scheduled hours (also over midnight)
+  readonly property bool nightLightScheduled: {
+    if (Config.nightLight.schedule !== "custom") return false;
+    const a = minutesOf(Config.nightLight.from), b = minutesOf(Config.nightLight.to);
+    if (a < 0 || b < 0 || a === b) return false;
+    const d = Time.date;
+    const now = d.getHours() * 60 + d.getMinutes();
+    return a < b ? now >= a && now < b : now >= a || now < b;
+  }
+
+  // The schedule switches it at the start and end; in between you can still
+  // turn it off or on by hand
+  onNightLightScheduledChanged: nightLight = nightLightScheduled
+  Component.onCompleted: if (nightLightScheduled) nightLight = true
 
   // --- Brightness (brightnessctl, backlight only) ----------------------------
   property bool brightnessAvailable: false
