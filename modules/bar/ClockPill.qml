@@ -18,6 +18,7 @@ BarItem {
   accessibleName: "Clock " + Time.time
                   + (Notifications.unread > 0 ? ", " + Notifications.unread + " unread notifications" : "")
                   + (Notifications.dnd ? ", do not disturb" : "")
+                  + (Power.scheduled ? ", " + (Power.action(Power.scheduledId)?.label ?? "") + " at " + Power.scheduledTime : "")
 
   onClicked: mouse => {
     if (mouse.button === Qt.RightButton) {
@@ -34,6 +35,15 @@ BarItem {
     kind: "title"
     font.pixelSize: Theme.font.body + 1
     anchors.verticalCenter: parent.verticalCenter
+  }
+
+  // Restart or shut down scheduled from the power menu
+  Row {
+    visible: Power.scheduled
+    spacing: 4
+    anchors.verticalCenter: parent.verticalCenter
+    Icon { name: "clock"; size: 13; color: Theme.warn; anchors.verticalCenter: parent.verticalCenter }
+    Label { text: Power.scheduledTime; color: Theme.warn; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
   }
 
   Icon {

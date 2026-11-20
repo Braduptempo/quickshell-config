@@ -8,3 +8,4 @@ singleton Session 1.0 Session.qml
 singleton Time 1.0 Time.qml
 singleton Clipboard 1.0 Clipboard.qml
 singleton Lock 1.0 Lock.qml
+singleton Power 1.0 Power.qml

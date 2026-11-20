@@ -11,6 +11,7 @@ import "./modules/osd"
 import "./modules/launcher"
 import "./modules/clipboard"
 import "./modules/lock"
+import "./modules/power"
 import "./dev"
 
 Scope {
@@ -66,6 +67,23 @@ Scope {
     }
     function previewSubmit(): void {
       if (Lock.preview) Lock.submit(Lock.typed);
+    }
+  }
+
+  // Super + Esc
+  PowerMenu {}
+
+  // `qs ipc call power toggle`; `open R` opens with Restart chosen
+  IpcHandler {
+    target: "power"
+    function toggle(): void {
+      Power.toggle(Panels.focusedScreen());
+    }
+    function open(key: string): void {
+      Power.openWith(Panels.focusedScreen(), key);
+    }
+    function cancel(): void {
+      Power.cancelSchedule();
     }
   }
 
