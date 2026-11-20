@@ -58,10 +58,13 @@ Singleton {
         root.available = text.trim() === "yes";
         if (!root.available) return;
         if (root.testDb === "") {
-          // Started detached and only once, so a shell reload doesn't lose or double them
+          // Started detached and only once, so a shell reload doesn't lose or
+          // double them. `ps -C wl-paste` lists only real wl-paste processes;
+          // `pgrep -f` would also match this shell's own command line.
           Quickshell.execDetached(["sh", "-c",
-            "pgrep -f 'wl-paste --type text --watch cliphist' >/dev/null || setsid -f wl-paste --type text --watch cliphist store;" +
-            "pgrep -f 'wl-paste --type image --watch cliphist' >/dev/null || setsid -f wl-paste --type image --watch cliphist store"]);
+            "running=$(ps -C wl-paste -o args=);" +
+            "echo \"$running\" | grep -q -- '--type text --watch cliphist' || setsid -f wl-paste --type text --watch cliphist store;" +
+            "echo \"$running\" | grep -q -- '--type image --watch cliphist' || setsid -f wl-paste --type image --watch cliphist store"]);
         }
         changes.running = true;
         root.refresh();
