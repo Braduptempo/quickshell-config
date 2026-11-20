@@ -42,6 +42,15 @@ Singleton {
     property string otherMonitors: "full"
   }
 
+  component SoundSettings: JsonObject {
+    // 1.0, or 1.5 to allow up to 150% (can distort)
+    property real maxVolume: 1.0
+    // A short click when the volume changes
+    property bool feedback: false
+    // Plugging in headphones (a new output) moves the sound there
+    property bool followNewDevices: true
+  }
+
   component DisplaySettings: JsonObject {
     // The monitor with the full bar; "" = the first one
     property string primary: ""
@@ -97,6 +106,7 @@ Singleton {
   property alias notifications: adapter.notifications
   property alias nightLight: adapter.nightLight
   property alias displays: adapter.displays
+  property alias sound: adapter.sound
   property alias apps: adapter.apps
 
   FileView {
@@ -126,6 +136,8 @@ Singleton {
       property NightLightSettings nightLight: NightLightSettings {}
 
       property DisplaySettings displays: DisplaySettings {}
+
+      property SoundSettings sound: SoundSettings {}
 
       property AppSettings apps: AppSettings {}
     }

@@ -25,13 +25,13 @@ PanelWindow {
     { key: "font", label: "Font", icon: "text", group: "Appearance" },
     { key: "bar", label: "Bar & panels", icon: "window", group: "Appearance" },
     { key: "animations", label: "Animations", icon: "activity", group: "Appearance" },
-    { key: "sound", label: "Sound", icon: "volume", group: "System", soon: "Devices, per-app volume and sounds. Quick settings has the volume sliders already." },
+    { key: "sound", label: "Sound", icon: "volume", group: "System" },
     { key: "network", label: "Network & Bluetooth", icon: "wifi", group: "System", soon: "Saved networks and devices. Quick settings handles connecting for now." },
     { key: "notifications", label: "Notifications", icon: "bell", group: "System" },
     { key: "calendars", label: "Calendars", icon: "calendar", group: "System", soon: "Syncing online calendars into the clock panel." },
     { key: "displays", label: "Displays", icon: "monitor", group: "System" },
     { key: "nightlight", label: "Night light", icon: "moon", group: "System" },
-    { key: "input", label: "Keyboard & mouse", icon: "keyboard", group: "System", soon: "Layouts, repeat rate and pointer speed." },
+    { key: "input", label: "Keyboard & mouse", icon: "keyboard", group: "System" },
     { key: "power", label: "Power & idle", icon: "power", group: "System" },
     { key: "privacy", label: "Privacy & lock", icon: "shield", group: "System" },
     { key: "keybinds", label: "Keybinds", icon: "keyboard", group: "System" },
@@ -203,6 +203,8 @@ PanelWindow {
             case "nightlight": return nightLightPage;
             case "keybinds": return keybindsPage;
             case "displays": return displaysPage;
+            case "sound": return soundPage;
+            case "input": return inputPage;
             case "apps": return appsPage;
             case "power": return powerPage;
             case "privacy": return privacyPage;
@@ -267,6 +269,8 @@ PanelWindow {
   Component { id: nightLightPage; NightLightPage {} }
   Component { id: keybindsPage; KeybindsPage {} }
   Component { id: displaysPage; DisplaysPage {} }
+  Component { id: soundPage; SoundPage {} }
+  Component { id: inputPage; InputPage {} }
   Component { id: appsPage; DefaultAppsPage {} }
   Component { id: powerPage; PowerPage {} }
   Component { id: privacyPage; PrivacyPage {} }

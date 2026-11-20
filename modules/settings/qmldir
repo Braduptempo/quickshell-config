@@ -15,3 +15,5 @@ NightLightPage 1.0 NightLightPage.qml
 KeybindsPage 1.0 KeybindsPage.qml
 DisplaysPage 1.0 DisplaysPage.qml
 DefaultAppsPage 1.0 DefaultAppsPage.qml
+SoundPage 1.0 SoundPage.qml
+InputPage 1.0 InputPage.qml

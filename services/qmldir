@@ -16,3 +16,4 @@ singleton SystemStats 1.0 SystemStats.qml
 singleton Wallpapers 1.0 Wallpapers.qml
 singleton Displays 1.0 Displays.qml
 singleton DefaultApps 1.0 DefaultApps.qml
+singleton Input 1.0 Input.qml

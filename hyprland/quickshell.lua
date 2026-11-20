@@ -68,3 +68,7 @@ hl.bind("SUPER + space", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
 -- Loaded last, so they win over modules/monitors.lua; delete the file to
 -- go back to your own.
 pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/monitors.lua")
+
+-- Keyboard and mouse settings made in Settings → Keyboard & mouse (per
+-- machine, not in git). Loaded last; delete the file to use your own.
+pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/input.lua")

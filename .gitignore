@@ -1,3 +1,4 @@
 settings.json
 __pycache__/
 hyprland/monitors.lua
+hyprland/input.lua
