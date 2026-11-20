@@ -12,6 +12,7 @@ import "./modules/launcher"
 import "./modules/clipboard"
 import "./modules/lock"
 import "./modules/power"
+import "./modules/media"
 import "./dev"
 
 Scope {
@@ -67,6 +68,17 @@ Scope {
     }
     function previewSubmit(): void {
       if (Lock.preview) Lock.submit(Lock.typed);
+    }
+  }
+
+  // Below the media pill
+  MediaMenu {}
+
+  // `qs ipc call media toggle`
+  IpcHandler {
+    target: "media"
+    function toggle(): void {
+      Media.toggle(Panels.focusedScreen(), 180);
     }
   }
 

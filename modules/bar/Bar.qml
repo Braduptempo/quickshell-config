@@ -53,7 +53,9 @@ Scope {
             screen: panel.modelData
           }
 
-          MediaPill {}
+          MediaPill {
+            screen: panel.modelData
+          }
         }
 
         ClockPill {
