@@ -6,8 +6,11 @@
 |---|---|
 | `config/` | `Theme` (colours, sizes, spacing, animation timings), `Palettes` (the 12 themes), `Config` (settings from `settings.json`) |
 | `components/` | Building blocks from the design: `Button`, `IconButton`, `Toggle`, `Segmented`, `PillSlider`, `Chip`, `Kbd`, `ListRow`, `GlassPanel`, `Card`, `Label`, `Icon` |
+| `modules/bar/` | The bar: `Workspaces`, `MediaPill`, `ClockPill`, `Tray`, `StatusPill` |
+| `services/` | `Hypr`: Hyprland actions that work with both the Lua and the old config |
 | `dev/` | `Gallery`: test window with every component |
-| `widgets/` | The current bar widgets (moving to the new components feature by feature) |
+| `widgets/` | Dropdowns and services from the old bar (moving over feature by feature) |
+| `hyprland/` | `quickshell.lua`: Hyprland layer rules (glass blur), loaded from `hyprland.lua` |
 
 Rules:
 - No hard-coded colours or sizes: always use `Theme`.
@@ -15,6 +18,14 @@ Rules:
 - Animations use `Theme.anim.*`, so the speed setting and "Off" work everywhere.
 
 `settings.json` is created on first start, next to `shell.qml`. It is per machine and not in git.
+
+## Hyprland
+
+Add this line to `~/.config/hypr/hyprland.lua` for the glass blur:
+
+```lua
+pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/quickshell.lua")
+```
 
 ## Component gallery
 

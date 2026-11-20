@@ -16,6 +16,7 @@ Singleton {
     "headphones": "M3 14v-2a9 9 0 0 1 18 0v2M3 14h3v6H3zM18 14h3v6h-3z",
     "monitor": "M3 4h18v12H3zM8 20h8M12 16v4",
     "usb": "M8 2h8v6H8zM6 8h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z",
+    "battery": "M3 7h15a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zM22 11v2M5 10v4M8 10v4M11 10v4",
     "keyboard": "M2 6h20v12H2zM6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10",
     // audio
     "volume": "M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7",

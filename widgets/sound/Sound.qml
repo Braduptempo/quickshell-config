@@ -21,6 +21,12 @@ QtObject {
         }
     }
 
+    function toggleMute() {
+        if (defaultSink && defaultSink.audio) {
+            defaultSink.audio.muted = !defaultSink.audio.muted;
+        }
+    }
+
     // --- Microfoon ---
     property var defaultSource: Pipewire.defaultAudioSource
     readonly property real micVolume: defaultSource && defaultSource.audio 

@@ -18,9 +18,17 @@ Singleton {
   // Emitted for every incoming notification, used by ToastOverlay
   signal toast(var notification)
 
+  // Shown as a red dot on the clock until the history is opened
+  property int unread: 0
+
+  function markRead(): void {
+    unread = 0;
+  }
+
   NotificationServer {
     id: server
     onNotification: function(notification) {
+      root.unread++;
       root.toast(notification);
       root.model.insert(0, {
         "appName": notification.appName || "Systeem",
