@@ -73,4 +73,20 @@ Singleton {
       openClockPanel(onScreen, tab);
     }
   }
+
+  // --- Theme picker (Super + T) ------------------------------------------------
+  property bool themePickerOpen: false
+  property ShellScreen themeScreen: null
+  property double themeClosedAt: 0
+
+  onThemePickerOpenChanged: if (!themePickerOpen) themeClosedAt = Date.now()
+
+  function toggleThemePicker(onScreen: ShellScreen): void {
+    if (themePickerOpen) {
+      themePickerOpen = false;
+    } else if (Date.now() - themeClosedAt > 250) {
+      themeScreen = onScreen ?? focusedScreen();
+      themePickerOpen = true;
+    }
+  }
 }

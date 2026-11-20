@@ -15,6 +15,7 @@ import "./modules/power"
 import "./modules/polkit"
 import "./modules/media"
 import "./modules/capture"
+import "./modules/pickers"
 import "./dev"
 
 Scope {
@@ -95,6 +96,24 @@ Scope {
     target: "media"
     function toggle(): void {
       Media.toggle(Panels.focusedScreen(), 180);
+    }
+  }
+
+  // Super + T and Super + W
+  ThemePicker {}
+  WallpaperPicker {}
+
+  // `qs ipc call pickers theme`, `wallpaper`, `random` (a random wallpaper)
+  IpcHandler {
+    target: "pickers"
+    function theme(): void {
+      Panels.toggleThemePicker(Panels.focusedScreen());
+    }
+    function wallpaper(): void {
+      Wallpapers.toggle(Panels.focusedScreen());
+    }
+    function random(): void {
+      Wallpapers.set(Wallpapers.random());
     }
   }
 
