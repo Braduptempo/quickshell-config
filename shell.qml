@@ -13,6 +13,7 @@ import "./modules/clipboard"
 import "./modules/lock"
 import "./modules/power"
 import "./modules/polkit"
+import "./modules/media"
 import "./dev"
 
 Scope {
@@ -82,6 +83,17 @@ Scope {
     }
     function cancel(): void {
       Polkit.cancel();
+    }
+  }
+
+  // Below the media pill
+  MediaMenu {}
+
+  // `qs ipc call media toggle`
+  IpcHandler {
+    target: "media"
+    function toggle(): void {
+      Media.toggle(Panels.focusedScreen(), 180);
     }
   }
 

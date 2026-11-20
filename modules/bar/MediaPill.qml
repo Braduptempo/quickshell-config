@@ -1,30 +1,34 @@
 // MediaPill.qml
 // What's playing. Only visible while a player is active.
-// Left: play/pause (the media menu comes later), right: next, scroll: volume.
+// Click: the media menu. Middle click: play/pause. Right click: next.
+// Scroll: the player's volume. Follows the player chosen in the media menu.
 import QtQuick
+import Quickshell
 import Quickshell.Services.Mpris
 import "../../config"
 import "../../components"
+import "../../services"
 
 BarItem {
   id: root
 
-  // Prefer the player that is playing, otherwise the first one
-  readonly property MprisPlayer player: {
-    const players = Mpris.players.values;
-    for (let i = 0; i < players.length; i++) {
-      if (players[i].isPlaying) return players[i];
-    }
-    return players.length > 0 ? players[0] : null;
-  }
+  required property ShellScreen screen
+
+  readonly property MprisPlayer player: Media.player
 
   visible: player !== null && player.trackTitle !== ""
+  active: Media.open && Media.screen === screen
   accessibleName: player ? "Media: " + player.trackTitle + " by " + player.trackArtist + (player.isPlaying ? ", playing" : ", paused") : ""
 
   onClicked: mouse => {
     if (!player) return;
-    if (mouse.button === Qt.RightButton && player.canGoNext) player.next();
-    else if (player.canTogglePlaying) player.togglePlaying();
+    if (mouse.button === Qt.RightButton) {
+      if (player.canGoNext) player.next();
+    } else if (mouse.button === Qt.MiddleButton) {
+      if (player.canTogglePlaying) player.togglePlaying();
+    } else {
+      Media.toggle(root.screen, root.mapToItem(null, 0, 0).x);
+    }
   }
   onScrolled: wheel => {
     if (player && player.volumeSupported) {
@@ -42,6 +46,7 @@ BarItem {
   Label {
     text: root.player ? root.player.trackTitle : ""
     width: Math.min(implicitWidth, 220)
+    elide: Text.ElideRight
     anchors.verticalCenter: parent.verticalCenter
   }
 }
