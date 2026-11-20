@@ -23,3 +23,10 @@ hl.layer_rule({
 hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc call quicksettings toggle"))
 hl.bind("SUPER + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("qs ipc call notifications dnd"))
+
+-- On-screen pop-ups. Volume and microphone are picked up automatically.
+-- Brightness keys: tell the shell to re-read the level after brightnessctl.
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("sleep 0.05; qs ipc call osd brightness"), { locked = true, repeating = true, non_consuming = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("sleep 0.05; qs ipc call osd brightness"), { locked = true, repeating = true, non_consuming = true })
+-- Caps Lock has no event; this bind doesn't swallow the key
+hl.bind("Caps_Lock", hl.dsp.exec_cmd("qs ipc call osd caps"), { non_consuming = true })

@@ -9,6 +9,7 @@
 | `modules/bar/` | The bar: `Workspaces`, `MediaPill`, `ClockPill`, `Tray`, `StatusPill` |
 | `modules/notifications/` | Notification pop-ups (stack, fan out on hover) and the card used everywhere |
 | `modules/clockpanel/` | Clock panel: month calendar and notification history |
+| `modules/osd/` | Pop-up for volume, microphone, brightness, keyboard layout and Caps Lock |
 | `modules/quicksettings/` | Quick settings panel: toggles, sliders, and network, Bluetooth and sound pages |
 | `services/` | `Hypr` (Hyprland actions for Lua and old configs), `Panels` (which panel is open), `Session` (caffeine, night light, brightness, power profiles) |
 | `dev/` | `Gallery`: test window with every component |
@@ -40,6 +41,8 @@ pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/quickshell.lua"
 | `qs ipc call notifications calendar` | Clock panel on the calendar tab |
 | `qs ipc call notifications dnd` | Do not disturb on/off (Super + Shift + N) |
 | `qs ipc call notifications clear` | Dismiss all notifications |
+| `qs ipc call osd caps` | Show the Caps Lock state (bound to Caps Lock) |
+| `qs ipc call osd brightness` | Re-read and show the brightness (bound to the brightness keys) |
 | `qs ipc call gallery toggle` | Component gallery |
 
 ## Component gallery

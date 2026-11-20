@@ -36,6 +36,11 @@ Singleton {
   property bool brightnessAvailable: false
   property real brightness: 0.5
 
+  // Re-read after brightness keys changed it outside the shell
+  function refreshBrightness(): void {
+    getBrightnessProc.running = true;
+  }
+
   function setBrightness(value: real): void {
     brightness = Math.max(0.01, Math.min(1, value));
     setBrightnessProc.command = ["brightnessctl", "-c", "backlight", "set", Math.round(brightness * 100) + "%"];
