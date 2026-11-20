@@ -32,10 +32,19 @@ Singleton {
     property string style: "floating"
   }
 
+  component LockSettings: JsonObject {
+    // Lock after this many minutes without input; 0 = never
+    property int idleMinutes: 10
+    // Show what's playing on the lock screen
+    property bool showMedia: true
+    // Show how many notifications came in
+    property bool showNotifications: true
+  }
 
   property alias appearance: adapter.appearance
   property alias animations: adapter.animations
   property alias bar: adapter.bar
+  property alias lock: adapter.lock
 
   FileView {
     id: file
@@ -56,6 +65,8 @@ Singleton {
       property AnimationSettings animations: AnimationSettings {}
 
       property BarSettings bar: BarSettings {}
+
+      property LockSettings lock: LockSettings {}
     }
   }
 }

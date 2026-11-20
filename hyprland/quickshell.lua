@@ -23,6 +23,15 @@ hl.layer_rule({
 hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc call quicksettings toggle"))
 hl.bind("SUPER + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("qs ipc call notifications dnd"))
+-- Lock screen. If the shell ever crashes while locked, Hyprland keeps the
+-- screen locked and shows an error. To recover: switch to a TTY
+-- (Ctrl + Alt + F3), log in and run
+--   HYPRLAND_INSTANCE_SIGNATURE=$(ls /run/user/$UID/hypr | head -1) \
+--     hyprctl dispatch 'hl.dsp.exec_cmd("qs -d; sleep 2; qs ipc call lock lock")'
+-- then go back with Ctrl + Alt + F1 (or F2) and unlock as usual.
+-- allow_session_lock_restore lets that new lock take over.
+hl.config({ misc = { allow_session_lock_restore = true } })
+hl.bind("SUPER + L", hl.dsp.exec_cmd("qs ipc call lock lock"))
 -- Clipboard history (Super + V stays "float window" from modules/keybinds.lua)
 hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("qs ipc call clipboard toggle"))
 

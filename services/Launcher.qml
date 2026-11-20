@@ -215,7 +215,8 @@ Singleton {
     add("Calendar", "Open the month view", "calendar", () => Panels.openClockPanel(null, "calendar"));
     add("Reload shell", "Restart Quickshell, apps stay open", "restart", () => Quickshell.reload(false), "", ["restart shell", "quickshell"]);
     add("Show hidden apps again", state.hidden.length + " hidden", "image", () => { state.hidden = []; root.revision++; });
-    add("Suspend", "Sleep until a key is pressed", "moon", () => Quickshell.execDetached(["systemctl", "suspend"]), "", ["sleep"]);
+    add("Lock screen", "Super + L", "lock", () => Lock.lock(), "", ["lock", "away"]);
+    add("Suspend", "Lock and sleep until a key is pressed", "moon", () => Lock.suspend(), "", ["sleep"]);
     add("Log out", "Close everything and leave Hyprland", "logout", () => Hypr.exit(), "Press Enter again to log out", ["logout", "sign out", "exit"]);
     add("Restart", "Restart the computer", "restart", () => Quickshell.execDetached(["systemctl", "reboot"]), "Press Enter again to restart", ["reboot"]);
     add("Shut down", "Turn the computer off", "power", () => Quickshell.execDetached(["systemctl", "poweroff"]), "Press Enter again to shut down", ["poweroff", "power off", "turn off"]);
