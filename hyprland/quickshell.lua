@@ -44,6 +44,8 @@ hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs ipc call capture shot screen"))
 -- toolbar, Super + Ctrl + R stops a recording
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs ipc call capture toggle"))
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("qs ipc call capture stop"))
+-- Settings
+hl.bind("SUPER + comma", hl.dsp.exec_cmd("qs ipc call settings toggle"))
 -- Theme and wallpaper pickers
 hl.bind("SUPER + T", hl.dsp.exec_cmd("qs ipc call pickers theme"))
 hl.bind("SUPER + W", hl.dsp.exec_cmd("qs ipc call pickers wallpaper"))
