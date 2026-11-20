@@ -51,6 +51,16 @@ Singleton {
     property bool followNewDevices: true
   }
 
+  component CalendarSettings: JsonObject {
+    // [{ name, url, color, enabled }]: ICS links (Google "secret address in
+    // iCal format", Nextcloud, Outlook "publish calendar", holiday calendars)
+    property var sources: []
+    // Minutes between syncs; 0 = only by hand
+    property int refreshMinutes: 15
+    // "monday" or "sunday"
+    property string weekStart: "monday"
+  }
+
   component DisplaySettings: JsonObject {
     // The monitor with the full bar; "" = the first one
     property string primary: ""
@@ -107,6 +117,7 @@ Singleton {
   property alias nightLight: adapter.nightLight
   property alias displays: adapter.displays
   property alias sound: adapter.sound
+  property alias calendar: adapter.calendar
   property alias apps: adapter.apps
 
   FileView {
@@ -138,6 +149,8 @@ Singleton {
       property DisplaySettings displays: DisplaySettings {}
 
       property SoundSettings sound: SoundSettings {}
+
+      property CalendarSettings calendar: CalendarSettings {}
 
       property AppSettings apps: AppSettings {}
     }

@@ -1,6 +1,7 @@
 // CalendarMonth.qml
-// Month grid with ISO week numbers, Monday first. Today is filled with the
-// accent, the selected day gets a ring, days of other months are dimmed.
+// Month grid with ISO week numbers, Monday or Sunday first (Settings →
+// Calendars). Today is filled with the accent, the selected day gets a ring,
+// days of other months are dimmed, a dot marks days with events.
 // Scroll over the grid or use the arrows to change month.
 pragma ComponentBehavior: Bound
 
@@ -38,9 +39,11 @@ ColumnLayout {
     selected = Time.date;
   }
 
-  // Monday on or before the 1st
+  readonly property bool sundayFirst: Config.calendar.weekStart === "sunday"
+
+  // Monday (or Sunday) on or before the 1st
   readonly property date gridStart: {
-    const offset = (month.getDay() + 6) % 7;
+    const offset = sundayFirst ? month.getDay() : (month.getDay() + 6) % 7;
     return new Date(month.getFullYear(), month.getMonth(), 1 - offset);
   }
 
@@ -97,7 +100,7 @@ ColumnLayout {
       spacing: 3
       Label { width: 28; text: "Wk"; kind: "label"; font.capitalization: Font.MixedCase; horizontalAlignment: Text.AlignHCenter }
       Repeater {
-        model: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+        model: root.sundayFirst ? ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
         Label {
           required property string modelData
           width: (grid.width - 28 - 7 * 3) / 7
@@ -120,7 +123,8 @@ ColumnLayout {
         Label {
           width: 28
           height: 36
-          text: root.isoWeek(root.dayAt(week.index, 0))
+          // The ISO week of the row's Monday
+          text: root.isoWeek(root.dayAt(week.index, root.sundayFirst ? 1 : 0))
           kind: "muted"
           font.pixelSize: Theme.font.label
           horizontalAlignment: Text.AlignHCenter
@@ -153,6 +157,18 @@ ColumnLayout {
               border.color: Theme.accent
 
               Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
+            }
+
+            // Events that day
+            Rectangle {
+              visible: Calendar.hasEvents(cell.day)
+              anchors.horizontalCenter: parent.horizontalCenter
+              anchors.bottom: parent.bottom
+              anchors.bottomMargin: 3
+              width: 4
+              height: 4
+              radius: 2
+              color: cell.today ? Theme.onAccent : Theme.accent
             }
 
             Label {
