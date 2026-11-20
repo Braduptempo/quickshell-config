@@ -44,6 +44,14 @@ hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs ipc call capture shot screen"))
 -- toolbar, Super + Ctrl + R stops a recording
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs ipc call capture toggle"))
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("qs ipc call capture stop"))
+-- Window switcher: hold Alt, press Tab to step, let go of Alt to switch.
+-- The release binds don't swallow Alt, so apps still see it.
+hl.bind("ALT + Tab", hl.dsp.exec_cmd("qs ipc call windows next"))
+hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call windows previous"))
+hl.bind("ALT + Alt_L", hl.dsp.exec_cmd("qs ipc call windows commit"), { release = true, non_consuming = true })
+hl.bind("ALT + Alt_R", hl.dsp.exec_cmd("qs ipc call windows commit"), { release = true, non_consuming = true })
+-- Workspace overview
+hl.bind("SUPER + Tab", hl.dsp.exec_cmd("qs ipc call windows overview"))
 -- Settings
 hl.bind("SUPER + comma", hl.dsp.exec_cmd("qs ipc call settings toggle"))
 -- Theme and wallpaper pickers
