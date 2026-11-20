@@ -18,4 +18,30 @@ Singleton {
       Hyprland.dispatch("workspace " + target);
     }
   }
+
+  // Lua dispatcher when Hyprland runs a Lua config, otherwise the classic one
+  function run(lua: string, classic: string): void {
+    Hyprland.dispatch(Hyprland.usingLua ? lua : classic);
+  }
+
+  // These act on the focused window
+  function windowFloat(): void {
+    run("hl.dsp.window.float({ action = \"toggle\" })", "togglefloating");
+  }
+
+  function windowPseudo(): void {
+    run("hl.dsp.window.pseudo()", "pseudo");
+  }
+
+  function windowClose(): void {
+    run("hl.dsp.window.close()", "killactive");
+  }
+
+  function windowToWorkspace(workspace: int): void {
+    run("hl.dsp.window.move({ workspace = " + workspace + " })", "movetoworkspace " + workspace);
+  }
+
+  function exit(): void {
+    run("hl.dsp.exit()", "exit");
+  }
 }

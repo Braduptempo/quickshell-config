@@ -1,6 +1,9 @@
 // LauncherWindow.qml
-// The launcher (Super + Space): type to search apps, do a sum, or start a
-// line with ">" to run a command. ↑ ↓ to choose, Enter to open, Esc to close.
+// The launcher (Super + Space). Type to search apps, commands and more;
+// see services/Launcher.qml for everything you can type.
+//   ↑ ↓ / Tab   choose            Enter         open
+//   Ctrl + K    actions for apps  Ctrl + Enter  alternative (force kill, edit script)
+//   Esc         back / close
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -19,6 +22,15 @@ PanelWindow {
   readonly property bool shown: Launcher.open
   property var results: []
   property int current: 0
+  // Ctrl + K menu for the selected app
+  property var actions: []
+  property int actionCurrent: 0
+  readonly property bool inActions: actions.length > 0
+  // Key of a result waiting for a second Enter (shut down, log out…)
+  property string pendingConfirm: ""
+
+  readonly property var selected: results[current] ?? null
+  readonly property var rows: inActions ? actions : results
 
   screen: Launcher.screen ?? Panels.focusedScreen()
   visible: shown || card.opacity > 0
@@ -35,22 +47,73 @@ PanelWindow {
   implicitWidth: 680 + 24
   implicitHeight: card.implicitHeight + 24
 
-  function refresh(): void {
+  function refresh(keepPosition: bool): void {
+    const key = selected?.key ?? "";
     results = Launcher.search(input.text);
-    current = 0;
+    pendingConfirm = "";
+    const index = keepPosition ? results.findIndex(r => r.key === key) : -1;
+    current = index >= 0 ? index : 0;
   }
 
   function move(step: int): void {
-    if (results.length === 0) return;
-    current = (current + step + results.length) % results.length;
-    list.positionViewAtIndex(current, ListView.Contain);
+    const count = rows.length;
+    if (count === 0) return;
+    if (inActions) {
+      actionCurrent = (actionCurrent + step + count) % count;
+      list.positionViewAtIndex(actionCurrent, ListView.Contain);
+    } else {
+      current = (current + step + count) % count;
+      pendingConfirm = "";
+      list.positionViewAtIndex(current, ListView.Contain);
+    }
+  }
+
+  function activate(alternative: bool): void {
+    if (inActions) {
+      const action = actions[actionCurrent];
+      if (!action) return;
+      action.run();
+      actions = [];
+      if (action.keepOpen) refresh(true);
+      else Launcher.open = false;
+      return;
+    }
+    const result = selected;
+    if (!result) return;
+    if (result.confirm && pendingConfirm !== result.key) {
+      pendingConfirm = result.key;
+      return;
+    }
+    if (alternative && result.runAlt) result.runAlt();
+    else result.run();
+    Launcher.open = false;
+  }
+
+  function openActions(): void {
+    if (inActions) {
+      actions = [];
+      return;
+    }
+    const list = Launcher.actionsFor(selected);
+    if (list.length === 0) return;
+    actionCurrent = 0;
+    actions = list;
   }
 
   onShownChanged: {
     if (shown) {
+      actions = [];
       input.text = Launcher.initialQuery;
-      refresh();
+      refresh(false);
       input.forceActiveFocus();
+    }
+  }
+
+  // Processes and scripts arrive a moment later
+  Connections {
+    target: Launcher
+    function onRevisionChanged() {
+      if (window.shown && !window.inActions) window.refresh(true);
     }
   }
 
@@ -99,7 +162,7 @@ PanelWindow {
           spacing: 12
 
           Icon {
-            name: input.text.trim().startsWith(">") ? "arrow-right" : "search"
+            name: window.inActions ? "settings" : input.text.trim().startsWith(">") ? "arrow-right" : "search"
             size: 18
             color: Theme.subtext
           }
@@ -113,64 +176,99 @@ PanelWindow {
             font.pixelSize: Theme.font.title + 2
             clip: true
             focus: true
+            readOnly: window.inActions
 
             Accessible.role: Accessible.EditableText
-            Accessible.name: "Search apps, sums and commands"
+            Accessible.name: "Search apps, commands, sums and more"
 
-            onTextChanged: window.refresh()
+            onTextChanged: if (!window.inActions) window.refresh(false)
             Keys.onUpPressed: window.move(-1)
             Keys.onDownPressed: window.move(1)
             Keys.onTabPressed: window.move(1)
             Keys.onBacktabPressed: window.move(-1)
-            Keys.onEscapePressed: Launcher.open = false
-            Keys.onReturnPressed: Launcher.activate(window.results[window.current])
-            Keys.onEnterPressed: Launcher.activate(window.results[window.current])
+            Keys.onEscapePressed: {
+              if (window.inActions) window.actions = [];
+              else Launcher.open = false;
+            }
+            Keys.onPressed: event => {
+              const ctrl = event.modifiers & Qt.ControlModifier;
+              if (ctrl && event.key === Qt.Key_K) {
+                window.openActions();
+                event.accepted = true;
+              } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                window.activate(ctrl);
+                event.accepted = true;
+              }
+            }
 
             Label {
               visible: input.text === ""
-              text: "Search apps, do a sum, or > run a command"
+              text: window.inActions ? "" : "Search apps and commands, or try yt, kill, window, >"
               kind: "muted"
               font.pixelSize: Theme.font.title + 2
               anchors.verticalCenter: parent.verticalCenter
             }
           }
 
-          Kbd { text: "Esc" }
+          Label {
+            visible: window.inActions
+            text: "Actions for " + (window.selected?.title ?? "")
+            kind: "muted"
+          }
+
+          Kbd { text: window.inActions ? "Esc back" : "Esc" }
         }
       }
 
-      // --- Results -------------------------------------------------------------
+      // --- Results / actions ---------------------------------------------------
       ListView {
         id: list
         Layout.fillWidth: true
-        Layout.preferredHeight: Math.min(contentHeight, 8 * 50)
-        visible: window.results.length > 0
-        model: window.results
+        Layout.preferredHeight: Math.min(contentHeight, 440)
+        visible: window.rows.length > 0
+        model: window.rows
         clip: true
         spacing: 2
         boundsBehavior: Flickable.StopAtBounds
-        currentIndex: window.current
         highlightFollowsCurrentItem: false
+
+        section.property: window.inActions ? "" : "section"
+        section.delegate: Item {
+          required property string section
+          width: list.width
+          height: 26
+          Label {
+            text: parent.section
+            kind: "label"
+            x: 14
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 4
+          }
+        }
 
         delegate: Item {
           id: row
           required property var modelData
           required property int index
-          readonly property bool selected: index === window.current
+          readonly property bool isSelected: window.inActions ? index === window.actionCurrent : index === window.current
+          readonly property bool confirming: !window.inActions && window.pendingConfirm !== "" && window.pendingConfirm === modelData.key
+          readonly property bool hasAppIcon: (modelData.appIcon ?? "") !== ""
 
           width: list.width
           height: 48
 
           Accessible.role: Accessible.ListItem
-          Accessible.name: modelData.title + (modelData.subtitle !== "" ? ", " + modelData.subtitle : "")
-          Accessible.selected: selected
+          Accessible.name: modelData.title + ((modelData.subtitle ?? "") !== "" ? ", " + modelData.subtitle : "")
+          Accessible.selected: isSelected
 
           Rectangle {
             anchors.fill: parent
             radius: Theme.pill(height)
-            color: row.selected ? Theme.alpha(Theme.accent, 0.16) : rowMouse.containsMouse ? Theme.item : "transparent"
-            border.width: row.selected ? 1 : 0
-            border.color: Theme.alpha(Theme.accent, 0.45)
+            color: row.confirming ? Theme.alpha(Theme.error, 0.16)
+                 : row.isSelected ? Theme.alpha(Theme.accent, 0.16)
+                 : rowMouse.containsMouse ? Theme.item : "transparent"
+            border.width: row.isSelected ? 1 : 0
+            border.color: row.confirming ? Theme.error : Theme.alpha(Theme.accent, 0.45)
 
             Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
           }
@@ -188,8 +286,8 @@ PanelWindow {
               IconImage {
                 id: appIcon
                 anchors.fill: parent
-                visible: row.modelData.kind === "app" && status === Image.Ready
-                source: row.modelData.kind === "app" ? Quickshell.iconPath(row.modelData.icon, true) : ""
+                visible: row.hasAppIcon && status === Image.Ready
+                source: row.hasAppIcon ? Quickshell.iconPath(row.modelData.appIcon, true) : ""
                 asynchronous: true
               }
 
@@ -197,13 +295,13 @@ PanelWindow {
                 anchors.fill: parent
                 visible: !appIcon.visible
                 radius: 16
-                color: row.modelData.kind === "app" ? Theme.overlay : Theme.alpha(Theme.accent, 0.2)
+                color: row.hasAppIcon ? Theme.overlay : Theme.alpha(row.confirming ? Theme.error : Theme.accent, 0.2)
 
                 Icon {
                   anchors.centerIn: parent
-                  name: row.modelData.kind === "app" ? "image" : row.modelData.icon
+                  name: row.modelData.icon ?? "image"
                   size: 16
-                  color: row.modelData.kind === "app" ? Theme.subtext : Theme.accent
+                  color: row.hasAppIcon ? Theme.subtext : row.confirming ? Theme.error : Theme.accent
                 }
               }
             }
@@ -215,23 +313,22 @@ PanelWindow {
               Label {
                 text: row.modelData.title
                 font.weight: Font.Bold
-                font.pixelSize: row.modelData.kind === "calc" ? Theme.font.title + 4 : Theme.font.body
+                font.pixelSize: row.modelData.big ? Theme.font.title + 4 : Theme.font.body
                 Layout.fillWidth: true
               }
               Label {
-                visible: row.modelData.subtitle !== ""
-                text: row.modelData.subtitle
+                visible: text !== ""
+                text: row.confirming ? row.modelData.confirm : (row.modelData.subtitle ?? "")
                 kind: "muted"
+                color: row.confirming ? Theme.error : Theme.subtext
                 font.pixelSize: Theme.font.label
                 Layout.fillWidth: true
               }
             }
 
             Label {
-              text: row.selected ? (row.modelData.kind === "calc" ? "Enter to copy" : "Enter")
-                  : row.modelData.kind === "app" ? "Application"
-                  : row.modelData.kind === "calc" ? "Calculator"
-                  : row.modelData.kind === "command" ? "Command" : "Web"
+              text: !row.isSelected ? (row.modelData.hint ?? "")
+                  : row.modelData.altHint ?? (row.modelData.app && !window.inActions ? "Enter · Ctrl + K actions" : "Enter")
               kind: "muted"
               font.pixelSize: Theme.font.label
             }
@@ -242,15 +339,21 @@ PanelWindow {
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onEntered: window.current = row.index
-            onClicked: Launcher.activate(row.modelData)
+            onEntered: {
+              if (window.inActions) window.actionCurrent = row.index;
+              else if (window.current !== row.index) {
+                window.current = row.index;
+                window.pendingConfirm = "";
+              }
+            }
+            onClicked: window.activate(false)
           }
         }
       }
 
       Label {
-        visible: window.results.length === 0 && input.text !== ""
-        text: "Nothing found"
+        visible: window.rows.length === 0 && input.text !== ""
+        text: input.text.trim().toLowerCase().startsWith("kill") ? "Looking for processes…" : "Nothing found"
         kind: "muted"
         horizontalAlignment: Text.AlignHCenter
         Layout.fillWidth: true
@@ -268,10 +371,10 @@ PanelWindow {
 
         Row { spacing: 6; Kbd { text: "↑ ↓" } Label { text: "select"; kind: "muted"; anchors.verticalCenter: parent.verticalCenter } }
         Row { spacing: 6; Kbd { text: "Enter" } Label { text: "open"; kind: "muted"; anchors.verticalCenter: parent.verticalCenter } }
-        Row { spacing: 6; Kbd { text: ">" } Label { text: "command"; kind: "muted"; anchors.verticalCenter: parent.verticalCenter } }
+        Row { spacing: 6; Kbd { text: "Ctrl + K" } Label { text: "actions"; kind: "muted"; anchors.verticalCenter: parent.verticalCenter } }
         Item { Layout.fillWidth: true }
         Label {
-          text: window.results.filter(r => r.kind === "app").length + " apps"
+          text: "yt · aw · aur · gh · kill · window · >"
           kind: "muted"
         }
       }

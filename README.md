@@ -10,7 +10,7 @@
 | `modules/notifications/` | Notification pop-ups (stack, fan out on hover) and the card used everywhere |
 | `modules/clockpanel/` | Clock panel: month calendar and notification history |
 | `modules/osd/` | Pop-up for volume, microphone, brightness, keyboard layout and Caps Lock |
-| `modules/launcher/` | Launcher: apps, calculator, `>` commands, web search |
+| `modules/launcher/` | Launcher: apps, favorites, calculator, quicklinks (`yt`, `aw`, `aur`, `gh`…), system and window commands, `kill`, your scripts, `>` commands |
 | `modules/quicksettings/` | Quick settings panel: toggles, sliders, and network, Bluetooth and sound pages |
 | `services/` | `Hypr` (Hyprland actions for Lua and old configs), `Panels` (which panel is open), `Session` (caffeine, night light, brightness, power profiles) |
 | `dev/` | `Gallery`: test window with every component |
@@ -23,6 +23,10 @@ Rules:
 - Animations use `Theme.anim.*`, so the speed setting and "Off" work everywhere.
 
 `settings.json` is created on first start, next to `shell.qml`. It is per machine and not in git.
+
+## Launcher scripts
+
+Executable files in `scripts/launcher/` show up in the launcher. See `scripts/launcher/README.md`.
 
 ## Hyprland
 
