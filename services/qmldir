@@ -1,1 +1,3 @@
 singleton Hypr 1.0 Hypr.qml
+singleton Panels 1.0 Panels.qml
+singleton Session 1.0 Session.qml

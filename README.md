@@ -7,7 +7,8 @@
 | `config/` | `Theme` (colours, sizes, spacing, animation timings), `Palettes` (the 12 themes), `Config` (settings from `settings.json`) |
 | `components/` | Building blocks from the design: `Button`, `IconButton`, `Toggle`, `Segmented`, `PillSlider`, `Chip`, `Kbd`, `ListRow`, `GlassPanel`, `Card`, `Label`, `Icon` |
 | `modules/bar/` | The bar: `Workspaces`, `MediaPill`, `ClockPill`, `Tray`, `StatusPill` |
-| `services/` | `Hypr`: Hyprland actions that work with both the Lua and the old config |
+| `modules/quicksettings/` | Quick settings panel: toggles, sliders, and Wi-Fi, Bluetooth and sound pages |
+| `services/` | `Hypr` (Hyprland actions for Lua and old configs), `Panels` (which panel is open), `Session` (caffeine, night light, brightness, power profiles) |
 | `dev/` | `Gallery`: test window with every component |
 | `widgets/` | Dropdowns and services from the old bar (moving over feature by feature) |
 | `hyprland/` | `quickshell.lua`: Hyprland layer rules (glass blur), loaded from `hyprland.lua` |
@@ -26,6 +27,14 @@ Add this line to `~/.config/hypr/hyprland.lua` for the glass blur:
 ```lua
 pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/quickshell.lua")
 ```
+
+## IPC
+
+| Command | What it does |
+|---|---|
+| `qs ipc call quicksettings toggle` | Open or close quick settings (Super + A) |
+| `qs ipc call quicksettings open wifi` | Open a page directly: `main`, `wifi`, `bluetooth`, `audio` |
+| `qs ipc call gallery toggle` | Component gallery |
 
 ## Component gallery
 

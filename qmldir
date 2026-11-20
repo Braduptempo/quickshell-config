@@ -5,19 +5,14 @@ module MijnSysteem
 Time 1.0 widgets/clock/Time.qml
 
 # widgets/battery
-BatteryDropdown 1.0 widgets/battery/BatteryDropdown.qml
 singleton Battery 1.0 widgets/battery/Battery.qml
 BatteryAnimation 1.0 widgets/battery/BatteryAnimation.qml
 
 # widgets/sound
 singleton Sound 1.0 widgets/sound/Sound.qml
-SoundDropdown 1.0 widgets/sound/SoundDropdown.qml
 
 # widgets/network
-NetworkDropdown 1.0 widgets/network/NetworkDropdown.qml
 NetworkManager 1.0 widgets/network/NetworkManager.qml
-NetworkRowDelegate 1.0 widgets/network/NetworkRowDelegate.qml
-NetworkStatsPanel 1.0 widgets/network/NetworkStatsPanel.qml
 
 
 # widgets/notifications

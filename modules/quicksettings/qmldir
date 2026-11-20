@@ -1,0 +1,8 @@
+AudioPage 1.0 AudioPage.qml
+BluetoothPage 1.0 BluetoothPage.qml
+ConnectionStats 1.0 ConnectionStats.qml
+MainPage 1.0 MainPage.qml
+PageHeader 1.0 PageHeader.qml
+QuickSettings 1.0 QuickSettings.qml
+Tile 1.0 Tile.qml
+WifiPage 1.0 WifiPage.qml

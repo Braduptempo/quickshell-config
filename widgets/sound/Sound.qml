@@ -34,6 +34,12 @@ QtObject {
         : 0
     readonly property bool isMicMuted: defaultSource && defaultSource.audio ? defaultSource.audio.muted : false
 
+    function toggleMicMute() {
+        if (defaultSource && defaultSource.audio) {
+            defaultSource.audio.muted = !defaultSource.audio.muted;
+        }
+    }
+
     function setMicVolume(val) {
         if (defaultSource && defaultSource.audio) {
             defaultSource.audio.volume = Math.max(0, Math.min(1, val));

@@ -18,6 +18,9 @@ Singleton {
   // Emitted for every incoming notification, used by ToastOverlay
   signal toast(var notification)
 
+  // Do not disturb: notifications still go into the history, but no pop-ups
+  property bool dnd: false
+
   // Shown as a red dot on the clock until the history is opened
   property int unread: 0
 
@@ -29,7 +32,8 @@ Singleton {
     id: server
     onNotification: function(notification) {
       root.unread++;
-      root.toast(notification);
+      // Critical notifications still show during Do not disturb
+      if (!root.dnd || notification.urgency === NotificationUrgency.Critical) root.toast(notification);
       root.model.insert(0, {
         "appName": notification.appName || "Systeem",
         "summary": notification.summary || "",
