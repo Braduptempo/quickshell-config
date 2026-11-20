@@ -14,7 +14,8 @@ Rectangle {
   default property alias control: controlRow.data
 
   Layout.fillWidth: true
-  implicitHeight: Math.max(56, textColumn.implicitHeight + 24)
+  // Grows with its control too (an open Dropdown)
+  implicitHeight: Math.max(56, textColumn.implicitHeight + 24, controlRow.implicitHeight + 24)
   radius: Theme.radiusCard
   color: Theme.item
 

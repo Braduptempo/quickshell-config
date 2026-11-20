@@ -13,3 +13,5 @@ BarPage 1.0 BarPage.qml
 NotificationsPage 1.0 NotificationsPage.qml
 NightLightPage 1.0 NightLightPage.qml
 KeybindsPage 1.0 KeybindsPage.qml
+DisplaysPage 1.0 DisplaysPage.qml
+DefaultAppsPage 1.0 DefaultAppsPage.qml

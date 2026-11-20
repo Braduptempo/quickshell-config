@@ -20,15 +20,18 @@ Scope {
   readonly property bool bottom: Config.bar.position === "bottom"
   readonly property bool attached: Config.bar.style === "attached"
 
+  // The main monitor (Settings → Displays), or the first one
+  readonly property ShellScreen mainScreen: Quickshell.screens.find(s => s.name === Config.displays.primary) ?? Quickshell.screens[0] ?? null
+
   Variants {
-    // The first monitor always has a bar; the others unless set to "none"
-    model: Quickshell.screens.filter((s, i) => i === 0 || Config.bar.otherMonitors !== "none")
+    // The main monitor always has a bar; the others unless set to "none"
+    model: Quickshell.screens.filter(s => s === root.mainScreen || Config.bar.otherMonitors !== "none")
 
     PanelWindow {
       id: panel
 
       required property ShellScreen modelData
-      readonly property bool light: modelData !== Quickshell.screens[0] && Config.bar.otherMonitors === "light"
+      readonly property bool light: modelData !== root.mainScreen && Config.bar.otherMonitors === "light"
 
       screen: modelData
       color: "transparent"
