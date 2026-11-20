@@ -18,3 +18,6 @@ singleton Displays 1.0 Displays.qml
 singleton DefaultApps 1.0 DefaultApps.qml
 singleton Input 1.0 Input.qml
 singleton Calendar 1.0 Calendar.qml
+singleton Privacy 1.0 Privacy.qml
+singleton Updates 1.0 Updates.qml
+singleton Drives 1.0 Drives.qml

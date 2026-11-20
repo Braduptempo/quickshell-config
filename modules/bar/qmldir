@@ -6,3 +6,5 @@ StatusPill 1.0 StatusPill.qml
 Tray 1.0 Tray.qml
 Workspaces 1.0 Workspaces.qml
 RecordingPill 1.0 RecordingPill.qml
+ExtrasPills 1.0 ExtrasPills.qml
+ExtrasMenu 1.0 ExtrasMenu.qml

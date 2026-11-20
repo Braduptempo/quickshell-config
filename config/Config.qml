@@ -40,6 +40,12 @@ Singleton {
     property bool showDate: false
     // Monitors other than the first: "full", "light" (workspaces and clock) or "none"
     property string otherMonitors: "full"
+    // Mic, camera or screen in use
+    property bool showPrivacy: true
+    // Waiting package updates (pacman + AUR)
+    property bool showUpdates: true
+    // USB sticks and other removable drives
+    property bool showDrives: true
   }
 
   component SoundSettings: JsonObject {

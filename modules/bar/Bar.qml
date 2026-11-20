@@ -106,6 +106,12 @@ Scope {
           anchors.verticalCenter: parent.verticalCenter
           spacing: 6
 
+          // Mic / camera / screen in use, updates, drives
+          ExtrasPills {
+            screen: panel.modelData
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
           // While recording
           RecordingPill {
             anchors.verticalCenter: parent.verticalCenter
