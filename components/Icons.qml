@@ -50,6 +50,8 @@ Singleton {
     "camera": "M15 10l5-3v10l-5-3zM3 6h12v12H3z",
     "palette": "M12 2a10 10 0 1 0 0 20c1 0 2-1 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1 .8-2 2-2h2a6 6 0 0 0 6-6c0-4.4-4.5-7.5-11-7.5z",
     "image": "M3 5h18v14H3zM21 16l-5-5-9 8",
+    "folder": "M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z",
+    "file": "M6 2h8l5 5v15H6zM14 2v5h5",
     // generic
     "chevron-left": "M15 6l-6 6 6 6",
     "chevron-right": "M9 6l6 6-6 6",

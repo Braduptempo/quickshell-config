@@ -12,6 +12,12 @@
 //   window …          act on the window that had focus
 //   kill firefox      stop a process (Ctrl + Enter: force)
 //   no match          search the web, ArchWiki or the AUR, or run it
+// With extra programs (services/LauncherTools.qml):
+//   5 km in miles     calculator with units and currency (qalc)
+//   /report, f report file search (fd)
+//   :laugh            emoji, typed into the window (wtype)
+//   ;qml              snippets from snippets/*.txt
+//   color             pick a colour from the screen (hyprpicker)
 //
 // Launch counts, favorites and hidden apps live in the shell's state folder.
 pragma Singleton
@@ -49,7 +55,17 @@ Singleton {
     open = true;
   }
 
-  onOpenChanged: if (open) scriptsProc.running = true
+  onOpenChanged: {
+    if (open) {
+      scriptsProc.running = true;
+      LauncherTools.refreshSnippets();
+    }
+  }
+
+  Connections {
+    target: LauncherTools
+    function onUpdated() { root.revision++; }
+  }
 
   // --- Stored state ---------------------------------------------------------------
   FileView {
@@ -186,6 +202,7 @@ Singleton {
     add("Clear notifications", "Notifications", "bell", () => Notifications.clearAll(), "", ["dismiss"]);
     add(Session.caffeine ? "Turn caffeine off" : "Turn caffeine on", "Keep the screen awake", "activity", () => Session.caffeine = !Session.caffeine, "", ["awake", "idle", "sleep"]);
     if (Session.nightLightAvailable) add(Session.nightLight ? "Turn night light off" : "Turn night light on", "Display", "sun", () => Session.nightLight = !Session.nightLight, "", ["redshift", "warm", "blue light"]);
+    if (LauncherTools.hasPicker) add("Pick a color", "From the screen, copies the hex code", "palette", () => LauncherTools.pickColor(), "", ["color", "colour", "hex", "picker", "hyprpicker"]);
     add("Quick settings", "Open the panel", "settings", () => Panels.openQuickSettings(null, "main"), "", ["qs", "settings", "volume"]);
     add("Notifications", "Open the history", "bell", () => Panels.openClockPanel(null, "notifications"));
     add("Calendar", "Open the month view", "calendar", () => Panels.openClockPanel(null, "calendar"));
@@ -302,6 +319,48 @@ Singleton {
     // kill <name>
     if (first === "kill") return processResults(rest.toLowerCase());
 
+    // :emoji
+    if (q.startsWith(":") && LauncherTools.emoji.length > 0) {
+      return LauncherTools.findEmoji(q.slice(1)).map(e => ({
+        key: "emoji:" + e[0], section: "Emoji", glyph: e[0], title: e[1].charAt(0).toUpperCase() + e[1].slice(1),
+        subtitle: LauncherTools.hasWtype ? "Typed into your window and copied" : "Copied", icon: "image", hint: "Emoji",
+        run: () => LauncherTools.typeText(e[0])
+      }));
+    }
+
+    // ;snippet
+    if (q.startsWith(";")) {
+      const term = q.slice(1);
+      const list = LauncherTools.snippets.filter(sn => term === "" || sn.name.toLowerCase().includes(term));
+      if (list.length === 0) return [{ key: "snip:none", section: "Snippets", title: "No snippets yet", subtitle: "Add .txt files to the snippets folder", icon: "plus", hint: "", run: () => Quickshell.execDetached(["xdg-open", LauncherTools.snippetsDir]) }];
+      return list.map(sn => ({
+        key: "snip:" + sn.path, section: "Snippets", title: sn.name, subtitle: LauncherTools.hasWtype ? "Typed into your window and copied" : "Copied",
+        icon: "clipboard", hint: "Snippet", altHint: "Ctrl + Enter: edit",
+        run: () => LauncherTools.typeFile(sn.path),
+        runAlt: () => Quickshell.execDetached(["sh", "-c", "kitty -e \"${EDITOR:-nvim}\" \"$1\"", "sh", sn.path])
+      }));
+    }
+
+    // /file or f file
+    if (LauncherTools.hasFd && (q.startsWith("/") || ((first === "f" || first === "file") && rest !== ""))) {
+      const term = q.startsWith("/") ? trimmed.slice(1) : rest;
+      return LauncherTools.findFiles(term).map(f => ({
+        key: "file:" + f.path, section: "Files", title: f.name, subtitle: f.folder, icon: f.isDir ? "folder" : "file",
+        hint: f.isDir ? "Folder" : "File", altHint: "Ctrl + Enter: show in folder",
+        run: () => Qt.openUrlExternally("file://" + f.path),
+        runAlt: () => Qt.openUrlExternally("file://" + f.path.split("/").slice(0, -1).join("/"))
+      }));
+    }
+
+    // color: pick from the screen, or copy a recent one
+    if (LauncherTools.hasPicker && (first === "color" || first === "colour" || first === "pick" || first === "hex")) {
+      const list = [{ key: "color:pick", section: "Color", title: "Pick a color from the screen", subtitle: "Click anywhere; the hex code is copied", icon: "palette", hint: "hyprpicker", run: () => LauncherTools.pickColor() }];
+      for (const hex of LauncherTools.recentColors) {
+        list.push({ key: "color:" + hex, section: "Recent colors", title: hex, subtitle: "RGB " + LauncherTools.rgb(hex), swatch: hex, icon: "palette", hint: "Copy", run: () => Quickshell.execDetached(["wl-copy", hex]) });
+      }
+      return list;
+    }
+
     // window …
     if (first === "window" || first === "win") return windowCommands(rest);
 
@@ -311,8 +370,8 @@ Singleton {
       results.push({ key: "link:" + link.keyword, section: "Quicklinks", title: link.name + ": " + rest, subtitle: link.url.replace("%s", rest).replace(/^https?:\/\//, ""), icon: "search", hint: "Quicklink", run: () => openUrl(link.url, rest) });
     }
 
-    // Sum
-    const calc = calculate(trimmed);
+    // Sum: qalc when installed (units, %, currency), the built-in one meanwhile
+    const calc = LauncherTools.calc(trimmed) || calculate(trimmed);
     if (calc !== "") results.push({ key: "calc", section: "Calculator", title: calc, subtitle: trimmed + " =", icon: "plus", hint: "Enter to copy", big: true, run: () => Quickshell.execDetached(["wl-copy", calc]) });
 
     // Nothing typed: favorites, then the most used apps

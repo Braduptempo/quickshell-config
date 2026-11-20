@@ -291,9 +291,27 @@ PanelWindow {
                 asynchronous: true
               }
 
+              // Emoji: the character itself
+              Text {
+                anchors.centerIn: parent
+                visible: (row.modelData.glyph ?? "") !== ""
+                text: row.modelData.glyph ?? ""
+                font.pixelSize: 24
+              }
+
+              // Colour: a swatch
               Rectangle {
                 anchors.fill: parent
-                visible: !appIcon.visible
+                visible: (row.modelData.swatch ?? "") !== ""
+                radius: 16
+                color: row.modelData.swatch ?? "transparent"
+                border.width: 1
+                border.color: Theme.border
+              }
+
+              Rectangle {
+                anchors.fill: parent
+                visible: !appIcon.visible && (row.modelData.glyph ?? "") === "" && (row.modelData.swatch ?? "") === ""
                 radius: 16
                 color: row.hasAppIcon ? Theme.overlay : Theme.alpha(row.confirming ? Theme.error : Theme.accent, 0.2)
 
@@ -374,7 +392,7 @@ PanelWindow {
         Row { spacing: 6; Kbd { text: "Ctrl + K" } Label { text: "actions"; kind: "muted"; anchors.verticalCenter: parent.verticalCenter } }
         Item { Layout.fillWidth: true }
         Label {
-          text: "yt · aw · aur · gh · kill · window · >"
+          text: ": emoji · ; snippets · / files · yt · kill · >"
           kind: "muted"
         }
       }
