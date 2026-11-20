@@ -32,6 +32,8 @@ hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("qs ipc call notifications dnd"))
 -- allow_session_lock_restore lets that new lock take over.
 hl.config({ misc = { allow_session_lock_restore = true } })
 hl.bind("SUPER + L", hl.dsp.exec_cmd("qs ipc call lock lock"))
+-- Power menu: lock, suspend, log out, restart, shut down
+hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs ipc call power toggle"))
 -- Clipboard history (Super + V stays "float window" from modules/keybinds.lua)
 hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("qs ipc call clipboard toggle"))
 
