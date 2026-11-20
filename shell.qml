@@ -5,15 +5,35 @@ import Quickshell.Io
 import "./modules/bar"
 import "./modules/quicksettings"
 import "./services"
-import "./widgets/notifications"
+import "./modules/notifications"
+import "./modules/clockpanel"
 import "./dev"
 
 Scope {
 
   Bar {}
 
-  // Het popup venster. Luistert zelf naar de Notifications-singleton.
-  ToastOverlay {}
+  // Notification pop-ups, and the clock panel (calendar + notifications)
+  Toasts {}
+
+  ClockPanel {}
+
+  // `qs ipc call notifications toggle` (Super + N), `dnd`, `clear`
+  IpcHandler {
+    target: "notifications"
+    function toggle(): void {
+      Panels.toggleClockPanel(Panels.focusedScreen(), "notifications");
+    }
+    function calendar(): void {
+      Panels.toggleClockPanel(Panels.focusedScreen(), "calendar");
+    }
+    function dnd(): void {
+      Notifications.dnd = !Notifications.dnd;
+    }
+    function clear(): void {
+      Notifications.clearAll();
+    }
+  }
 
   QuickSettings {}
 

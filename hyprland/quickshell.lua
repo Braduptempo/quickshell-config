@@ -21,3 +21,5 @@ hl.layer_rule({
 -- Shell keybinds. They call Quickshell over IPC, so they work as long as
 -- the shell runs (`qs ipc show` lists every target).
 hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc call quicksettings toggle"))
+hl.bind("SUPER + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"))
+hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("qs ipc call notifications dnd"))

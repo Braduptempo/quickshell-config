@@ -11,7 +11,7 @@ import "../../components"
 import "../../services"
 import "../../widgets/sound"
 import "../../widgets/battery"
-import "../../widgets/notifications"
+
 
 ColumnLayout {
   id: root

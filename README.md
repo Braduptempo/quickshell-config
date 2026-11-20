@@ -7,6 +7,8 @@
 | `config/` | `Theme` (colours, sizes, spacing, animation timings), `Palettes` (the 12 themes), `Config` (settings from `settings.json`) |
 | `components/` | Building blocks from the design: `Button`, `IconButton`, `Toggle`, `Segmented`, `PillSlider`, `Chip`, `Kbd`, `ListRow`, `GlassPanel`, `Card`, `Label`, `Icon` |
 | `modules/bar/` | The bar: `Workspaces`, `MediaPill`, `ClockPill`, `Tray`, `StatusPill` |
+| `modules/notifications/` | Notification pop-ups (stack, fan out on hover) and the card used everywhere |
+| `modules/clockpanel/` | Clock panel: month calendar and notification history |
 | `modules/quicksettings/` | Quick settings panel: toggles, sliders, and network, Bluetooth and sound pages |
 | `services/` | `Hypr` (Hyprland actions for Lua and old configs), `Panels` (which panel is open), `Session` (caffeine, night light, brightness, power profiles) |
 | `dev/` | `Gallery`: test window with every component |
@@ -34,6 +36,10 @@ pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/quickshell.lua"
 |---|---|
 | `qs ipc call quicksettings toggle` | Open or close quick settings (Super + A) |
 | `qs ipc call quicksettings open network` | Open a page directly: `main`, `network`, `bluetooth`, `audio` |
+| `qs ipc call notifications toggle` | Clock panel on the notifications tab (Super + N) |
+| `qs ipc call notifications calendar` | Clock panel on the calendar tab |
+| `qs ipc call notifications dnd` | Do not disturb on/off (Super + Shift + N) |
+| `qs ipc call notifications clear` | Dismiss all notifications |
 | `qs ipc call gallery toggle` | Component gallery |
 
 ## Component gallery
