@@ -102,6 +102,9 @@ Singleton {
     }
   }
 
+  property alias pins: state.pins
+  property alias seen: state.seen
+
   // --- Reading the history -----------------------------------------------------------
   function refresh(): void {
     if (!available) return;
@@ -136,16 +139,16 @@ Singleton {
       if (tab < 1) continue;
       const id = line.slice(0, tab);
       const preview = line.slice(tab + 1);
-      seen[id] = state.seen[id] ?? now;
-      list.push(Object.assign({ id, line, preview, added: seen[id], pinned: state.pins.indexOf(preview) >= 0 }, kindOf(preview)));
+      seen[id] = root.seen[id] ?? now;
+      list.push(Object.assign({ id, line, preview, added: seen[id], pinned: root.pins.indexOf(preview) >= 0 }, kindOf(preview)));
     }
     // Forget pins whose item is gone, unless the list is empty (cliphist not ready)
     if (list.length > 0) {
       const previews = list.map(i => i.preview);
-      const pins = state.pins.filter(p => previews.indexOf(p) >= 0);
-      if (pins.length !== state.pins.length) state.pins = pins;
+      const pins = root.pins.filter(p => previews.indexOf(p) >= 0);
+      if (pins.length !== root.pins.length) root.pins = pins;
     }
-    if (JSON.stringify(seen) !== JSON.stringify(state.seen)) state.seen = seen;
+    if (JSON.stringify(seen) !== JSON.stringify(root.seen)) root.seen = seen;
     items = list;
     revision++;
   }
@@ -217,12 +220,12 @@ Singleton {
   }
 
   function togglePin(item: var): void {
-    state.pins = item.pinned ? state.pins.filter(p => p !== item.preview) : state.pins.concat([item.preview]);
+    root.pins = item.pinned ? root.pins.filter(p => p !== item.preview) : root.pins.concat([item.preview]);
     parseAgain();
   }
 
   function remove(item: var): void {
-    if (item.pinned) state.pins = state.pins.filter(p => p !== item.preview);
+    if (item.pinned) root.pins = root.pins.filter(p => p !== item.preview);
     items = items.filter(i => i.id !== item.id);
     revision++;
     withItem(item.id, "echo \"$1\" | " + root.cliphistCmd + " delete", []);
@@ -245,7 +248,7 @@ Singleton {
 
   // Pins changed: recompute `pinned` without asking cliphist again
   function parseAgain(): void {
-    items = items.map(i => Object.assign({}, i, { pinned: state.pins.indexOf(i.preview) >= 0 }));
+    items = items.map(i => Object.assign({}, i, { pinned: root.pins.indexOf(i.preview) >= 0 }));
     revision++;
   }
 
