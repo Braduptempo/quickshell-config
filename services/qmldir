@@ -1,4 +1,5 @@
 singleton Hypr 1.0 Hypr.qml
+singleton Launcher 1.0 Launcher.qml
 singleton Notifications 1.0 Notifications.qml
 singleton Osd 1.0 Osd.qml
 singleton Panels 1.0 Panels.qml

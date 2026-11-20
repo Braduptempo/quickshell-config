@@ -8,6 +8,7 @@ import "./services"
 import "./modules/notifications"
 import "./modules/clockpanel"
 import "./modules/osd"
+import "./modules/launcher"
 import "./dev"
 
 Scope {
@@ -21,6 +22,20 @@ Scope {
 
   // Volume, microphone, brightness, keyboard layout and Caps Lock pop-up
   OsdWindow {}
+
+  // Super + Space
+  LauncherWindow {}
+
+  IpcHandler {
+    target: "launcher"
+    function toggle(): void {
+      Launcher.toggle(Panels.focusedScreen());
+    }
+    // `qs ipc call launcher search "2*21"` opens with that text already typed
+    function search(text: string): void {
+      Launcher.openWith(Panels.focusedScreen(), text);
+    }
+  }
 
   // `qs ipc call notifications toggle` (Super + N), `dnd`, `clear`
   IpcHandler {
