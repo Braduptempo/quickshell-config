@@ -19,3 +19,4 @@ SoundPage 1.0 SoundPage.qml
 InputPage 1.0 InputPage.qml
 NetworkSettingsPage 1.0 NetworkSettingsPage.qml
 CalendarsPage 1.0 CalendarsPage.qml
+WeatherPage 1.0 WeatherPage.qml

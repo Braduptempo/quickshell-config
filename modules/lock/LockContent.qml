@@ -222,23 +222,64 @@ Item {
       color: Theme.subtext
     }
 
-    // Notifications that came in (only the count, never the content)
-    GlassPill {
-      visible: Config.lock.showNotifications && Notifications.count > 0
+    // Weather, notifications (only the count, never the content), next event
+    Row {
       Layout.alignment: Qt.AlignHCenter
       Layout.topMargin: 8
-      implicitHeight: 30
-      implicitWidth: notifRow.implicitWidth + 28
+      spacing: 8
 
-      Row {
-        id: notifRow
-        anchors.centerIn: parent
-        spacing: 8
-        Rectangle { width: 7; height: 7; radius: 4; color: Theme.error; anchors.verticalCenter: parent.verticalCenter }
-        Label {
-          text: Notifications.count + (Notifications.count === 1 ? " notification" : " notifications")
-          font.pixelSize: Theme.font.small
-          anchors.verticalCenter: parent.verticalCenter
+      GlassPill {
+        visible: Config.weather.showOnLock && Weather.current !== null
+        implicitHeight: 30
+        implicitWidth: weatherRow.implicitWidth + 28
+
+        Row {
+          id: weatherRow
+          anchors.centerIn: parent
+          spacing: 8
+          Icon { name: Weather.current ? Weather.icon(Weather.current.code, Weather.current.isDay) : "cloud"; size: 14; anchors.verticalCenter: parent.verticalCenter }
+          Label {
+            text: Weather.current ? Weather.degrees(Weather.current.temperature) + " " + Weather.describe(Weather.current.code) : ""
+            font.pixelSize: Theme.font.small
+            anchors.verticalCenter: parent.verticalCenter
+          }
+        }
+      }
+
+      GlassPill {
+        visible: Config.lock.showNotifications && Notifications.count > 0
+        implicitHeight: 30
+        implicitWidth: notifRow.implicitWidth + 28
+
+        Row {
+          id: notifRow
+          anchors.centerIn: parent
+          spacing: 8
+          Rectangle { width: 7; height: 7; radius: 4; color: Theme.error; anchors.verticalCenter: parent.verticalCenter }
+          Label {
+            text: Notifications.count + (Notifications.count === 1 ? " notification" : " notifications")
+            font.pixelSize: Theme.font.small
+            anchors.verticalCenter: parent.verticalCenter
+          }
+        }
+      }
+
+      GlassPill {
+        // Only today's: what's next, not the whole agenda
+        visible: Calendar.next !== null && new Date(Calendar.next.start).toDateString() === Time.date.toDateString()
+        implicitHeight: 30
+        implicitWidth: nextRow.implicitWidth + 28
+
+        Row {
+          id: nextRow
+          anchors.centerIn: parent
+          spacing: 8
+          Rectangle { width: 7; height: 7; radius: 4; color: Calendar.next ? Calendar.next.color : Theme.accent; anchors.verticalCenter: parent.verticalCenter }
+          Label {
+            text: Calendar.next ? "Next at " + Qt.formatDateTime(new Date(Calendar.next.start), "HH:mm") : ""
+            font.pixelSize: Theme.font.small
+            anchors.verticalCenter: parent.verticalCenter
+          }
         }
       }
     }

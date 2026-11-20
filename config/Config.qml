@@ -67,6 +67,16 @@ Singleton {
     property string weekStart: "monday"
   }
 
+  component WeatherSettings: JsonObject {
+    // The place you chose in Settings → Weather; empty = no weather
+    property string place: ""
+    property real latitude: 0
+    property real longitude: 0
+    // "celsius" or "fahrenheit"
+    property string units: "celsius"
+    property bool showOnLock: true
+  }
+
   component DisplaySettings: JsonObject {
     // The monitor with the full bar; "" = the first one
     property string primary: ""
@@ -124,6 +134,7 @@ Singleton {
   property alias displays: adapter.displays
   property alias sound: adapter.sound
   property alias calendar: adapter.calendar
+  property alias weather: adapter.weather
   property alias apps: adapter.apps
 
   FileView {
@@ -157,6 +168,8 @@ Singleton {
       property SoundSettings sound: SoundSettings {}
 
       property CalendarSettings calendar: CalendarSettings {}
+
+      property WeatherSettings weather: WeatherSettings {}
 
       property AppSettings apps: AppSettings {}
     }
