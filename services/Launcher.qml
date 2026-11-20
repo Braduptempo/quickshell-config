@@ -1,12 +1,27 @@
 // Launcher.qml
-// Search for the launcher: apps (ranked by match and how often you open
-// them), a calculator, shell commands (start with ">") and a web search
-// as last resort. Launch counts live in the shell's state folder.
+// Everything the launcher can find. Each result is a plain object:
+//   { key, section, title, subtitle, icon, appIcon?, hint, confirm?, run() }
+// and apps also carry `app` so the Ctrl + K menu can act on them.
+//
+// What you can type:
+//   (nothing)         favorites and your most used apps
+//   an app name       apps, plus matching system commands and scripts
+//   a sum             the calculator; Enter copies the answer
+//   yt lofi           quicklinks: a keyword, then what to search for
+//   > command         runs in a shell
+//   window …          act on the window that had focus
+//   kill firefox      stop a process (Ctrl + Enter: force)
+//   no match          search the web, ArchWiki or the AUR, or run it
+//
+// Launch counts, favorites and hidden apps live in the shell's state folder.
 pragma Singleton
 
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Bluetooth
+import Quickshell.Networking
+import Quickshell.Hyprland
 
 Singleton {
   id: root
@@ -15,6 +30,8 @@ Singleton {
   property ShellScreen screen: null
   // Text to start with when opening (IPC `launcher search …`)
   property string initialQuery: ""
+  // Bumped when async data (processes, scripts) arrives, so the window re-runs search
+  property int revision: 0
 
   function toggle(onScreen: ShellScreen): void {
     if (open) {
@@ -32,9 +49,10 @@ Singleton {
     open = true;
   }
 
-  // --- Launch counts ("frecency light") -------------------------------------
+  onOpenChanged: if (open) scriptsProc.running = true
+
+  // --- Stored state ---------------------------------------------------------------
   FileView {
-    id: stateFile
     path: Quickshell.statePath("launcher.json")
     watchChanges: false
     onAdapterUpdated: writeAdapter()
@@ -46,6 +64,10 @@ Singleton {
       id: state
       // app id -> { count, last }
       property var launches: ({})
+      // app ids, in the order you pinned them
+      property var favorites: []
+      // app ids you don't want to see
+      property var hidden: []
     }
   }
 
@@ -64,28 +86,54 @@ Singleton {
     state.launches = launches;
   }
 
+  function isFavorite(id: string): bool {
+    return state.favorites.indexOf(id) >= 0;
+  }
+
+  function toggleFavorite(id: string): void {
+    state.favorites = isFavorite(id) ? state.favorites.filter(f => f !== id) : state.favorites.concat([id]);
+    revision++;
+  }
+
+  function hide(id: string): void {
+    state.hidden = state.hidden.concat([id]);
+    state.favorites = state.favorites.filter(f => f !== id);
+    revision++;
+  }
+
   // --- Apps ---------------------------------------------------------------------
-  readonly property var apps: DesktopEntries.applications.values.filter(a => !a.noDisplay)
+  readonly property var apps: DesktopEntries.applications.values.filter(a => !a.noDisplay && state.hidden.indexOf(a.id) < 0)
+
+  function scoreText(name: string, q: string): real {
+    if (name === q) return 100;
+    if (name.startsWith(q)) return 80;
+    if (name.split(/[\s\-_.]+/).some(w => w.startsWith(q))) return 65;
+    if (name.includes(q)) return 50;
+    if (initials(name, q)) return 20;
+    return 0;
+  }
 
   function scoreApp(app: DesktopEntry, q: string): real {
-    const name = app.name.toLowerCase();
-    let score = 0;
-    if (name === q) score = 100;
-    else if (name.startsWith(q)) score = 80;
-    else if (name.split(/[\s\-_.]+/).some(w => w.startsWith(q))) score = 65;
-    else if (name.includes(q)) score = 50;
-    else if ((app.genericName ?? "").toLowerCase().includes(q)) score = 35;
-    else if ((app.keywords ?? []).some(k => k.toLowerCase().startsWith(q))) score = 30;
-    else if (fuzzy(name, q)) score = 20;
-    else if ((app.comment ?? "").toLowerCase().includes(q)) score = 10;
-    if (score === 0) return 0;
-    return score + boostFor(app.id);
+    let score = scoreText(app.name.toLowerCase(), q);
+    if (score === 0 && (app.genericName ?? "").toLowerCase().includes(q)) score = 35;
+    if (score === 0 && (app.keywords ?? []).some(k => k.toLowerCase().startsWith(q))) score = 30;
+    if (score === 0 && (app.comment ?? "").toLowerCase().includes(q)) score = 10;
+    return score === 0 ? 0 : score + boostFor(app.id);
   }
 
   // First letters of the words, e.g. "vsc" matches "Visual Studio Code"
-  function fuzzy(text: string, q: string): bool {
-    const initials = text.split(/[\s\-_.]+/).filter(w => w !== "").map(w => w[0]).join("");
-    return q.length >= 2 && initials.startsWith(q);
+  function initials(text: string, q: string): bool {
+    const letters = text.split(/[\s\-_.]+/).filter(w => w !== "").map(w => w[0]).join("");
+    return q.length >= 2 && letters.startsWith(q);
+  }
+
+  function appResult(app: DesktopEntry, section: string): var {
+    return {
+      key: "app:" + app.id, section, app,
+      title: app.name, subtitle: app.genericName || app.comment || "",
+      appIcon: app.icon, icon: "image", hint: "Application",
+      run: () => { remember(app.id); app.execute(); }
+    };
   }
 
   // --- Calculator -------------------------------------------------------------
@@ -109,63 +157,219 @@ Singleton {
     }
   }
 
-  // --- Results -------------------------------------------------------------------
-  // Each result: { kind, title, subtitle, icon, app?, value? }
+  // --- Quicklinks: keyword + search terms ---------------------------------------
+  readonly property var quicklinks: [
+    { keyword: "yt", name: "YouTube", url: "https://www.youtube.com/results?search_query=%s" },
+    { keyword: "g", name: "Google", url: "https://www.google.com/search?q=%s" },
+    { keyword: "ddg", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=%s" },
+    { keyword: "gh", name: "GitHub", url: "https://github.com/search?q=%s" },
+    { keyword: "aw", name: "ArchWiki", url: "https://wiki.archlinux.org/index.php?search=%s" },
+    { keyword: "aur", name: "AUR", url: "https://aur.archlinux.org/packages?K=%s" },
+    { keyword: "pkg", name: "Arch packages", url: "https://archlinux.org/packages/?q=%s" },
+    { keyword: "w", name: "Wikipedia", url: "https://en.wikipedia.org/w/index.php?search=%s" },
+    { keyword: "qs", name: "Quickshell docs", url: "https://quickshell.org/docs/search/?q=%s" }
+  ]
+
+  function openUrl(template: string, terms: string): void {
+    Qt.openUrlExternally(template.replace("%s", encodeURIComponent(terms)));
+  }
+
+  // --- System commands ------------------------------------------------------------
+  readonly property var systemCommands: {
+    const list = [];
+    const add = (title, subtitle, icon, run, confirm, words) => list.push({ key: "sys:" + title, section: "Commands", title, subtitle, icon, hint: "Command", run, confirm: confirm ?? "", words: words ?? [] });
+    const wifi = Networking.wifiEnabled;
+    add(wifi ? "Turn Wi-Fi off" : "Turn Wi-Fi on", "Network", wifi ? "wifi-off" : "wifi", () => Networking.wifiEnabled = !wifi, "", ["wifi", "wlan", "wireless", "network"]);
+    const adapter = Bluetooth.defaultAdapter;
+    if (adapter) add(adapter.enabled ? "Turn Bluetooth off" : "Turn Bluetooth on", "Bluetooth", "bluetooth", () => adapter.enabled = !adapter.enabled, "", ["bt", "bluetooth"]);
+    add(Notifications.dnd ? "Turn Do not disturb off" : "Turn Do not disturb on", "Notifications", "moon", () => Notifications.dnd = !Notifications.dnd, "", ["dnd", "focus", "quiet", "silent"]);
+    add("Clear notifications", "Notifications", "bell", () => Notifications.clearAll(), "", ["dismiss"]);
+    add(Session.caffeine ? "Turn caffeine off" : "Turn caffeine on", "Keep the screen awake", "activity", () => Session.caffeine = !Session.caffeine, "", ["awake", "idle", "sleep"]);
+    if (Session.nightLightAvailable) add(Session.nightLight ? "Turn night light off" : "Turn night light on", "Display", "sun", () => Session.nightLight = !Session.nightLight, "", ["redshift", "warm", "blue light"]);
+    add("Quick settings", "Open the panel", "settings", () => Panels.openQuickSettings(null, "main"), "", ["qs", "settings", "volume"]);
+    add("Notifications", "Open the history", "bell", () => Panels.openClockPanel(null, "notifications"));
+    add("Calendar", "Open the month view", "calendar", () => Panels.openClockPanel(null, "calendar"));
+    add("Reload shell", "Restart Quickshell, apps stay open", "restart", () => Quickshell.reload(false), "", ["restart shell", "quickshell"]);
+    add("Show hidden apps again", state.hidden.length + " hidden", "image", () => { state.hidden = []; root.revision++; });
+    add("Suspend", "Sleep until a key is pressed", "moon", () => Quickshell.execDetached(["systemctl", "suspend"]), "", ["sleep"]);
+    add("Log out", "Close everything and leave Hyprland", "logout", () => Hypr.exit(), "Press Enter again to log out", ["logout", "sign out", "exit"]);
+    add("Restart", "Restart the computer", "restart", () => Quickshell.execDetached(["systemctl", "reboot"]), "Press Enter again to restart", ["reboot"]);
+    add("Shut down", "Turn the computer off", "power", () => Quickshell.execDetached(["systemctl", "poweroff"]), "Press Enter again to shut down", ["poweroff", "power off", "turn off"]);
+    return list;
+  }
+
+  // --- Window commands (act on the window that had focus) ----------------------
+  function windowCommands(rest: string): var {
+    const list = [];
+    const add = (title, subtitle, icon, run) => list.push({ key: "win:" + title, section: "Window", title, subtitle, icon, hint: "Window", run });
+    const active = Hyprland.activeToplevel;
+    const name = active ? (active.title || "") : "";
+    add("Float or tile", name, "image", () => Hypr.windowFloat());
+    add("Pseudo-tile", name, "image", () => Hypr.windowPseudo());
+    add("Close window", name, "close", () => Hypr.windowClose());
+    const ws = parseInt(rest);
+    if (!isNaN(ws) && ws > 0) {
+      add("Move to workspace " + ws, name, "arrow-right", () => Hypr.windowToWorkspace(ws));
+    } else {
+      for (let i = 1; i <= 5; i++) add("Move to workspace " + i, name, "arrow-right", () => Hypr.windowToWorkspace(i));
+    }
+    return list;
+  }
+
+  // --- Processes ("kill name") ---------------------------------------------------
+  property var processes: []
+  property string processQuery: ""
+
+  Process {
+    id: psProc
+    command: ["ps", "-eo", "pid=,comm=,%cpu=,rss=", "--sort=-%cpu"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const rows = [];
+        for (const line of text.split("\n")) {
+          const m = line.trim().match(/^(\d+)\s+(.+?)\s+([\d.]+)\s+(\d+)$/);
+          if (m) rows.push({ pid: m[1], name: m[2], cpu: parseFloat(m[3]), mem: parseInt(m[4]) * 1024 });
+        }
+        root.processes = rows;
+        root.revision++;
+      }
+    }
+  }
+
+  function formatBytes(bytes: real): string {
+    if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + " GB";
+    return Math.round(bytes / 1048576) + " MB";
+  }
+
+  function processResults(q: string): var {
+    if (q !== processQuery) {
+      processQuery = q;
+      psProc.running = true;
+    }
+    return processes.filter(p => q === "" || p.name.toLowerCase().includes(q)).slice(0, 8).map(p => ({
+      key: "kill:" + p.pid, section: "Processes", icon: "close", hint: "Kill",
+      title: p.name, subtitle: "PID " + p.pid + " · CPU " + p.cpu.toFixed(1) + "% · " + formatBytes(p.mem),
+      run: () => Quickshell.execDetached(["kill", p.pid]),
+      runAlt: () => Quickshell.execDetached(["kill", "-9", p.pid]),
+      altHint: "Ctrl + Enter: force"
+    }));
+  }
+
+  // --- Your scripts (scripts/launcher/) ---------------------------------------------
+  readonly property string scriptsDir: Quickshell.shellPath("scripts/launcher")
+  property var scripts: []
+
+  Process {
+    id: scriptsProc
+    command: ["find", root.scriptsDir, "-maxdepth", "1", "-type", "f", "-perm", "-u+x"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        root.scripts = text.split("\n").filter(p => p !== "").sort();
+        root.revision++;
+      }
+    }
+  }
+
+  function scriptResults(q: string): var {
+    return scripts.map(path => {
+      const file = path.split("/").pop();
+      const name = file.replace(/\.[a-z]+$/, "").replace(/[-_]/g, " ");
+      return { path, file, name };
+    }).filter(s => q === "" || scoreText(s.name.toLowerCase(), q) > 0 || s.file.toLowerCase().includes(q)).map(s => ({
+      key: "script:" + s.path, section: "Scripts", icon: "arrow-right", hint: "Script",
+      title: s.name, subtitle: s.file,
+      run: () => Quickshell.execDetached(["sh", "-c", "cd \"$1\" && \"$2\"", "sh", root.scriptsDir, s.path]),
+      runAlt: () => Quickshell.execDetached(["sh", "-c", "kitty -e \"${EDITOR:-nvim}\" \"$1\"", "sh", s.path]),
+      altHint: "Ctrl + Enter: edit"
+    }));
+  }
+
+  // --- Search --------------------------------------------------------------------
   function search(text: string): var {
-    const q = text.trim().toLowerCase();
-    const results = [];
+    const trimmed = text.trim();
+    const q = trimmed.toLowerCase();
+    const first = q.split(/\s+/)[0];
+    const rest = trimmed.slice(first.length).trim();
+    let results = [];
 
+    // > command
     if (q.startsWith(">")) {
-      const cmd = text.trim().slice(1).trim();
-      if (cmd !== "") results.push({ kind: "command", title: cmd, subtitle: "Run in a shell", icon: "arrow-right", value: cmd });
+      const cmd = trimmed.slice(1).trim();
+      if (cmd !== "") results.push({ key: "cmd", section: "Run", title: cmd, subtitle: "Run in a shell", icon: "arrow-right", hint: "Command", run: () => Quickshell.execDetached(["sh", "-c", cmd]) });
       return results;
     }
 
-    const calc = calculate(text);
-    if (calc !== "") results.push({ kind: "calc", title: calc, subtitle: text.trim() + " =", icon: "plus", value: calc });
+    // kill <name>
+    if (first === "kill") return processResults(rest.toLowerCase());
 
+    // window …
+    if (first === "window" || first === "win") return windowCommands(rest);
+
+    // yt lofi
+    const link = quicklinks.find(l => l.keyword === first);
+    if (link && rest !== "") {
+      results.push({ key: "link:" + link.keyword, section: "Quicklinks", title: link.name + ": " + rest, subtitle: link.url.replace("%s", rest).replace(/^https?:\/\//, ""), icon: "search", hint: "Quicklink", run: () => openUrl(link.url, rest) });
+    }
+
+    // Sum
+    const calc = calculate(trimmed);
+    if (calc !== "") results.push({ key: "calc", section: "Calculator", title: calc, subtitle: trimmed + " =", icon: "plus", hint: "Enter to copy", big: true, run: () => Quickshell.execDetached(["wl-copy", calc]) });
+
+    // Nothing typed: favorites, then the most used apps
     if (q === "") {
-      // Nothing typed: your most used apps first, then A–Z
-      const sorted = apps.slice().sort((a, b) => boostFor(b.id) - boostFor(a.id) || a.name.localeCompare(b.name));
-      for (const app of sorted.slice(0, 8)) results.push(appResult(app));
+      const favorites = state.favorites.map(id => apps.find(a => a.id === id)).filter(a => a);
+      for (const app of favorites) results.push(appResult(app, "Favorites"));
+      const used = apps.filter(a => !isFavorite(a.id) && boostFor(a.id) > 0)
+        .sort((a, b) => boostFor(b.id) - boostFor(a.id)).slice(0, 6);
+      for (const app of used) results.push(appResult(app, "Frequently used"));
+      if (results.length === 0) {
+        for (const app of apps.slice().sort((a, b) => a.name.localeCompare(b.name)).slice(0, 8)) results.push(appResult(app, "Applications"));
+      }
       return results;
     }
 
+    // Apps
     const scored = [];
     for (const app of apps) {
-      const s = scoreApp(app, q);
+      const s = scoreApp(app, q) + (isFavorite(app.id) ? 15 : 0);
       if (s > 0) scored.push({ app, s });
     }
     scored.sort((a, b) => b.s - a.s || a.app.name.localeCompare(b.app.name));
-    for (const item of scored.slice(0, 8)) results.push(appResult(item.app));
+    for (const item of scored.slice(0, 7)) results.push(appResult(item.app, "Applications"));
 
-    if (results.length === 0 || q.length > 2) {
-      results.push({ kind: "web", title: "Search the web for \"" + text.trim() + "\"", subtitle: "Opens your browser", icon: "search", value: text.trim() });
+    // System commands and scripts that match
+    // Hyphens don't count, so "wifi" finds "Wi-Fi"
+    const plain = q.replace(/-/g, "");
+    const commands = systemCommands.filter(c => scoreText(c.title.toLowerCase().replace(/-/g, ""), plain) > 0
+                                            || c.subtitle.toLowerCase().startsWith(q)
+                                            || c.words.some(w => w.startsWith(plain)));
+    results = results.concat(commands.slice(0, 4));
+    results = results.concat(scriptResults(q).slice(0, 4));
+
+    // Nothing found: offer what to do with the text
+    if (results.length === 0) {
+      const section = "Use \"" + trimmed + "\" with…";
+      results.push({ key: "fb:web", section, title: "Search the web", subtitle: "DuckDuckGo", icon: "search", hint: "Web", run: () => openUrl("https://duckduckgo.com/?q=%s", trimmed) });
+      results.push({ key: "fb:wiki", section, title: "Search the ArchWiki", subtitle: "wiki.archlinux.org", icon: "search", hint: "Web", run: () => openUrl("https://wiki.archlinux.org/index.php?search=%s", trimmed) });
+      results.push({ key: "fb:aur", section, title: "Search the AUR", subtitle: "aur.archlinux.org", icon: "search", hint: "Web", run: () => openUrl("https://aur.archlinux.org/packages?K=%s", trimmed) });
+      results.push({ key: "fb:run", section, title: "Run as a command", subtitle: trimmed, icon: "arrow-right", hint: "Command", run: () => Quickshell.execDetached(["sh", "-c", trimmed]) });
     }
     return results;
   }
 
-  function appResult(app: DesktopEntry): var {
-    return { kind: "app", title: app.name, subtitle: app.genericName || app.comment || "", icon: app.icon, app };
-  }
-
-  function activate(result: var): void {
-    if (!result) return;
-    switch (result.kind) {
-    case "app":
-      remember(result.app.id);
-      result.app.execute();
-      break;
-    case "calc":
-      Quickshell.execDetached(["wl-copy", result.value]);
-      break;
-    case "command":
-      Quickshell.execDetached(["sh", "-c", result.value]);
-      break;
-    case "web":
-      Qt.openUrlExternally("https://duckduckgo.com/?q=" + encodeURIComponent(result.value));
-      break;
+  // --- Ctrl + K: what you can do with an app ------------------------------------------
+  function actionsFor(result: var): var {
+    if (!result || !result.app) return [];
+    const app = result.app;
+    const list = [{ title: "Open", icon: "arrow-right", run: result.run }];
+    for (let i = 1; i <= 5; i++) {
+      list.push({ title: "Open on workspace " + i, icon: "image", run: () => { Hypr.focusWorkspace(i); remember(app.id); app.execute(); } });
     }
-    open = false;
+    for (const action of app.actions ?? []) {
+      list.push({ title: action.name, icon: "chevron-right", run: () => action.execute() });
+    }
+    list.push({ title: isFavorite(app.id) ? "Remove from favorites" : "Pin to favorites", icon: "star", keepOpen: true, run: () => toggleFavorite(app.id) });
+    list.push({ title: "Hide from results", icon: "close", keepOpen: true, run: () => hide(app.id) });
+    return list;
   }
 }
