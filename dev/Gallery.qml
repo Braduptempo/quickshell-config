@@ -135,6 +135,7 @@ FloatingWindow {
               model: ["Saver", "Balanced", "Performance"]
               currentIndex: 1
               accessibleName: "Power profile"
+              onActivated: index => currentIndex = index
             }
             Label { text: "Filter chips"; kind: "label" }
             Flow {
