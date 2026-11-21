@@ -216,6 +216,18 @@ PanelWindow {
             default: return soonPage;
             }
           }
+          // A new page fades in and settles from a little lower
+          onLoaded: {
+            const page = item as Item;
+            page.opacity = 0.35;
+            page.y = 12;
+            pageIn.restart();
+          }
+          ParallelAnimation {
+            id: pageIn
+            NumberAnimation { target: pageLoader.item; property: "opacity"; to: 1; duration: Theme.anim.panelIn; easing.type: Easing.OutCubic }
+            NumberAnimation { target: pageLoader.item; property: "y"; to: 0; duration: Theme.anim.panelIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
+          }
         }
 
         // Footer

@@ -29,8 +29,21 @@ Item {
   Accessible.role: Accessible.Button
   Accessible.name: accessibleName
 
+  // Pops in when it appears: fades and grows from 70 %. A Behavior always
+  // reaches its end, so a pill can never get stuck half transparent
+  property real appear: 0
+  Component.onCompleted: appear = Qt.binding(() => root.visible ? 1 : 0)
+  Behavior on appear { NumberAnimation { duration: Theme.anim.segment; easing.type: Easing.OutCubic } }
+  transform: Scale {
+    origin.x: root.width / 2
+    origin.y: root.height / 2
+    xScale: 0.7 + 0.3 * root.appear
+    yScale: 0.7 + 0.3 * root.appear
+  }
+
   Rectangle {
     anchors.fill: parent
+    opacity: root.appear
     radius: Theme.pill(height)
     color: root.active ? Theme.alpha(root.activeColor, 0.16)
          : root.flat && !Theme.barPills ? (root.hovered ? Theme.item : "transparent")
@@ -46,6 +59,7 @@ Item {
     id: row
     // Centred in the pill, so it moves itself when it grows
     slide: false
+    opacity: root.appear
     anchors.centerIn: parent
     spacing: 8
   }
