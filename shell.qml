@@ -26,6 +26,8 @@ Scope {
 
   // Notification pop-ups, and the clock panel (calendar + notifications)
   Toasts {}
+  // Low-battery warnings (laptops); a singleton only starts when used
+  readonly property int batteryStage: BatteryWarning.stage
 
   ClockPanel {}
 

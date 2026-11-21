@@ -72,7 +72,7 @@ BarItem {
     visible: Battery.hasBattery
     name: "battery"
     size: 15
-    color: Battery.charging ? Theme.good : Battery.batteryLevel <= 15 ? Theme.error : Theme.text
+    color: Battery.charging ? Theme.good : Battery.batteryLevel <= (Config.battery.warnAt > 0 ? Config.battery.warnAt : 15) ? Theme.error : Theme.text
     anchors.verticalCenter: parent.verticalCenter
   }
 }
