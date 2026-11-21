@@ -208,6 +208,10 @@ Scope {
     function random(): void {
       Wallpapers.set(Wallpapers.random());
     }
+    // A picture or video as wallpaper, e.g. from a script
+    function set(file: string): void {
+      Wallpapers.set(file);
+    }
   }
 
   // Print: screenshot and recording toolbar

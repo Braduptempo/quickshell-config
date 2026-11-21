@@ -30,7 +30,8 @@ Variants {
 
     screen: modelData
     visible: file !== ""
-    color: "black"
+    // See-through until the video plays: the still frame (awww) shows meanwhile
+    color: "transparent"
 
     // Not "quickshell…": the glass blur rule shouldn't blur behind a video
     WlrLayershell.namespace: "qs-video-wallpaper"

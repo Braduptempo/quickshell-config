@@ -156,7 +156,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `notifications` | `toggle`, `overview`, `calendar`, `weather`, `tab <name>` (switch while open), `dnd`, `clear` |
 | `media` | `toggle` |
 | `clipboard` | `toggle` |
-| `pickers` | `theme`, `wallpaper`, `random` |
+| `pickers` | `theme`, `wallpaper`, `random`, `set <file>` (a picture or video as wallpaper) |
 | `lock` | `lock`, `suspend` |
 | `power` | `toggle`, `open <letter>`, `cancel` (a scheduled action) |
 | `capture` | `toggle`, `shot <region\|window\|screen>`, `record <region\|window\|screen>`, `pause`, `stop`, `edit <file>` (draw on a picture), `editSave`, `editCopy`, `replay` (start / stop the replay buffer), `replaySave`, `replayStop` |
