@@ -3,11 +3,12 @@
 // window per screen that has a video in Wallpapers.videos, under all other
 // windows, muted and looping. It pauses when nobody can see it: a fullscreen
 // window on that screen, the lock screen, and (Settings → Wallpaper) on
-// battery. Clicks go straight through to the desktop.
+// battery. Clicks go straight through to the desktop. The player itself is
+// VideoPlayer.qml, loaded only when needed (so a missing qt6-multimedia only
+// costs the video wallpapers).
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtMultimedia
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -44,19 +45,16 @@ Variants {
     }
     mask: Region {}
 
-    Video {
-      id: video
+    // Qt Multimedia only gets loaded here, when there is a video
+    Loader {
       anchors.fill: parent
-      source: window.file !== "" ? "file://" + window.file : ""
-      loops: MediaPlayer.Infinite
-      muted: true
-      fillMode: Wallpapers.fit === "fit" ? VideoOutput.PreserveAspectFit : VideoOutput.PreserveAspectCrop
-      autoPlay: true
-      opacity: video.playbackState === MediaPlayer.StoppedState ? 0 : 1
-      Behavior on opacity { NumberAnimation { duration: Theme.anim.wallpaper } }
+      active: window.file !== ""
+      source: "VideoPlayer.qml"
+      onLoaded: {
+        item["file"] = Qt.binding(() => window.file);
+        item["crop"] = Qt.binding(() => Wallpapers.fit !== "fit");
+        item["paused"] = Qt.binding(() => window.hidden);
+      }
     }
-
-    onHiddenChanged: hidden ? video.pause() : video.play()
-    onFileChanged: if (file !== "" && !hidden) video.play()
   }
 }
