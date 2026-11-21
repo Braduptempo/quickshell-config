@@ -18,6 +18,7 @@ import "./modules/capture"
 import "./modules/pickers"
 import "./modules/windows"
 import "./modules/settings"
+import "./modules/mainmenu"
 import "./dev"
 
 Scope {
@@ -115,6 +116,17 @@ Scope {
     target: "media"
     function toggle(): void {
       Media.toggle(Panels.focusedScreen(), 180);
+    }
+  }
+
+  // The button at the far left of the bar, and Super + X
+  MainMenu {}
+
+  // `qs ipc call mainmenu toggle`
+  IpcHandler {
+    target: "mainmenu"
+    function toggle(): void {
+      Panels.toggleMainMenu(Panels.focusedScreen());
     }
   }
 

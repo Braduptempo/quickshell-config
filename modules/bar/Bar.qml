@@ -67,6 +67,11 @@ Scope {
           anchors.verticalCenter: parent.verticalCenter
           spacing: 6
 
+          // Tools, settings and power (Super + X); right click: launcher
+          MainMenuButton {
+            screen: panel.modelData
+          }
+
           Workspaces {
             screen: panel.modelData
           }

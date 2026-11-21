@@ -71,6 +71,8 @@ hl.bind("Caps_Lock", hl.dsp.exec_cmd("qs ipc call osd caps"), { non_consuming = 
 -- (this file is loaded after it). Remove these two lines to get rofi back.
 hl.unbind("SUPER + space")
 hl.bind("SUPER + space", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
+-- Main menu: tools, settings and power (also the button at the left of the bar)
+hl.bind("SUPER + X", hl.dsp.exec_cmd("qs ipc call mainmenu toggle"))
 
 -- Monitor settings made in Settings → Displays (per machine, not in git).
 -- Loaded last, so they win over modules/monitors.lua; delete the file to

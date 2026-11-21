@@ -58,6 +58,7 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Keys | What it does |
 |---|---|
 | Super + Space | Launcher |
+| Super + X | Main menu (also the button at the far left of the bar; right click it for the launcher) |
 | Super + A | Quick settings |
 | Super + N | Notifications (Super + Shift + N: do not disturb) |
 | Super + , | Settings |
@@ -74,7 +75,7 @@ No Print key? Super + Shift + R opens the same toolbar.
 
 ## What's in it
 
-**Bar.** Workspaces, what's playing (title and artist), clock and date, tray, and a status pill with network, Bluetooth, volume and battery. Optional pills: window title, clipboard, privacy (camera, microphone or screen in use), updates, drives, recording. Top or bottom, on one screen or all.
+**Bar.** The main menu button (tools, settings, lock and power; right click for the launcher), workspaces, what's playing (title and artist), clock and date, tray, and a status pill with network, Bluetooth, volume and battery. Optional pills: window title, clipboard, privacy (camera, microphone or screen in use), updates, drives, recording. Top or bottom, on one screen or all.
 
 **Panels from the bar.**
 - *Quick settings:* Wi-Fi, Ethernet, Bluetooth, do not disturb, night light, caffeine, microphone, volume per app and per device, system stats, and the charge of every battery. Without a Bluetooth adapter it says why (service off, blocked, no hardware) and can fix the usual causes.
@@ -127,6 +128,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | Target | Functions |
 |---|---|
 | `launcher` | `toggle`, `search <text>` |
+| `mainmenu` | `toggle` |
 | `quicksettings` | `toggle`, `open <page>` (`main`, `network`, `bluetooth`, `audio`) |
 | `settings` | `toggle`, `open <page>` (`theme`, `wallpaper`, `power`, …) |
 | `notifications` | `toggle`, `calendar`, `dnd`, `clear` |
