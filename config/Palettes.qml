@@ -38,7 +38,10 @@ Singleton {
   }
 
   readonly property var custom: (Config.appearance.customThemes ?? []).map(t => complete(t))
-  readonly property var list: builtIn.concat(custom)
+  // Made from the wallpaper by WallpaperTheme; there once it has been made
+  readonly property var fromWallpaper: (Config.appearance.wallpaperPalette?.base ?? "") !== ""
+    ? [Object.assign(complete(Config.appearance.wallpaperPalette), { name: "Wallpaper", custom: false, wallpaper: true })] : []
+  readonly property var list: builtIn.concat(fromWallpaper).concat(custom)
   readonly property var names: list.map(p => p.name)
 
   function byName(name: string): var {

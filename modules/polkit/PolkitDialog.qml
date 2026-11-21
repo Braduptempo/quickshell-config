@@ -43,6 +43,7 @@ PanelWindow {
     if (shown) {
       details = false;
       field.forceActiveFocus();
+      Lock.refreshKeyboard();
     }
   }
 
@@ -75,7 +76,7 @@ PanelWindow {
     y: Math.round((parent.height - height) / 2) + (window.shown ? 0 : 10)
     width: 440
     height: column.implicitHeight + 44
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.88))
+    color: Theme.panelSolid
     opacity: window.shown ? 1 : 0
     scale: window.shown ? 1 : 0.97
 
@@ -101,7 +102,7 @@ PanelWindow {
         Rectangle {
           implicitWidth: 48
           implicitHeight: 48
-          radius: 24
+          radius: Theme.r(24)
           color: window.ok ? Theme.alpha(Theme.good, 0.18) : window.cancelled ? Theme.overlay : Theme.alpha(Theme.warn, 0.18)
 
           Icon {
@@ -134,7 +135,7 @@ PanelWindow {
       Rectangle {
         Layout.fillWidth: true
         implicitHeight: messageColumn.implicitHeight + 24
-        radius: 14
+        radius: Theme.r(14)
         color: Theme.alpha(Theme.crust, 0.45)
 
         ColumnLayout {
@@ -154,7 +155,7 @@ PanelWindow {
           Rectangle {
             implicitHeight: 24
             implicitWidth: detailsRow.implicitWidth + 16
-            radius: 12
+            radius: Theme.r(12)
             color: detailsMouse.containsMouse ? Theme.item : "transparent"
 
             Accessible.role: Accessible.Button
@@ -211,7 +212,7 @@ PanelWindow {
           Rectangle {
             implicitWidth: 30
             implicitHeight: 30
-            radius: 15
+            radius: Theme.r(15)
             color: Theme.surface
             border.width: 2
             border.color: Theme.accent
@@ -264,6 +265,7 @@ PanelWindow {
             Accessible.name: "Password"
             Accessible.passwordEdit: !Polkit.echo
 
+            Keys.onPressed: event => { if (event.key === Qt.Key_CapsLock) Lock.capsChanged(); }
             Keys.onReturnPressed: Polkit.submit(text)
             Keys.onEnterPressed: Polkit.submit(text)
             Keys.onEscapePressed: Polkit.cancel()
@@ -285,6 +287,26 @@ PanelWindow {
           NumberAnimation { target: shake; property: "x"; to: -7; duration: 90 }
           NumberAnimation { target: shake; property: "x"; to: 7; duration: 90 }
           NumberAnimation { target: shake; property: "x"; to: 0; duration: 45 }
+        }
+
+        // Caps Lock on: the most common reason a password is "wrong"
+        Rectangle {
+          visible: Lock.capsLock
+          implicitHeight: 26
+          implicitWidth: polkitCaps.implicitWidth + 24
+          radius: Theme.pill(height)
+          color: Theme.alpha(Theme.warn, 0.14)
+
+          Accessible.role: Accessible.AlertMessage
+          Accessible.name: "Caps Lock is on"
+
+          Row {
+            id: polkitCaps
+            anchors.centerIn: parent
+            spacing: 6
+            Icon { name: "caps"; size: 13; color: Theme.warn; anchors.verticalCenter: parent.verticalCenter }
+            Label { text: "Caps Lock is on"; color: Theme.warn; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
+          }
         }
 
         Rectangle {

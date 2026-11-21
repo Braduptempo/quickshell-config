@@ -111,7 +111,7 @@ SettingsPage {
           y: modelData.y * arrangement.factor
           width: Math.round((modelData.transform % 2 ? modelData.height : modelData.width) / modelData.scale) * arrangement.factor - 4
           height: Math.round((modelData.transform % 2 ? modelData.width : modelData.height) / modelData.scale) * arrangement.factor - 4
-          radius: 8
+          radius: Theme.r(8)
           color: Theme.alpha(Theme.accent, main ? 0.25 : 0.12)
           border.width: 1
           border.color: main ? Theme.accent : Theme.border

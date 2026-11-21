@@ -19,6 +19,7 @@ BarItem {
   padding: 12
   active: Panels.quickSettingsOpen && Panels.screen === screen
   accessibleName: "Quick settings. " + networkText + ", volume " + Sound.volume + " percent" + (Battery.hasBattery ? ", battery " + Battery.batteryLevel + " percent" : "")
+    + (Sound.isMicMuted ? ", microphone muted" : "") + (Lock.capsLock ? ", Caps Lock on" : "")
     + (Battery.batteries.length > 1 ? " (" + Battery.batteries.map((d, i) => "battery " + (i + 1) + " " + Battery.levelOf(d)).join(", ") + ")" : "")
 
   // Follows the connection that carries the traffic, not just "a cable is in"
@@ -57,6 +58,14 @@ BarItem {
     name: Sound.isMuted ? "volume-off" : Sound.volume > 60 ? "volume-high" : "volume"
     size: 15
     color: Sound.isMuted ? Theme.subtext : Theme.text
+    anchors.verticalCenter: parent.verticalCenter
+  }
+
+  Icon {
+    visible: Lock.capsLock
+    name: "caps"
+    size: 15
+    color: Theme.warn
     anchors.verticalCenter: parent.verticalCenter
   }
 

@@ -108,8 +108,8 @@ PanelWindow {
     x: 12
     width: 980
     height: 620
-    radius: 20
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.82))
+    radius: Theme.r(20)
+    color: Theme.panelSolid
     clip: true
 
     opacity: window.shown ? 1 : 0
@@ -297,7 +297,7 @@ PanelWindow {
                 Rectangle {
                   implicitWidth: 30
                   implicitHeight: 30
-                  radius: 8
+                  radius: Theme.r(8)
                   color: row.modelData.kind === "color" ? row.modelData.preview : Theme.overlay
                   border.width: row.modelData.kind === "color" ? 1 : 0
                   border.color: Theme.border
@@ -399,7 +399,7 @@ PanelWindow {
             visible: window.selected?.kind === "image"
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: 12
+            radius: Theme.r(12)
             color: Theme.crust
             border.width: 1
             border.color: Theme.border
@@ -422,7 +422,7 @@ PanelWindow {
             Rectangle {
               implicitWidth: 120
               implicitHeight: 120
-              radius: 16
+              radius: Theme.r(16)
               color: window.selected?.kind === "color" ? window.selected.preview : "transparent"
               border.width: 1
               border.color: Theme.border
@@ -435,7 +435,7 @@ PanelWindow {
             visible: window.selected !== null && window.selected.kind !== "image"
             Layout.fillWidth: true
             Layout.fillHeight: true
-            radius: 12
+            radius: Theme.r(12)
             color: Theme.item
             clip: true
 

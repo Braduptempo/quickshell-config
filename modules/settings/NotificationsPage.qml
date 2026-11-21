@@ -67,7 +67,7 @@ SettingsPage {
     signal edited(string value)
     width: 76
     height: 32
-    radius: 16
+    radius: Theme.r(16)
     color: Theme.alpha(Theme.crust, 0.5)
     border.width: input.activeFocus ? 1 : 0
     border.color: Theme.accent

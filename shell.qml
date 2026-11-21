@@ -2,6 +2,7 @@
 
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.SystemTray
 import "./modules/bar"
 import "./modules/quicksettings"
 import "./services"
@@ -18,6 +19,7 @@ import "./modules/capture"
 import "./modules/pickers"
 import "./modules/windows"
 import "./modules/settings"
+import "./modules/mainmenu"
 import "./dev"
 
 Scope {
@@ -28,6 +30,10 @@ Scope {
   Toasts {}
   // Low-battery warnings (laptops); a singleton only starts when used
   readonly property int batteryStage: BatteryWarning.stage
+  // Blur on or off (Settings → Theme)
+  readonly property bool blurOn: Appearance.blur
+  // The "Wallpaper" theme follows the wallpaper
+  readonly property bool wallpaperTheme: WallpaperTheme.active
 
   ClockPanel {}
 
@@ -98,6 +104,21 @@ Scope {
   // Under the privacy, updates and drives pills
   ExtrasMenu {}
 
+  // Under a tray icon: the app's menu
+  TrayMenu {}
+
+  // `qs ipc call tray menu 0`: the menu of the first tray app; `close`
+  IpcHandler {
+    target: "tray"
+    function menu(index: int): void {
+      const item = SystemTray.items.values[index] ?? null;
+      if (item && item.hasMenu) Panels.toggleTrayMenu(item, Panels.focusedScreen(), (Panels.focusedScreen()?.width ?? 1920) - 300);
+    }
+    function close(): void {
+      Panels.trayMenuItem = null;
+    }
+  }
+
   // `qs ipc call extras open privacy|updates|drives`, `check` (updates now)
   IpcHandler {
     target: "extras"
@@ -115,6 +136,17 @@ Scope {
     target: "media"
     function toggle(): void {
       Media.toggle(Panels.focusedScreen(), 180);
+    }
+  }
+
+  // The button at the far left of the bar, and Super + X
+  MainMenu {}
+
+  // `qs ipc call mainmenu toggle`
+  IpcHandler {
+    target: "mainmenu"
+    function toggle(): void {
+      Panels.toggleMainMenu(Panels.focusedScreen());
     }
   }
 
@@ -225,7 +257,8 @@ Scope {
     }
   }
 
-  // `qs ipc call notifications toggle` (Super + N), `dnd`, `clear`
+  // `qs ipc call notifications toggle` (Super + N), `overview`, `calendar`,
+  // `weather`, `dnd`, `clear`
   IpcHandler {
     target: "notifications"
     function toggle(): void {
@@ -233,6 +266,12 @@ Scope {
     }
     function calendar(): void {
       Panels.toggleClockPanel(Panels.focusedScreen(), "calendar");
+    }
+    function overview(): void {
+      Panels.toggleClockPanel(Panels.focusedScreen(), "overview");
+    }
+    function weather(): void {
+      Panels.toggleClockPanel(Panels.focusedScreen(), "weather");
     }
     function dnd(): void {
       Notifications.dnd = !Notifications.dnd;

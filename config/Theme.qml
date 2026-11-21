@@ -12,8 +12,10 @@ Singleton {
 
   // Typed groups, so tools and qmllint can see every token
   component SizeTokens: QtObject {
-    readonly property int bar: 44
-    readonly property int barItem: 30
+    // Settings → Bar & panels → Size
+    readonly property int barStep: Config.bar.size === "compact" ? -1 : Config.bar.size === "large" ? 1 : 0
+    readonly property int bar: 44 + barStep * 6
+    readonly property int barItem: 30 + barStep * 4
     readonly property int button: 36
     readonly property int buttonSmall: 32
     readonly property int buttonList: 28
@@ -82,8 +84,13 @@ Singleton {
   // (layerrule blur on the quickshell namespace)
   readonly property real glass: Config.appearance.glass
   readonly property color panel: Qt.rgba(base.r, base.g, base.b, glass)
-  // Menus and panels with text to read: never more see-through than this
-  readonly property color panelSolid: Qt.rgba(base.r, base.g, base.b, Math.max(glass, 0.86))
+  // Menus and panels with text to read (Settings → Theme → Panels)
+  readonly property color panelSolid: Qt.rgba(base.r, base.g, base.b, Math.max(0.5, Math.min(1, Config.appearance.panelOpacity)))
+  // Bar style "pills": no bar behind them, so every pill gets the glass
+  readonly property bool barPills: Config.bar.style === "pills"
+  readonly property color barItem: barPills ? panel : item
+  readonly property bool borders: Config.appearance.borders
+  readonly property bool shadows: Config.appearance.shadows
   readonly property color item: light ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(crust.r, crust.g, crust.b, 0.45)
   readonly property color border: light ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(1, 1, 1, 0.14)
   readonly property color highlight: light ? Qt.rgba(1, 1, 1, 0.8) : Qt.rgba(1, 1, 1, 0.22)
@@ -99,12 +106,18 @@ Singleton {
   }
 
   // --- Shape ---------------------------------------------------------------
-  // Every control is a pill: radius = height / 2
+  // Every control is a pill: radius = height / 2. Settings → Theme →
+  // Corners scales every radius, down to square.
+  readonly property real roundness: Math.max(0, Math.min(1, Config.appearance.roundness))
   function pill(height: real): real {
-    return height / 2;
+    return height / 2 * roundness;
   }
-  readonly property int radiusPanel: 18
-  readonly property int radiusCard: 14
+  // A radius from the design, scaled the same way
+  function r(radius: real): real {
+    return radius * roundness;
+  }
+  readonly property real radiusPanel: 18 * roundness
+  readonly property real radiusCard: 14 * roundness
 
   // --- Sizes ---------------------------------------------------------------
   readonly property SizeTokens size: SizeTokens {}

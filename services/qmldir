@@ -25,3 +25,6 @@ singleton Windows 1.0 Windows.qml
 singleton Weather 1.0 Weather.qml
 singleton BluetoothCheck 1.0 BluetoothCheck.qml
 singleton BatteryWarning 1.0 BatteryWarning.qml
+singleton WifiAdmin 1.0 WifiAdmin.qml
+singleton Appearance 1.0 Appearance.qml
+singleton WallpaperTheme 1.0 WallpaperTheme.qml

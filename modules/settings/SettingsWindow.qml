@@ -70,8 +70,8 @@ PanelWindow {
     x: 12
     width: 1120
     height: 740
-    radius: 20
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.86))
+    radius: Theme.r(20)
+    color: Theme.panelSolid
     clip: true
     focus: true
 

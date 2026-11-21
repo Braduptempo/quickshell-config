@@ -25,7 +25,9 @@ Item {
   Rectangle {
     anchors.fill: parent
     radius: Theme.pill(height)
-    color: Theme.item
+    color: Theme.barItem
+    border.width: Theme.barPills && Theme.borders ? 1 : 0
+    border.color: Theme.border
   }
 
   MouseArea {
@@ -52,7 +54,7 @@ Item {
 
         width: current ? 28 : 12
         height: 12
-        radius: 6
+        radius: Theme.r(6)
         color: current ? Theme.accent
              : dotMouse.containsMouse ? Theme.text
              : occupied ? Theme.subtext : Theme.overlay

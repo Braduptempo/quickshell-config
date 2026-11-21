@@ -69,7 +69,7 @@ Rectangle {
 
       ClippingRectangle {
         anchors.fill: parent
-        radius: 20
+        radius: Theme.r(20)
         color: root.critical ? Theme.error : Theme.accent
 
         Label {

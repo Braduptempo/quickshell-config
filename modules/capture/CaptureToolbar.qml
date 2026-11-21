@@ -163,7 +163,7 @@ PanelWindow {
     width: implicitWidth
     height: implicitHeight
     radius: Theme.pill(height)
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.88))
+    color: Theme.panelSolid
     opacity: window.shown ? 1 : 0
 
     Accessible.role: Accessible.ToolBar

@@ -9,7 +9,8 @@
 
 hl.layer_rule({
     name  = "quickshell-glass",
-    match = { namespace = "^quickshell" },
+    -- Rules match the whole name, so ".*": "^quickshell" alone matched nothing
+    match = { namespace = "quickshell.*" },
 
     blur         = true,
     -- Only blur behind pixels that are at least 20% opaque, so the rounded
@@ -52,6 +53,13 @@ hl.bind("ALT + Alt_L", hl.dsp.exec_cmd("qs ipc call windows commit"), { release 
 hl.bind("ALT + Alt_R", hl.dsp.exec_cmd("qs ipc call windows commit"), { release = true, non_consuming = true })
 -- Workspace overview
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd("qs ipc call windows overview"))
+-- Screens: focus the left or right one, take the window along with Shift,
+-- or step through them all
+hl.bind("SUPER + ALT + left", hl.dsp.focus({ monitor = "l" }))
+hl.bind("SUPER + ALT + right", hl.dsp.focus({ monitor = "r" }))
+hl.bind("SUPER + ALT + SHIFT + left", hl.dsp.window.move({ monitor = "l" }))
+hl.bind("SUPER + ALT + SHIFT + right", hl.dsp.window.move({ monitor = "r" }))
+hl.bind("SUPER + ALT + Tab", hl.dsp.focus({ monitor = "+1" }))
 -- Settings
 hl.bind("SUPER + comma", hl.dsp.exec_cmd("qs ipc call settings toggle"))
 -- Theme and wallpaper pickers
@@ -71,6 +79,8 @@ hl.bind("Caps_Lock", hl.dsp.exec_cmd("qs ipc call osd caps"), { non_consuming = 
 -- (this file is loaded after it). Remove these two lines to get rofi back.
 hl.unbind("SUPER + space")
 hl.bind("SUPER + space", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
+-- Main menu: tools, settings and power (also the button at the left of the bar)
+hl.bind("SUPER + X", hl.dsp.exec_cmd("qs ipc call mainmenu toggle"))
 
 -- Monitor settings made in Settings → Displays (per machine, not in git).
 -- Loaded last, so they win over modules/monitors.lua; delete the file to

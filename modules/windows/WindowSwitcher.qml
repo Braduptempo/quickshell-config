@@ -70,8 +70,8 @@ PanelWindow {
     implicitHeight: column.implicitHeight + 32
     width: Math.min(implicitWidth, window.width - 24)
     height: implicitHeight
-    radius: 18
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.88))
+    radius: Theme.r(18)
+    color: Theme.panelSolid
     opacity: window.shown ? 1 : 0
     scale: window.shown ? 1 : 0.96
 
@@ -114,7 +114,7 @@ PanelWindow {
 
           width: 168
           height: cards.height
-          radius: 16
+          radius: Theme.r(16)
           color: current ? Theme.alpha(Theme.text, 0.08) : entryMouse.containsMouse ? Theme.item : "transparent"
           border.width: 2
           border.color: current ? Theme.accent : "transparent"
@@ -129,7 +129,7 @@ PanelWindow {
             y: 6
             width: parent.width - 12
             height: 100
-            radius: 10
+            radius: Theme.r(10)
             color: Theme.crust
             clip: true
 
@@ -146,7 +146,7 @@ PanelWindow {
               anchors.margins: 6
               implicitWidth: wsLabel.implicitWidth + 14
               implicitHeight: 18
-              radius: 9
+              radius: Theme.r(9)
               color: Theme.alpha(Theme.crust, 0.75)
               Label { id: wsLabel; anchors.centerIn: parent; text: "WS " + entry.modelData.workspace; font.pixelSize: Theme.font.label; color: Theme.subtext }
             }

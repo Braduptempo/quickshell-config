@@ -89,7 +89,7 @@ SettingsPage {
       Rectangle {
         implicitWidth: 64
         implicitHeight: 64
-        radius: 20
+        radius: Theme.r(20)
         color: Theme.accent
         Icon { anchors.centerIn: parent; name: "monitor"; size: 30; color: Theme.onAccent }
       }

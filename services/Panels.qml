@@ -49,14 +49,14 @@ Singleton {
 
   // --- Clock panel (calendar + notifications) ------------------------------
   property bool clockPanelOpen: false
-  // "calendar" or "notifications"
-  property string clockTab: "calendar"
+  // "overview", "calendar", "weather" or "notifications"
+  property string clockTab: "overview"
   property ShellScreen clockScreen: null
   property double clockClosedAt: 0
 
   function openClockPanel(onScreen: ShellScreen, tab: string): void {
     clockScreen = onScreen ?? focusedScreen();
-    clockTab = tab !== "" ? tab : "calendar";
+    clockTab = tab !== "" ? tab : "overview";
     clockPanelOpen = true;
   }
 
@@ -122,6 +122,42 @@ Singleton {
       extrasScreen = onScreen;
       extrasRight = right;
       extrasMenu = kind;
+    }
+  }
+
+  // --- Main menu: the button at the far left of the bar (Super + X) ----------------
+  property bool mainMenuOpen: false
+  property ShellScreen mainMenuScreen: null
+  property double mainMenuClosedAt: 0
+
+  onMainMenuOpenChanged: if (!mainMenuOpen) mainMenuClosedAt = Date.now()
+
+  function toggleMainMenu(onScreen: ShellScreen): void {
+    if (mainMenuOpen) {
+      mainMenuOpen = false;
+    } else if (Date.now() - mainMenuClosedAt > 250) {
+      mainMenuScreen = onScreen ?? focusedScreen();
+      mainMenuOpen = true;
+    }
+  }
+
+  // --- Tray menu: the menu of a tray app, under its icon ---------------------------
+  property var trayMenuItem: null
+  property ShellScreen trayMenuScreen: null
+  // Centre of the icon, in screen coordinates
+  property real trayMenuX: 0
+  property double trayMenuClosedAt: 0
+  readonly property bool trayMenuOpen: trayMenuItem !== null
+
+  onTrayMenuItemChanged: if (trayMenuItem === null) trayMenuClosedAt = Date.now()
+
+  function toggleTrayMenu(item: var, onScreen: ShellScreen, x: real): void {
+    if (trayMenuItem === item) {
+      trayMenuItem = null;
+    } else if (trayMenuItem !== null || Date.now() - trayMenuClosedAt > 250) {
+      trayMenuScreen = onScreen ?? focusedScreen();
+      trayMenuX = x;
+      trayMenuItem = item;
     }
   }
 }

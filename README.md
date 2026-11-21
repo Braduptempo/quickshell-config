@@ -12,7 +12,24 @@ A desktop shell for Hyprland, built with [Quickshell](https://quickshell.outfoxx
 
 ## Install
 
-Needs Quickshell 0.3 or newer and Hyprland with a Lua config (`hyprland.lua`).
+Needs Arch Linux, Quickshell 0.3 or newer and Hyprland with a Lua config (`hyprland.lua`).
+
+### With the script
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Braduptempo/quickshell-config/main/install.sh | bash
+```
+
+Or from a clone: `./install.sh`. It asks before every step:
+
+1. installs the packages below with pacman (`--minimal`: only the required ones);
+2. puts this config in `~/.config/quickshell` (an existing other config is moved to a backup first);
+3. adds the line for the shell's rules and keys to `hyprland.lua`, and starts the shell with Hyprland unless something already does;
+4. turns on NetworkManager, Bluetooth and power profiles.
+
+`--dry-run` shows what it would do without changing anything, `--yes` answers yes to everything. Running it again is safe: what's already done is skipped.
+
+### By hand
 
 ```bash
 git clone https://github.com/Braduptempo/quickshell-config ~/.config/quickshell
@@ -24,7 +41,7 @@ Add this line at the end of `~/.config/hypr/hyprland.lua`. It loads the glass bl
 pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/quickshell.lua")
 ```
 
-Start the shell (and add the same line to your autostart):
+Start the shell (and add the same to your autostart):
 
 ```bash
 qs -d
@@ -34,7 +51,7 @@ Start it like this, not with `qs -p <folder>`: the keybinds call `qs ipc call �
 
 ### Programs it uses
 
-Arch package names. Everything except the first group is optional: a feature whose program is missing is hidden or says what to install.
+Arch package names, all in the official repos. Everything except the first group is optional: a feature whose program is missing is hidden or says what to install.
 
 | For | Packages |
 |---|---|
@@ -58,6 +75,7 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Keys | What it does |
 |---|---|
 | Super + Space | Launcher |
+| Super + X | Main menu (also the button at the far left of the bar; right click it for the launcher) |
 | Super + A | Quick settings |
 | Super + N | Notifications (Super + Shift + N: do not disturb) |
 | Super + , | Settings |
@@ -67,6 +85,9 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Super + Esc | Power menu |
 | Alt + Tab | Window switcher (release Alt to switch) |
 | Super + Tab | Overview of all workspaces |
+| Super + Alt + ← / → | Focus the screen on the left / right |
+| Super + Alt + Shift + ← / → | Move the window to the screen on the left / right |
+| Super + Alt + Tab | Next screen |
 | Print | Screenshot and recording toolbar (Shift: area right away, Ctrl: whole screen) |
 | Super + Shift + R / Super + Ctrl + R | Recording toolbar / stop recording |
 
@@ -74,11 +95,11 @@ No Print key? Super + Shift + R opens the same toolbar.
 
 ## What's in it
 
-**Bar.** Workspaces, what's playing (title and artist), clock and date, tray, and a status pill with network, Bluetooth, volume and battery. Optional pills: window title, clipboard, privacy (camera, microphone or screen in use), updates, drives, recording. Top or bottom, on one screen or all.
+**Bar.** The main menu button (tools, settings, lock and power; right click for the launcher), workspaces, what's playing (title and artist), clock and date, tray, and a status pill with network, Bluetooth, volume and battery. Optional pills: window title, clipboard, privacy (camera, microphone or screen in use), updates, drives, recording. Top or bottom, on one screen or all.
 
 **Panels from the bar.**
 - *Quick settings:* Wi-Fi, Ethernet, Bluetooth, do not disturb, night light, caffeine, microphone, volume per app and per device, system stats, and the charge of every battery. Without a Bluetooth adapter it says why (service off, blocked, no hardware) and can fix the usual causes.
-- *Clock panel:* month calendar with your calendars' events, the weather, and the notification history.
+- *Clock panel:* four tabs. Overview (today's events, the weather and the latest notifications), Calendar (month, the chosen day, and your own events with New event), Weather (the next 24 hours and 7 days with rain, wind, UV and the sun) and Notifications. The weather can show next to the clock too.
 - *Media menu:* cover, controls, seeking, the player's volume, and every player with its own play/pause.
 - *Extras menu:* updates and drives.
 
@@ -104,9 +125,9 @@ Settings (Super + ,) changes everything right away and saves it in `settings.jso
 
 | Page | What you set |
 |---|---|
-| Theme | 12 themes, your own themes (New theme: every colour, light or dark), accent, glass |
+| Theme | 12 themes, your own themes (New theme: every colour, light or dark), a theme from your wallpaper, accent; bar glass, panels, corners, blur, borders and shadows, with a live preview |
 | Wallpaper, Font, Animations | Wallpaper folder, font and size, speed and style of the panels |
-| Bar & panels | Position, which pills show, other screens |
+| Bar & panels | Position, style (floating, attached, pills only), size, which pills show, tray click, other screens |
 | Sound | Maximum volume, feedback click, following new devices |
 | Network & Bluetooth | Saved networks, VPNs, paired devices |
 | Notifications | Do not disturb, quiet hours, muted apps |
@@ -127,9 +148,10 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | Target | Functions |
 |---|---|
 | `launcher` | `toggle`, `search <text>` |
+| `mainmenu` | `toggle` |
 | `quicksettings` | `toggle`, `open <page>` (`main`, `network`, `bluetooth`, `audio`) |
 | `settings` | `toggle`, `open <page>` (`theme`, `wallpaper`, `power`, …) |
-| `notifications` | `toggle`, `calendar`, `dnd`, `clear` |
+| `notifications` | `toggle`, `overview`, `calendar`, `weather`, `dnd`, `clear` |
 | `media` | `toggle` |
 | `clipboard` | `toggle` |
 | `pickers` | `theme`, `wallpaper`, `random` |
@@ -159,7 +181,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 
 Rules:
 - No hard-coded colours or sizes: always use `Theme`.
-- Every control is a pill: `radius: Theme.pill(height)`.
+- Every control is a pill: `radius: Theme.pill(height)`; any other radius goes through `Theme.r(n)`, so the Corners setting reaches it.
 - Animations use `Theme.anim.*`, so the speed setting and "Off" work everywhere.
 - Panels with text use `Theme.panelSolid`, so they stay readable over bright windows.
 
