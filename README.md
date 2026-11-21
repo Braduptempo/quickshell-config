@@ -12,7 +12,24 @@ A desktop shell for Hyprland, built with [Quickshell](https://quickshell.outfoxx
 
 ## Install
 
-Needs Quickshell 0.3 or newer and Hyprland with a Lua config (`hyprland.lua`).
+Needs Arch Linux, Quickshell 0.3 or newer and Hyprland with a Lua config (`hyprland.lua`).
+
+### With the script
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Braduptempo/quickshell-config/main/install.sh | bash
+```
+
+Or from a clone: `./install.sh`. It asks before every step:
+
+1. installs the packages below with pacman (`--minimal`: only the required ones);
+2. puts this config in `~/.config/quickshell` (an existing other config is moved to a backup first);
+3. adds the line for the shell's rules and keys to `hyprland.lua`, and starts the shell with Hyprland unless something already does;
+4. turns on NetworkManager, Bluetooth and power profiles.
+
+`--dry-run` shows what it would do without changing anything, `--yes` answers yes to everything. Running it again is safe: what's already done is skipped.
+
+### By hand
 
 ```bash
 git clone https://github.com/Braduptempo/quickshell-config ~/.config/quickshell
@@ -24,7 +41,7 @@ Add this line at the end of `~/.config/hypr/hyprland.lua`. It loads the glass bl
 pcall(dofile, os.getenv("HOME") .. "/.config/quickshell/hyprland/quickshell.lua")
 ```
 
-Start the shell (and add the same line to your autostart):
+Start the shell (and add the same to your autostart):
 
 ```bash
 qs -d
@@ -34,7 +51,7 @@ Start it like this, not with `qs -p <folder>`: the keybinds call `qs ipc call â€
 
 ### Programs it uses
 
-Arch package names. Everything except the first group is optional: a feature whose program is missing is hidden or says what to install.
+Arch package names, all in the official repos. Everything except the first group is optional: a feature whose program is missing is hidden or says what to install.
 
 | For | Packages |
 |---|---|
