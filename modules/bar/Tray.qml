@@ -34,13 +34,14 @@ Row {
     visible: root.showIcons
     implicitHeight: Theme.size.barItem
     implicitWidth: iconRow.implicitWidth + 12
+    Behavior on implicitWidth { NumberAnimation { duration: Theme.anim.segment; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard } }
     anchors.verticalCenter: parent.verticalCenter
     radius: Theme.pill(height)
     color: Theme.barItem
     border.width: Theme.barPills && Theme.borders ? 1 : 0
     border.color: Theme.border
 
-    Row {
+    SmoothRow {
       id: iconRow
       anchors.centerIn: parent
       spacing: 8

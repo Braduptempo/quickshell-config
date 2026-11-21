@@ -10,7 +10,7 @@ import "../../config"
 import "../../components"
 import "../../services"
 
-Row {
+SmoothRow {
   id: root
 
   required property ShellScreen screen

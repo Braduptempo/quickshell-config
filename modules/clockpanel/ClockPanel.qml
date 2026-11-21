@@ -43,6 +43,14 @@ PanelWindow {
 
   readonly property var tabs: ["overview", "calendar", "weather", "notifications"]
 
+  // A new tab fades in instead of popping
+  property real tabFade: 1
+  NumberAnimation on tabFade { id: tabFadeIn; running: false; from: 0; to: 1; duration: Theme.anim.panelIn; easing.type: Easing.OutCubic }
+  Connections {
+    target: Panels
+    function onClockTabChanged() { tabFadeIn.restart(); }
+  }
+
   onShownChanged: if (shown && Panels.clockTab === "notifications") Notifications.markRead()
 
   HyprlandFocusGrab {
@@ -59,6 +67,9 @@ PanelWindow {
     width: 720
     implicitHeight: content.implicitHeight + 32
     height: implicitHeight
+    // Tabs have different heights: grow or shrink to the next one smoothly
+    Behavior on implicitHeight { NumberAnimation { duration: Theme.anim.panelIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard } }
+    clip: true
     focus: true
     transformOrigin: window.fromBottom ? Item.Bottom : Item.Top
 
@@ -116,21 +127,25 @@ PanelWindow {
       }
 
       OverviewTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "overview"
         Layout.fillWidth: true
       }
 
       CalendarTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "calendar"
         Layout.fillWidth: true
       }
 
       WeatherTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "weather"
         Layout.fillWidth: true
       }
 
       NotificationsTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "notifications"
         Layout.fillWidth: true
       }
