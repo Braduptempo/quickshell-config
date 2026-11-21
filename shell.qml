@@ -1,4 +1,7 @@
+//@ pragma UseQApplication
 //shell.qml
+// UseQApplication (must be the first lines): tray menus are platform menus,
+// which Quickshell can only show in QApplication mode
 
 import Quickshell
 import Quickshell.Io
