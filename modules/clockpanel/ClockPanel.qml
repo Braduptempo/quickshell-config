@@ -132,6 +132,78 @@ PanelWindow {
             kind: "section"
           }
 
+          // --- Weather (Settings → Weather) ------------------------------------
+          Rectangle {
+            visible: Weather.current !== null
+            Layout.fillWidth: true
+            implicitHeight: weatherColumn.implicitHeight + 24
+            radius: Theme.radiusCard
+            color: Theme.item
+
+            Accessible.role: Accessible.StaticText
+            Accessible.name: Weather.current ? "Weather in " + Config.weather.place + ": " + Weather.degrees(Weather.current.temperature) + ", " + Weather.describe(Weather.current.code) : ""
+
+            ColumnLayout {
+              id: weatherColumn
+              x: 14
+              y: 12
+              width: parent.width - 28
+              spacing: 10
+
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+                Icon {
+                  name: Weather.current ? Weather.icon(Weather.current.code, Weather.current.isDay) : "cloud"
+                  size: 30
+                  color: Theme.accent
+                }
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  spacing: 1
+                  Label {
+                    text: Weather.current ? Weather.degrees(Weather.current.temperature) + "  " + Weather.describe(Weather.current.code) : ""
+                    kind: "title"
+                  }
+                  Label {
+                    text: Weather.current ? Config.weather.place.split(",")[0] + " · feels like " + Weather.degrees(Weather.current.feelsLike) + " · wind " + Weather.current.wind + (Weather.fahrenheit ? " mph" : " km/h") : ""
+                    kind: "muted"
+                    font.pixelSize: Theme.font.label
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                  }
+                }
+              }
+
+              Label {
+                visible: Weather.rainNote !== ""
+                text: Weather.rainNote
+                color: Theme.accent
+                font.pixelSize: Theme.font.small
+                font.weight: Font.Bold
+              }
+
+              // The next days
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: 4
+                Repeater {
+                  model: Weather.days.slice(1, 6)
+                  ColumnLayout {
+                    id: day
+                    required property var modelData
+                    Layout.fillWidth: true
+                    spacing: 3
+                    Label { Layout.alignment: Qt.AlignHCenter; text: Qt.formatDate(day.modelData.date, "ddd"); kind: "muted"; font.pixelSize: Theme.font.label }
+                    Icon { Layout.alignment: Qt.AlignHCenter; name: Weather.icon(day.modelData.code, true); size: 16; color: Theme.text }
+                    Label { Layout.alignment: Qt.AlignHCenter; text: Weather.degrees(day.modelData.max); font.pixelSize: Theme.font.label; font.weight: Font.Bold }
+                    Label { Layout.alignment: Qt.AlignHCenter; text: Weather.degrees(day.modelData.min); kind: "muted"; font.pixelSize: Theme.font.label }
+                  }
+                }
+              }
+            }
+          }
+
           readonly property var dayEvents: Calendar.eventsOn(month.selected)
 
           // That day's events

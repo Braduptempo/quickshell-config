@@ -29,6 +29,7 @@ PanelWindow {
     { key: "network", label: "Network & Bluetooth", icon: "wifi", group: "System" },
     { key: "notifications", label: "Notifications", icon: "bell", group: "System" },
     { key: "calendars", label: "Calendars", icon: "calendar", group: "System" },
+    { key: "weather", label: "Weather", icon: "cloud-sun", group: "System" },
     { key: "displays", label: "Displays", icon: "monitor", group: "System" },
     { key: "nightlight", label: "Night light", icon: "moon", group: "System" },
     { key: "input", label: "Keyboard & mouse", icon: "keyboard", group: "System" },
@@ -206,6 +207,7 @@ PanelWindow {
             case "sound": return soundPage;
             case "network": return networkPage;
             case "calendars": return calendarsPage;
+            case "weather": return weatherPage;
             case "input": return inputPage;
             case "apps": return appsPage;
             case "power": return powerPage;
@@ -274,6 +276,7 @@ PanelWindow {
   Component { id: soundPage; SoundPage {} }
   Component { id: networkPage; NetworkSettingsPage {} }
   Component { id: calendarsPage; CalendarsPage {} }
+  Component { id: weatherPage; WeatherPage {} }
   Component { id: inputPage; InputPage {} }
   Component { id: appsPage; DefaultAppsPage {} }
   Component { id: powerPage; PowerPage {} }

@@ -22,3 +22,4 @@ singleton Privacy 1.0 Privacy.qml
 singleton Updates 1.0 Updates.qml
 singleton Drives 1.0 Drives.qml
 singleton Windows 1.0 Windows.qml
+singleton Weather 1.0 Weather.qml

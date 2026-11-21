@@ -67,6 +67,16 @@ Singleton {
     property string weekStart: "monday"
   }
 
+  component WeatherSettings: JsonObject {
+    // The place you chose in Settings → Weather; empty = no weather
+    property string place: ""
+    property real latitude: 0
+    property real longitude: 0
+    // "celsius" or "fahrenheit"
+    property string units: "celsius"
+    property bool showOnLock: true
+  }
+
   component DisplaySettings: JsonObject {
     // The monitor with the full bar; "" = the first one
     property string primary: ""
@@ -124,14 +134,30 @@ Singleton {
   property alias displays: adapter.displays
   property alias sound: adapter.sound
   property alias calendar: adapter.calendar
+  property alias weather: adapter.weather
   property alias apps: adapter.apps
+
+  property double lastWrite: 0
+
+  Timer {
+    id: writeDelay
+    interval: 60
+    onTriggered: {
+      root.lastWrite = Date.now();
+      file.writeAdapter();
+    }
+  }
 
   FileView {
     id: file
     path: Quickshell.shellPath("settings.json")
     watchChanges: true
-    onFileChanged: reload()
-    onAdapterUpdated: writeAdapter()
+    // Edits by hand are picked up; our own writes are not read back, or a
+    // reload in the middle of setting several values (place, latitude,
+    // longitude) would undo the ones set after the first write
+    onFileChanged: if (Date.now() - root.lastWrite > 1000) reload()
+    // Several changes in a row become one write
+    onAdapterUpdated: writeDelay.restart()
     onLoadFailed: error => {
       // First start: write the defaults so there is a file to edit
       if (error === FileViewError.FileNotFound) writeAdapter();
@@ -157,6 +183,8 @@ Singleton {
       property SoundSettings sound: SoundSettings {}
 
       property CalendarSettings calendar: CalendarSettings {}
+
+      property WeatherSettings weather: WeatherSettings {}
 
       property AppSettings apps: AppSettings {}
     }
