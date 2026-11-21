@@ -36,8 +36,11 @@ Singleton {
   }
 
   component AnimationSettings: JsonObject {
-    // 0 off, 1 slow, 2 normal, 3 fast
+    // 0 off, 1 slow, 2 normal, 3 fast (the old steps; 0 still means off)
     property int speed: 2
+    // How fast, 0.25 … 2 (1 is normal); used once it differs from 1, or
+    // when speed is back on "normal"
+    property real rate: 1.0
     // "slide", "fade" or "scale"
     property string panelStyle: "slide"
   }
@@ -66,6 +69,8 @@ Singleton {
     property bool showUpdates: true
     // USB sticks and other removable drives
     property bool showDrives: true
+    // A warning pill while CPU or GPU runs at 90 % or above, or 85 °C
+    property bool showLoad: true
   }
 
   component SoundSettings: JsonObject {

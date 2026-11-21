@@ -191,7 +191,7 @@ ColumnLayout {
   }
 
   EmptyState {
-    visible: root.outputs.length === 0
+    visible: root.outputs.length === 0 || Fake.has("no-audio")
     Layout.fillWidth: true
     icon: "volume"
     crossed: true

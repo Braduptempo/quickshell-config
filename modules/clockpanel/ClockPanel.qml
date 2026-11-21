@@ -39,9 +39,22 @@ PanelWindow {
   margins.top: 6
   margins.bottom: 6
   implicitWidth: 720 + 24
-  implicitHeight: card.implicitHeight + 24
+  // The window never changes size: resizing a Wayland window makes the
+  // content shake (every frame) or go blank (a frame or two after a jump).
+  // It's as tall as the screen allows; only the card takes clicks (mask),
+  // so clicks beside it reach the windows below and close the panel.
+  implicitHeight: (screen ? screen.height : 1080) - Theme.size.bar - 24
+  mask: Region { item: card }
 
   readonly property var tabs: ["overview", "calendar", "weather", "notifications"]
+
+  // A new tab fades in instead of popping
+  property real tabFade: 1
+  NumberAnimation on tabFade { id: tabFadeIn; running: false; from: 0.35; to: 1; duration: Theme.anim.panelIn; easing.type: Easing.OutCubic }
+  Connections {
+    target: Panels
+    function onClockTabChanged() { tabFadeIn.restart(); }
+  }
 
   onShownChanged: if (shown && Panels.clockTab === "notifications") Notifications.markRead()
 
@@ -59,11 +72,16 @@ PanelWindow {
     width: 720
     implicitHeight: content.implicitHeight + 32
     height: implicitHeight
+    // Tabs have different heights: grow or shrink to the next one smoothly
+    // (the card's height animates, the window around it holds still)
+    Behavior on height { NumberAnimation { duration: Theme.anim.panelIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard } }
+    clip: true
     focus: true
     transformOrigin: window.fromBottom ? Item.Bottom : Item.Top
 
     opacity: window.shown ? 1 : 0
-    y: 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
+    // With the bar at the bottom the card hugs the bottom of the (held) window
+    y: (window.fromBottom ? window.height - 24 - height : 0) + 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
     scale: window.shown || window.style !== "scale" ? 1 : 0.94
 
     Behavior on opacity {
@@ -100,30 +118,41 @@ PanelWindow {
           }
         }
 
-        Item { Layout.fillWidth: true }
+        Item { Layout.fillWidth: true; visible: Panels.clockTab === "overview" }
 
+        // The date (the overview's Today card has it already); shortens
+        // rather than pushing out of the panel
         Label {
+          visible: Panels.clockTab !== "overview"
+          Layout.fillWidth: true
+          Layout.minimumWidth: 0
+          horizontalAlignment: Text.AlignRight
           text: Qt.formatDate(Time.date, "dddd d MMMM")
           kind: "muted"
+          elide: Text.ElideLeft
         }
       }
 
       OverviewTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "overview"
         Layout.fillWidth: true
       }
 
       CalendarTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "calendar"
         Layout.fillWidth: true
       }
 
       WeatherTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "weather"
         Layout.fillWidth: true
       }
 
       NotificationsTab {
+        opacity: window.tabFade
         visible: Panels.clockTab === "notifications"
         Layout.fillWidth: true
       }

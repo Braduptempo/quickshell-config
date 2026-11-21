@@ -163,6 +163,23 @@ Rectangle {
         Layout.fillWidth: true
       }
 
+      // Progress the app reports (downloads, copies): the "value" hint, 0 … 100
+      Rectangle {
+        readonly property var value: root.notification?.hints?.value
+        visible: value !== undefined && value !== null && !isNaN(value)
+        Layout.fillWidth: true
+        Layout.topMargin: 4
+        implicitHeight: 6
+        radius: Theme.pill(height)
+        color: Theme.alpha(Theme.text, 0.1)
+        Rectangle {
+          width: parent.width * Math.max(0, Math.min(100, parent.value ?? 0)) / 100
+          height: parent.height
+          radius: parent.radius
+          color: Theme.accent
+        }
+      }
+
       // The app's own buttons ("Reply", "Mark as read", "Open"…)
       Flow {
         visible: root.buttons.length > 0

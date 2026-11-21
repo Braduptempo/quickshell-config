@@ -3,6 +3,7 @@
 // `active` marks it as open (e.g. its panel is showing).
 import QtQuick
 import "../../config"
+import "../../components"
 
 Item {
   id: root
@@ -20,6 +21,10 @@ Item {
 
   implicitHeight: Theme.size.barItem
   implicitWidth: Math.max(implicitHeight, row.implicitWidth + padding * 2)
+  // Grows and shrinks smoothly when something comes or goes (the moon by
+  // the clock, a muted mic…); the content is clipped while it does
+  Behavior on implicitWidth { NumberAnimation { duration: Theme.anim.segment; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard } }
+  clip: true
 
   Accessible.role: Accessible.Button
   Accessible.name: accessibleName
@@ -37,8 +42,10 @@ Item {
     Behavior on border.color { ColorAnimation { duration: Theme.anim.fast } }
   }
 
-  Row {
+  SmoothRow {
     id: row
+    // Centred in the pill, so it moves itself when it grows
+    slide: false
     anchors.centerIn: parent
     spacing: 8
   }

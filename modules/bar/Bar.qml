@@ -66,7 +66,7 @@ Scope {
         border.width: root.pills || !Theme.borders ? 0 : 1
         shadow: false
 
-        Row {
+        SmoothRow {
           anchors.left: parent.left
           anchors.leftMargin: 7
           anchors.verticalCenter: parent.verticalCenter
@@ -114,8 +114,10 @@ Scope {
           anchors.centerIn: parent
         }
 
-        Row {
+        SmoothRow {
           visible: !panel.light
+          // Anchored right: pop in, no sliding (see SmoothRow)
+          slide: false
           anchors.right: parent.right
           anchors.rightMargin: 7
           anchors.verticalCenter: parent.verticalCenter
