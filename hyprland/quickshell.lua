@@ -53,6 +53,13 @@ hl.bind("ALT + Alt_L", hl.dsp.exec_cmd("qs ipc call windows commit"), { release 
 hl.bind("ALT + Alt_R", hl.dsp.exec_cmd("qs ipc call windows commit"), { release = true, non_consuming = true })
 -- Workspace overview
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd("qs ipc call windows overview"))
+-- Screens: focus the left or right one, take the window along with Shift,
+-- or step through them all
+hl.bind("SUPER + ALT + left", hl.dsp.focus({ monitor = "l" }))
+hl.bind("SUPER + ALT + right", hl.dsp.focus({ monitor = "r" }))
+hl.bind("SUPER + ALT + SHIFT + left", hl.dsp.window.move({ monitor = "l" }))
+hl.bind("SUPER + ALT + SHIFT + right", hl.dsp.window.move({ monitor = "r" }))
+hl.bind("SUPER + ALT + Tab", hl.dsp.focus({ monitor = "+1" }))
 -- Settings
 hl.bind("SUPER + comma", hl.dsp.exec_cmd("qs ipc call settings toggle"))
 -- Theme and wallpaper pickers

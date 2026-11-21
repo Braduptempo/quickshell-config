@@ -68,6 +68,9 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Super + Esc | Power menu |
 | Alt + Tab | Window switcher (release Alt to switch) |
 | Super + Tab | Overview of all workspaces |
+| Super + Alt + ← / → | Focus the screen on the left / right |
+| Super + Alt + Shift + ← / → | Move the window to the screen on the left / right |
+| Super + Alt + Tab | Next screen |
 | Print | Screenshot and recording toolbar (Shift: area right away, Ctrl: whole screen) |
 | Super + Shift + R / Super + Ctrl + R | Recording toolbar / stop recording |
 
