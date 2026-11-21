@@ -116,6 +116,8 @@ Scope {
 
         SmoothRow {
           visible: !panel.light
+          // Anchored right: pop in, no sliding (see SmoothRow)
+          slide: false
           anchors.right: parent.right
           anchors.rightMargin: 7
           anchors.verticalCenter: parent.verticalCenter

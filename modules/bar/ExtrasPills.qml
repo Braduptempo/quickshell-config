@@ -12,6 +12,8 @@ import "../../services"
 
 SmoothRow {
   id: root
+  // In the bar's right half, which grows to the left
+  slide: false
 
   required property ShellScreen screen
 

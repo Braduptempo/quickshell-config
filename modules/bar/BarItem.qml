@@ -44,6 +44,8 @@ Item {
 
   SmoothRow {
     id: row
+    // Centred in the pill, so it moves itself when it grows
+    slide: false
     anchors.centerIn: parent
     spacing: 8
   }
