@@ -50,32 +50,14 @@ ColumnLayout {
     Layout.fillWidth: true
   }
 
-  // Empty state
-  ColumnLayout {
+  EmptyState {
     visible: Notifications.count === 0
     Layout.fillWidth: true
-    Layout.topMargin: 24
-    Layout.bottomMargin: 24
-    spacing: 8
-
-    Icon {
-      name: "bell"
-      size: 28
-      color: Theme.subtext
-      Layout.alignment: Qt.AlignHCenter
-    }
-    Label {
-      text: "You're all caught up"
-      kind: "title"
-      horizontalAlignment: Text.AlignHCenter
-      Layout.fillWidth: true
-    }
-    Label {
-      text: "New notifications show up here."
-      kind: "muted"
-      horizontalAlignment: Text.AlignHCenter
-      Layout.fillWidth: true
-    }
+    Layout.bottomMargin: 16
+    icon: "bell-check"
+    iconColor: Theme.good
+    title: "You're all caught up"
+    text: Notifications.quiet ? "Do not disturb is on: new notifications wait here quietly." : "No new notifications. New ones show up here."
   }
 
   Flickable {

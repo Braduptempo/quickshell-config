@@ -87,11 +87,15 @@ Scope {
             visible: Config.bar.showMedia && !panel.light && player !== null && player.trackTitle !== ""
           }
 
-          // What the focused window is called
+          // What the focused window is called. The light bar on other screens
+          // always shows it, for that screen's own workspace
           BarItem {
             id: titleItem
-            readonly property string title: Hyprland.activeToplevel?.title ?? ""
-            visible: Config.bar.showWindowTitle && !panel.light && title !== ""
+            readonly property int workspace: Hyprland.monitorFor(panel.modelData)?.activeWorkspace?.id ?? -1
+            readonly property string title: panel.light
+              ? (Windows.windows.find(w => w.workspace === workspace)?.title ?? "")
+              : (Hyprland.activeToplevel?.title ?? "")
+            visible: (Config.bar.showWindowTitle || panel.light) && title !== ""
             flat: true
             accessibleName: "Window: " + title
 
