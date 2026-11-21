@@ -16,6 +16,7 @@ SettingsPage {
     Config.bar.showWindowTitle = false;
     Config.bar.showClipboard = true;
     Config.bar.collapseTray = true;
+    Config.bar.trayClick = "menu";
     Config.bar.showDate = false;
     Config.bar.otherMonitors = "full";
     Config.bar.showPrivacy = true;
@@ -77,6 +78,16 @@ SettingsPage {
     title: "Tray behind an arrow"
     subtitle: "App icons stay hidden until you click the arrow. Off: always shown."
     Toggle { checked: Config.bar.collapseTray; accessibleName: "Tray behind an arrow"; onToggled: value => Config.bar.collapseTray = value }
+  }
+  SettingRow {
+    title: "Tray click"
+    subtitle: "What a left click on a tray icon does. Many apps (Spotify, Electron apps) only answer with their menu. Right click is always the menu."
+    Segmented {
+      model: ["Menu", "Open the app"]
+      currentIndex: Config.bar.trayClick === "open" ? 1 : 0
+      accessibleName: "Tray click"
+      onActivated: index => Config.bar.trayClick = index === 1 ? "open" : "menu"
+    }
   }
   SettingRow {
     title: "Privacy"

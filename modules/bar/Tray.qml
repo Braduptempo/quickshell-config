@@ -1,7 +1,9 @@
 // Tray.qml
 // System tray behind an arrow. Click the arrow to show the app icons.
-// Icon: left click opens the app, right click its menu, middle click its
-// secondary action.
+// Icon: left click opens the app's menu (or the app itself, Settings → Bar &
+// panels → Tray click), right click always the menu, middle click opens the
+// app. Many apps (Spotify, Electron apps) ignore "open" and only have a menu,
+// which is why the menu is the default.
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -19,6 +21,7 @@ Row {
   readonly property bool collapsible: Config.bar.collapseTray
   property bool expanded: false
   readonly property bool showIcons: expanded || !collapsible
+  readonly property bool fromBottom: Config.bar.position === "bottom"
 
   spacing: 6
   visible: SystemTray.items.values.length > 0
@@ -59,6 +62,15 @@ Row {
             source: trayItem.modelData.icon
           }
 
+          // The app's own menu, opened under the icon
+          QsMenuAnchor {
+            id: menuAnchor
+            menu: trayItem.modelData.menu
+            anchor.item: trayItem
+            anchor.edges: root.fromBottom ? Edges.Top : Edges.Bottom
+            anchor.gravity: root.fromBottom ? Edges.Top : Edges.Bottom
+          }
+
           MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -66,16 +78,11 @@ Row {
             cursorShape: Qt.PointingHandCursor
             onClicked: mouse => {
               const item = trayItem.modelData;
-              if (mouse.button === Qt.RightButton || item.onlyMenu) {
-                if (item.hasMenu) {
-                  const pos = trayItem.mapToItem(null, 0, trayItem.height + 14);
-                  item.display(root.window, pos.x, pos.y);
-                }
-              } else if (mouse.button === Qt.MiddleButton) {
-                item.secondaryActivate();
-              } else {
-                item.activate();
-              }
+              const wantsMenu = mouse.button === Qt.RightButton || item.onlyMenu
+                                || (mouse.button === Qt.LeftButton && Config.bar.trayClick === "menu");
+              if (wantsMenu && item.hasMenu) menuAnchor.open();
+              else if (mouse.button === Qt.MiddleButton && Config.bar.trayClick !== "menu") item.secondaryActivate();
+              else item.activate();
             }
             onWheel: wheel => trayItem.modelData.scroll(wheel.angleDelta.y, false)
           }
