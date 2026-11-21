@@ -27,6 +27,18 @@ Rectangle {
 
   readonly property bool critical: notification?.urgency === NotificationUrgency.Critical
   readonly property var buttons: (notification?.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "")
+
+  // A picture on disk (a screenshot from any tool): it gets an Edit button
+  // that opens it in the drawing editor, unless the app has its own Edit
+  readonly property string pictureFile: {
+    const candidates = [notification?.image ?? "", (notification ? notification.hints["image-path"] : "") ?? "", notification?.appIcon ?? ""];
+    for (const c of candidates) {
+      const path = String(c).replace(/^file:\/\//, "");
+      if (path.startsWith("/") && /\.(png|jpe?g|webp)$/i.test(path)) return path;
+    }
+    return "";
+  }
+  readonly property bool canEdit: pictureFile !== "" && !buttons.some(a => (a?.text ?? "").toLowerCase() === "edit")
   readonly property string iconSource: {
     const icon = notification?.appIcon ?? "";
     if (icon === "") return "";
@@ -182,10 +194,22 @@ Rectangle {
 
       // The app's own buttons ("Reply", "Mark as read", "Open"…)
       Flow {
-        visible: root.buttons.length > 0
+        visible: root.buttons.length > 0 || root.canEdit
         Layout.fillWidth: true
         Layout.topMargin: 6
         spacing: 6
+
+        Button {
+          visible: root.canEdit
+          text: "Edit"
+          icon: "pencil"
+          size: Theme.size.buttonList
+          variant: "ghost"
+          onClicked: {
+            Annotate.edit(root.pictureFile);
+            Notifications.hidePopup(root.notification);
+          }
+        }
 
         Repeater {
           model: root.buttons

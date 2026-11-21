@@ -50,6 +50,8 @@ Singleton {
       property string mode: "shot"
       property bool delay: false
       property bool copy: true
+      // Open the drawing editor right after a screenshot
+      property bool edit: false
       property bool cursor: false
       property bool mic: false
       property bool audio: true
@@ -62,6 +64,7 @@ Singleton {
   property alias mode: options.mode
   property alias delay: options.delay
   property alias copy: options.copy
+  property alias edit: options.edit
   property alias cursor: options.cursor
   property alias mic: options.mic
   property alias audio: options.audio
@@ -99,6 +102,7 @@ Singleton {
     if (delay) args.push("--delay", "3");
     if (copy) args.push("--copy");
     if (cursor) args.push("--cursor");
+    if (edit) args.push("--edit");
     Quickshell.execDetached(args);
   }
 

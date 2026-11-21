@@ -36,7 +36,7 @@ PanelWindow {
     ? [["mic", "Mic", "mic", "Record microphone"], ["audio", "Audio", "volume", "Record system audio"],
        ["recordCursor", "Cursor", "cursor", "Show cursor"], ["countdown", "3 s", "clock", "3 second countdown"]]
     : [["delay", "3 s", "clock", "3 second timer"], ["copy", "Copy", "clipboard", "Copy to clipboard"],
-       ["cursor", "Cursor", "cursor", "Show cursor"]]
+       ["cursor", "Cursor", "cursor", "Show cursor"], ["edit", "Edit", "pencil", "Draw on it before saving"]]
 
   screen: Capture.screen ?? Panels.focusedScreen()
   visible: shown || bar.opacity > 0

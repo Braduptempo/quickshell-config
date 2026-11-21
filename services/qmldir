@@ -29,3 +29,4 @@ singleton WifiAdmin 1.0 WifiAdmin.qml
 singleton Appearance 1.0 Appearance.qml
 singleton WallpaperTheme 1.0 WallpaperTheme.qml
 singleton Fake 1.0 Fake.qml
+singleton Annotate 1.0 Annotate.qml
