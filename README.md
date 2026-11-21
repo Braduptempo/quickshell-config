@@ -90,6 +90,7 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Super + Alt + Tab | Next screen |
 | Print | Screenshot and recording toolbar (Shift: area right away, Ctrl: whole screen) |
 | Super + P / Super + Shift + P | Screenshot of an area / a window (replaces hyprshot) |
+| Alt + F10 | Save the replay buffer (the last 30 s – 5 min) |
 | Super + Shift + R / Super + Ctrl + R | Recording toolbar / stop recording |
 
 No Print key? Super + Shift + R opens the same toolbar.
@@ -112,7 +113,7 @@ No Print key? Super + Shift + R opens the same toolbar.
 
 **Windows.** Alt + Tab with live previews, and an overview of every workspace.
 
-**Screenshots and recording.** Area, window or screen; recording with or without sound, pause, and a timer in the bar. Draw on a screenshot before saving or copying it: arrows, boxes, the pen, text, numbered steps, a highlighter, blur over private details and crop ("Edit" on the screenshot notification, or the Edit toggle in the capture toolbar to always open it).
+**Screenshots and recording.** Area, window or screen; recording with or without sound, pause, and a timer in the bar. A replay buffer keeps the last 30 s to 5 min of the screen in memory and saves it on Alt + F10, like ShadowPlay (Replay in the capture toolbar; a yellow pill in the bar while it runs; optionally on at login). Draw on a screenshot before saving or copying it: arrows, boxes, the pen, text, numbered steps, a highlighter, blur over private details and crop ("Edit" on the screenshot notification, or the Edit toggle in the capture toolbar to always open it).
 
 **Power.** Power menu (lock, suspend, log out, restart, shut down) with scheduling, a polkit password dialog, low and critical battery warnings, and power profiles.
 
@@ -158,7 +159,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `pickers` | `theme`, `wallpaper`, `random` |
 | `lock` | `lock`, `suspend` |
 | `power` | `toggle`, `open <letter>`, `cancel` (a scheduled action) |
-| `capture` | `toggle`, `shot <region\|window\|screen>`, `record <region\|window\|screen>`, `pause`, `stop`, `edit <file>` (draw on a picture), `editSave`, `editCopy` |
+| `capture` | `toggle`, `shot <region\|window\|screen>`, `record <region\|window\|screen>`, `pause`, `stop`, `edit <file>` (draw on a picture), `editSave`, `editCopy`, `replay` (start / stop the replay buffer), `replaySave`, `replayStop` |
 | `windows` | `next`, `previous`, `commit`, `cancel`, `overview` |
 | `extras` | `open <updates\|drives>`, `check` |
 | `osd` | `caps`, `brightness` |

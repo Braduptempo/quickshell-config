@@ -233,6 +233,16 @@ Scope {
     function edit(file: string): void {
       Annotate.edit(file);
     }
+    // Replay buffer: start or stop it, save the last part
+    function replay(): void {
+      Capture.toggleReplay();
+    }
+    function replaySave(): void {
+      Capture.saveReplay();
+    }
+    function replayStop(): void {
+      Capture.stopReplay();
+    }
     // The editor's Save and Copy (Enter)
     function editSave(): void {
       Annotate.finishRequested(false);

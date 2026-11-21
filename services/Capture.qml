@@ -46,12 +46,17 @@ Singleton {
       id: options
       // "region", "window" or "screen"
       property string target: "region"
-      // "shot" or "record"
+      // "shot", "record" or "replay"
       property string mode: "shot"
       property bool delay: false
       property bool copy: true
       // Open the drawing editor right after a screenshot
       property bool edit: false
+      // Replay buffer: how many seconds, with sound / mic, on at login
+      property int replaySeconds: 30
+      property bool replayAudio: true
+      property bool replayMic: false
+      property bool replayOnLogin: false
       property bool cursor: false
       property bool mic: false
       property bool audio: true
@@ -65,6 +70,10 @@ Singleton {
   property alias delay: options.delay
   property alias copy: options.copy
   property alias edit: options.edit
+  property alias replaySeconds: options.replaySeconds
+  property alias replayAudio: options.replayAudio
+  property alias replayMic: options.replayMic
+  property alias replayOnLogin: options.replayOnLogin
   property alias cursor: options.cursor
   property alias mic: options.mic
   property alias audio: options.audio
@@ -93,6 +102,7 @@ Singleton {
     interval: 250
     onTriggered: {
       if (root.mode === "record") root.record(root.target);
+      else if (root.mode === "replay") root.toggleReplay();
       else root.shoot(root.target);
     }
   }
@@ -194,4 +204,70 @@ Singleton {
 
   // "2:14"
   readonly property string elapsedText: Math.floor(elapsed / 60) + ":" + String(elapsed % 60).padStart(2, "0")
+
+  // --- Replay buffer (like ShadowPlay) -------------------------------------------------------
+  // The last replaySeconds of the screen stay in memory; saveReplay() writes
+  // them to ~/Videos/Replays (Alt + F10). Runs on after a shell reload.
+  property bool replaying: false
+  property int replayActiveSeconds: 0
+
+  function startReplay(): void {
+    const args = [root.script, "replay", "start", "--seconds", String(replaySeconds)];
+    if (replayAudio) args.push("--audio");
+    if (replayMic) args.push("--mic");
+    Quickshell.execDetached(args);
+  }
+  function stopReplay(): void {
+    Quickshell.execDetached([root.script, "replay", "stop"]);
+  }
+  function saveReplay(): void {
+    Quickshell.execDetached([root.script, "replay", "save"]);
+  }
+  function toggleReplay(): void {
+    if (replaying) stopReplay();
+    else startReplay();
+  }
+
+  FileView {
+    id: replayFile
+    path: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/quickshell-replay"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: root.parseReplay(text())
+    onLoadFailed: root.parseReplay("")
+  }
+
+  function parseReplay(text: string): void {
+    // pid seconds monitor
+    const parts = text.trim().split(" ");
+    replaying = parts.length >= 3;
+    replayActiveSeconds = replaying ? parseInt(parts[1]) : 0;
+  }
+
+  // Notices when the recorder stopped by itself; picks the file up again
+  Timer {
+    interval: 3000
+    running: true
+    repeat: true
+    onTriggered: {
+      if (root.replaying) replayCheck.running = true;
+      else replayFile.reload();
+    }
+  }
+
+  Process {
+    id: replayCheck
+    command: [root.script, "replay", "status"]
+    stdout: StdioCollector {
+      onStreamFinished: if (text.trim() === "idle") root.parseReplay("")
+    }
+  }
+
+  // On at login, when chosen (a reload doesn't start a second one)
+  Timer {
+    interval: 4000
+    running: root.replayOnLogin
+    onTriggered: if (!root.replaying) root.startReplay()
+  }
 }
