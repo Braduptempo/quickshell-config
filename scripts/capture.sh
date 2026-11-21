@@ -2,11 +2,17 @@
 # capture.sh: screenshots (grim + slurp) and screen recording
 # (gpu-screen-recorder) for the shell's capture toolbar.
 #
-#   capture.sh shot   <region|window|screen> [--delay N] [--copy] [--cursor] [--no-save] [--no-freeze]
+#   capture.sh shot   <region|window|screen> [--delay N] [--copy] [--cursor] [--no-save] [--no-freeze] [--edit]
 #   capture.sh record <region|window|screen> [--mic] [--audio] [--cursor] [--countdown]
 #   capture.sh stop       stop the recording and save it
 #   capture.sh pause      pause or resume the recording
 #   capture.sh status     prints "idle", or "recording <start> <paused 0|1> <paused seconds> <file>"
+#   capture.sh replay start [--seconds N] [--audio] [--mic]
+#                          keep the last N seconds (30 by default) of the focused
+#                          monitor in memory, like ShadowPlay
+#   capture.sh replay save  write them to ~/Videos/Replays
+#   capture.sh replay stop
+#   capture.sh replay status   prints "idle", or "replay <seconds> <monitor>"
 #
 # The recorder runs detached, so a shell reload doesn't stop it; its state is
 # in $XDG_RUNTIME_DIR/quickshell-recording.
@@ -17,6 +23,7 @@ set -u
 
 runtime="${XDG_RUNTIME_DIR:-/tmp}"
 state="$runtime/quickshell-recording"
+replay_state="$runtime/quickshell-replay"
 pictures="${QS_CAPTURE_DIR:-$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")/Screenshots}"
 videos="${QS_CAPTURE_DIR:-$(xdg-user-dir VIDEOS 2>/dev/null || echo "$HOME/Videos")/Recordings}"
 
@@ -54,17 +61,21 @@ select_area() {
 notify_saved() {
   # $1 title, $2 file, $3 folder; actions run when clicked
   local title="$1" file="$2" folder="$3" answer
+  # Edit (the drawing editor) only for pictures
+  local edit_action=()
+  case "$file" in *.png|*.jpg) edit_action=(-A edit=Edit) ;; esac
   answer="$(notify-send -a "$title" -i "$file" "$title" "$(basename "$file")" \
-    -A open=Open -A folder="Show in folder")"
+    -A open=Open "${edit_action[@]}" -A folder="Show in folder")"
   case "$answer" in
     open) xdg-open "$file" >/dev/null 2>&1 & ;;
+    edit) qs ipc call capture edit "$file" >/dev/null 2>&1 & ;;
     folder) xdg-open "$folder" >/dev/null 2>&1 & ;;
   esac
 }
 
 shot() {
   local target="$1"; shift
-  local delay=0 copy=0 cursor=0 save=1 freeze=1
+  local delay=0 copy=0 cursor=0 save=1 freeze=1 edit=0
   while [ $# -gt 0 ]; do
     case "$1" in
       --delay) delay="$2"; shift ;;
@@ -72,6 +83,7 @@ shot() {
       --cursor) cursor=1 ;;
       --no-save) save=0 ;;
       --no-freeze) freeze=0 ;;
+      --edit) edit=1 ;;
     esac
     shift
   done
@@ -105,6 +117,10 @@ shot() {
   fi
 
   [ "$copy" = 1 ] && wl-copy --type image/png < "$file"
+  # Straight into the drawing editor; it saves or copies the result itself
+  if [ "$edit" = 1 ]; then
+    qs ipc call capture edit "$file" >/dev/null 2>&1 && exit 0
+  fi
   if [ "$save" = 1 ]; then
     # In the background: it waits for a click on Open / Show in folder
     notify_saved "Screenshot saved" "$file" "$dir" &
@@ -207,6 +223,75 @@ status() {
   fi
 }
 
+# --- Replay buffer -------------------------------------------------------------------------
+read_replay() {
+  [ -f "$replay_state" ] || return 1
+  # pid seconds monitor
+  read -r rpid rseconds rmonitor < "$replay_state" || return 1
+  kill -0 "$rpid" 2>/dev/null || { rm -f "$replay_state"; return 1; }
+}
+
+replay() {
+  local sub="${1:-status}"; [ $# -gt 0 ] && shift
+  case "$sub" in
+    start)
+      local seconds=30 audio=0 mic=0
+      while [ $# -gt 0 ]; do
+        case "$1" in
+          --seconds) seconds="$2"; shift ;;
+          --audio) audio=1 ;;
+          --mic) mic=1 ;;
+        esac
+        shift
+      done
+      command -v gpu-screen-recorder >/dev/null || {
+        notify-send -a Replay "gpu-screen-recorder is not installed" "sudo pacman -S gpu-screen-recorder"
+        exit 1
+      }
+      read_replay && exit 0
+      local dir="${QS_CAPTURE_DIR:-$(xdg-user-dir VIDEOS 2>/dev/null || echo "$HOME/Videos")/Replays}"
+      mkdir -p "$dir"
+      local monitor
+      monitor="$(focused_monitor)"
+      local args=(-w "$monitor" -f 60 -q very_high -c mp4 -r "$seconds" -replay-storage ram -o "$dir"
+                  -sc "$(dirname "$(readlink -f "$0")")/capture.sh")
+      if [ "$mic" = 1 ] && [ "$audio" = 1 ]; then args+=(-a "default_output|default_input")
+      elif [ "$audio" = 1 ]; then args+=(-a default_output)
+      elif [ "$mic" = 1 ]; then args+=(-a default_input)
+      fi
+      setsid -f gpu-screen-recorder "${args[@]}" >"$runtime/quickshell-replay.log" 2>&1
+      sleep 0.4
+      local pid
+      pid="$(pgrep -n -f "gpu-screen-recorder .*-r $seconds .*-o $dir")" || {
+        notify-send -a Replay "The replay buffer failed to start" "See $runtime/quickshell-replay.log"
+        exit 1
+      }
+      echo "$pid $seconds $monitor" > "$replay_state"
+      ;;
+    save)
+      read_replay || { notify-send -a Replay "The replay buffer is off" "Start it from the capture toolbar (Print)"; exit 0; }
+      kill -USR1 "$rpid"
+      ;;
+    stop)
+      read_replay || exit 0
+      kill -INT "$rpid"
+      for _ in $(seq 30); do kill -0 "$rpid" 2>/dev/null || break; sleep 0.1; done
+      rm -f "$replay_state"
+      ;;
+    status)
+      if read_replay; then echo "replay $rseconds $rmonitor"; else echo idle; fi
+      ;;
+  esac
+}
+
+# gpu-screen-recorder runs this script (-sc) with the saved file and its kind
+if [ -f "${1:-}" ] && [ "${2:-}" = replay ]; then
+  # In the background: the recorder shouldn't wait for a click
+  notify_saved "Replay saved" "$1" "$(dirname "$1")" &
+  disown
+  exit 0
+fi
+
 cmd="${1:-}"
 [ $# -gt 0 ] && shift
 case "$cmd" in
@@ -215,5 +300,6 @@ case "$cmd" in
   stop) stop ;;
   pause) pause ;;
   status) status ;;
+  replay) replay "$@" ;;
   *) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

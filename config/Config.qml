@@ -18,6 +18,8 @@ Singleton {
     property real glass: 0.45
     property string fontFamily: "JetBrains Mono"
     property real fontScale: 1.0
+    // Video wallpapers stop on battery
+    property bool videoPauseOnBattery: true
     // Panels and menus with text (the bar uses glass): 0.5 … 1
     property real panelOpacity: 0.86
     // Corner rounding: 1 round as designed, 0 square

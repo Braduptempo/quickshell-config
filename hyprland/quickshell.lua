@@ -36,8 +36,7 @@ hl.bind("SUPER + L", hl.dsp.exec_cmd("qs ipc call lock lock"))
 -- Power menu: lock, suspend, log out, restart, shut down
 hl.bind("SUPER + Escape", hl.dsp.exec_cmd("qs ipc call power toggle"))
 -- Screenshots and recording. Print: the toolbar; Shift + Print: an area
--- straight away; Ctrl + Print: the whole screen. (Super + P from
--- modules/keybinds.lua still runs hyprshot.)
+-- straight away; Ctrl + Print: the whole screen.
 hl.bind("Print", hl.dsp.exec_cmd("qs ipc call capture toggle"))
 hl.bind("SHIFT + Print", hl.dsp.exec_cmd("qs ipc call capture shot region"))
 hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs ipc call capture shot screen"))
@@ -45,6 +44,17 @@ hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs ipc call capture shot screen"))
 -- toolbar, Super + Ctrl + R stops a recording
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs ipc call capture toggle"))
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("qs ipc call capture stop"))
+-- Replay buffer (start it in the capture toolbar's Replay mode): Alt + F10
+-- saves the last 30 s – 5 min, like ShadowPlay
+hl.bind("ALT + F10", hl.dsp.exec_cmd("qs ipc call capture replaySave"))
+-- Super + P (an area) and Super + Shift + P (a window) take the shell's
+-- screenshots too, so their notification has Edit. They replace hyprshot from
+-- modules/keybinds.lua (loaded before this file); remove these four lines to
+-- get it back.
+hl.unbind("SUPER + P")
+hl.unbind("SUPER + SHIFT + P")
+hl.bind("SUPER + P", hl.dsp.exec_cmd("qs ipc call capture shot region"))
+hl.bind("SUPER + SHIFT + P", hl.dsp.exec_cmd("qs ipc call capture shot window"))
 -- Window switcher: hold Alt, press Tab to step, let go of Alt to switch.
 -- The release binds don't swallow Alt, so apps still see it.
 hl.bind("ALT + Tab", hl.dsp.exec_cmd("qs ipc call windows next"))

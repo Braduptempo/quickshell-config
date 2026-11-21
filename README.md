@@ -59,7 +59,7 @@ Arch package names, all in the official repos. Everything except the first group
 | Bluetooth | `bluez`, `bluez-utils` (and `systemctl enable --now bluetooth`) |
 | Clipboard history | `cliphist` |
 | Screenshots and recording | `grim`, `slurp`, `gpu-screen-recorder` |
-| Wallpapers | `awww` (or `swww`) |
+| Wallpapers | `awww` (or `swww`); videos play in the shell itself (`qt6-multimedia`, `qt6-multimedia-ffmpeg`), with `ffmpeg` for their thumbnails |
 | Night light | `hyprsunset` |
 | Brightness | `brightnessctl` |
 | Colour picker (launcher, theme editor) | `hyprpicker` |
@@ -89,6 +89,8 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Super + Alt + Shift + ← / → | Move the window to the screen on the left / right |
 | Super + Alt + Tab | Next screen |
 | Print | Screenshot and recording toolbar (Shift: area right away, Ctrl: whole screen) |
+| Super + P / Super + Shift + P | Screenshot of an area / a window (replaces hyprshot) |
+| Alt + F10 | Save the replay buffer (the last 30 s – 5 min) |
 | Super + Shift + R / Super + Ctrl + R | Recording toolbar / stop recording |
 
 No Print key? Super + Shift + R opens the same toolbar.
@@ -111,7 +113,7 @@ No Print key? Super + Shift + R opens the same toolbar.
 
 **Windows.** Alt + Tab with live previews, and an overview of every workspace.
 
-**Screenshots and recording.** Area, window or screen; recording with or without sound, pause, and a timer in the bar.
+**Screenshots and recording.** Area, window or screen; recording with or without sound, pause, and a timer in the bar. A replay buffer keeps the last 30 s to 5 min of the screen in memory and saves it on Alt + F10, like ShadowPlay (Replay in the capture toolbar; a yellow pill in the bar while it runs; optionally on at login). Draw on a screenshot before saving or copying it: arrows, boxes, the pen, text, numbered steps, a highlighter, blur over private details and crop ("Edit" on the screenshot notification, or the Edit toggle in the capture toolbar to always open it).
 
 **Power.** Power menu (lock, suspend, log out, restart, shut down) with scheduling, a polkit password dialog, low and critical battery warnings, and power profiles.
 
@@ -154,10 +156,10 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `notifications` | `toggle`, `overview`, `calendar`, `weather`, `tab <name>` (switch while open), `dnd`, `clear` |
 | `media` | `toggle` |
 | `clipboard` | `toggle` |
-| `pickers` | `theme`, `wallpaper`, `random` |
+| `pickers` | `theme`, `wallpaper`, `random`, `set <file>` (a picture or video as wallpaper) |
 | `lock` | `lock`, `suspend` |
 | `power` | `toggle`, `open <letter>`, `cancel` (a scheduled action) |
-| `capture` | `toggle`, `shot <region\|window\|screen>`, `record <region\|window\|screen>`, `pause`, `stop` |
+| `capture` | `toggle`, `shot <region\|window\|screen>`, `record <region\|window\|screen>`, `pause`, `stop`, `edit <file>` (draw on a picture), `editSave`, `editCopy`, `replay` (start / stop the replay buffer), `replaySave`, `replayStop` |
 | `windows` | `next`, `previous`, `commit`, `cancel`, `overview` |
 | `extras` | `open <updates\|drives>`, `check` |
 | `osd` | `caps`, `brightness` |
@@ -204,7 +206,7 @@ These variables make the risky parts safe to try:
 | `QS_POWER_DRYRUN=1` | Power actions (and the critical-battery action) only show a notification |
 | `QS_LOCK_TEST=1` | The lock screen really locks, but unlocks by itself after 20 seconds |
 | `QS_BATTERY_FAKE=<percent>` | Pretends to be a discharging battery at that level |
-| `QS_FAKE=<states>` | Shows states without causing them, comma-separated: `wifi-off`, `no-internet`, `portal`, `bt-off`, `no-audio`, `load` |
+| `QS_FAKE=<states>` | Shows states without causing them, comma-separated: `wifi-off`, `no-internet`, `portal`, `bt-off`, `no-audio`, `load`, `annotate-demo` (the drawing editor opens with one of each shape) |
 | `QS_BT_FAKE=<problem>` | Shows the Bluetooth hint: `service`, `blocked`, `hardblocked`, `notinstalled`, `nohardware` |
 | `QS_CLIPHIST_DB=<file>` | Clipboard history from another cliphist database |
 | `QS_GALLERY=1` | Opens the component gallery at start |

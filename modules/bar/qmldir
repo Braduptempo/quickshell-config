@@ -10,3 +10,4 @@ ExtrasPills 1.0 ExtrasPills.qml
 ExtrasMenu 1.0 ExtrasMenu.qml
 MainMenuButton 1.0 MainMenuButton.qml
 TrayMenu 1.0 TrayMenu.qml
+ReplayPill 1.0 ReplayPill.qml

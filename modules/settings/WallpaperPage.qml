@@ -90,6 +90,16 @@ SettingsPage {
   }
 
   SettingRow {
+    title: "Videos pause on battery"
+    subtitle: "Video wallpapers (mp4, webm, mkv) play muted and pause behind fullscreen windows and the lock screen; on battery they can pause too."
+    Toggle {
+      checked: Config.appearance.videoPauseOnBattery
+      accessibleName: "Videos pause on battery"
+      onToggled: value => Config.appearance.videoPauseOnBattery = value
+    }
+  }
+
+  SettingRow {
     title: "Change every 30 minutes"
     subtitle: "Picks from your favourites first (Ctrl + F in the picker)."
     Toggle {

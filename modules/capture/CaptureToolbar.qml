@@ -21,6 +21,9 @@ PanelWindow {
 
   readonly property bool shown: Capture.open
   readonly property bool recordMode: Capture.mode === "record"
+  readonly property bool replayMode: Capture.mode === "replay"
+  // Replay lengths: seconds and their label
+  readonly property var lengths: [[30, "30 s"], [60, "1 min"], [120, "2 min"], [300, "5 min"]]
 
   readonly property var targets: [
     { key: "region", label: "Region", icon: "region", letter: "R" },
@@ -29,14 +32,18 @@ PanelWindow {
   ]
   readonly property var modes: [
     { key: "shot", label: "Screenshot", icon: "photo" },
-    { key: "record", label: "Record", icon: "record" }
+    { key: "record", label: "Record", icon: "record" },
+    { key: "replay", label: "Replay", icon: "restart" }
   ]
   // The toggles for the chosen mode: [option name, short label, icon, long name]
-  readonly property var toggles: recordMode
+  readonly property var toggles: replayMode
+    ? [["replayAudio", "Audio", "volume", "Keep system audio"], ["replayMic", "Mic", "mic", "Keep the microphone"],
+       ["replayOnLogin", "At login", "power", "Start the replay buffer at login"]]
+    : recordMode
     ? [["mic", "Mic", "mic", "Record microphone"], ["audio", "Audio", "volume", "Record system audio"],
        ["recordCursor", "Cursor", "cursor", "Show cursor"], ["countdown", "3 s", "clock", "3 second countdown"]]
     : [["delay", "3 s", "clock", "3 second timer"], ["copy", "Copy", "clipboard", "Copy to clipboard"],
-       ["cursor", "Cursor", "cursor", "Show cursor"]]
+       ["cursor", "Cursor", "cursor", "Show cursor"], ["edit", "Edit", "pencil", "Draw on it before saving"]]
 
   screen: Capture.screen ?? Panels.focusedScreen()
   visible: shown || bar.opacity > 0
@@ -113,7 +120,8 @@ PanelWindow {
       if (target) {
         Capture.target = target.key;
       } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
-        Capture.mode = window.recordMode ? "shot" : "record";
+        const keys = window.modes.map(m => m.key);
+        Capture.mode = keys[(keys.indexOf(Capture.mode) + 1) % keys.length];
       } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
         window.go();
       } else if (event.key === Qt.Key_Escape) {
@@ -125,7 +133,11 @@ PanelWindow {
     }
   }
 
-  readonly property bool canGo: !recordMode || (Capture.hasRecorder && !Capture.recording)
+  readonly property bool canGo: replayMode ? Capture.hasRecorder : !recordMode || (Capture.hasRecorder && !Capture.recording)
+
+  function lengthLabel(seconds: int): string {
+    return seconds >= 60 ? (seconds / 60) + (seconds === 60 ? " minute" : " minutes") : seconds + " seconds";
+  }
 
   function go(): void {
     if (canGo) Capture.start();
@@ -146,7 +158,9 @@ PanelWindow {
       id: hintLabel
       anchors.centerIn: parent
       font.pixelSize: Theme.font.small
-      text: window.recordMode && !Capture.hasRecorder ? "Recording needs gpu-screen-recorder: sudo pacman -S gpu-screen-recorder"
+      text: (window.recordMode || window.replayMode) && !Capture.hasRecorder ? "Recording needs gpu-screen-recorder: sudo pacman -S gpu-screen-recorder"
+          : window.replayMode && Capture.replaying ? "Keeping the last " + window.lengthLabel(Capture.replayActiveSeconds) + " · Alt + F10 saves them"
+          : window.replayMode ? "Keeps the last " + window.lengthLabel(Capture.replaySeconds) + " of this screen in memory · Alt + F10 saves them"
           : window.recordMode && Capture.recording ? "A recording is running; stop it in the bar first"
           : Capture.target === "region" ? "Drag to choose an area · Esc cancels"
           : Capture.target === "window" ? "Click a window · Esc cancels"
@@ -180,7 +194,8 @@ PanelWindow {
       spacing: 4
 
       Repeater {
-        model: window.targets
+        // Replay keeps the whole screen the toolbar is on
+        model: window.replayMode ? [] : window.targets
         ChoiceButton {
           required property var modelData
           icon: modelData.icon
@@ -190,7 +205,7 @@ PanelWindow {
         }
       }
 
-      Divider { Layout.leftMargin: 6; Layout.rightMargin: 6 }
+      Divider { visible: !window.replayMode; Layout.leftMargin: 6; Layout.rightMargin: 6 }
 
       Repeater {
         model: window.modes
@@ -199,7 +214,7 @@ PanelWindow {
           icon: modelData.icon
           text: modelData.label
           active: Capture.mode === modelData.key
-          activeColor: modelData.key === "record" ? Theme.error : Theme.accent
+          activeColor: modelData.key === "record" ? Theme.error : modelData.key === "replay" ? Theme.warn : Theme.accent
           onClicked: Capture.mode = modelData.key
         }
       }
@@ -218,14 +233,54 @@ PanelWindow {
         }
       }
 
+      // How much the replay keeps
+      Divider { visible: window.replayMode; Layout.leftMargin: 6; Layout.rightMargin: 6 }
+      Repeater {
+        model: window.replayMode ? window.lengths : []
+        ChoiceButton {
+          required property var modelData
+          icon: "clock"
+          text: modelData[1]
+          active: Capture.replaySeconds === modelData[0]
+          Accessible.name: "Keep " + modelData[1]
+          onClicked: Capture.replaySeconds = modelData[0]
+        }
+      }
+
       Item { implicitWidth: 6 }
+
+      // Save what the running replay buffer holds
+      Rectangle {
+        visible: window.replayMode && Capture.replaying
+        implicitHeight: 40
+        implicitWidth: saveRow.implicitWidth + 32
+        radius: Theme.pill(height)
+        color: Theme.accent
+        Accessible.role: Accessible.Button
+        Accessible.name: "Save the replay"
+        Row {
+          id: saveRow
+          anchors.centerIn: parent
+          spacing: 8
+          Icon { name: "download"; size: 15; color: Theme.onAccent; anchors.verticalCenter: parent.verticalCenter }
+          Label { text: "Save"; font.weight: Font.Bold; color: Theme.onAccent; anchors.verticalCenter: parent.verticalCenter }
+        }
+        MouseArea {
+          anchors.fill: parent
+          cursorShape: Qt.PointingHandCursor
+          onClicked: {
+            Capture.open = false;
+            Capture.saveReplay();
+          }
+        }
+      }
 
       // Go
       Rectangle {
         implicitHeight: 40
         implicitWidth: goRow.implicitWidth + 32
         radius: Theme.pill(height)
-        color: !window.canGo ? Theme.overlay : window.recordMode ? Theme.error : Theme.accent
+        color: !window.canGo ? Theme.overlay : window.recordMode ? Theme.error : window.replayMode ? (Capture.replaying ? Theme.overlay : Theme.warn) : Theme.accent
         opacity: window.canGo ? 1 : 0.6
 
         Accessible.role: Accessible.Button
@@ -235,8 +290,14 @@ PanelWindow {
           id: goRow
           anchors.centerIn: parent
           spacing: 8
-          Icon { name: window.recordMode ? "record" : "photo"; size: 15; color: Theme.onAccent; anchors.verticalCenter: parent.verticalCenter }
-          Label { id: goLabel; text: window.recordMode ? "Start recording" : "Capture"; font.weight: Font.Bold; color: Theme.onAccent; anchors.verticalCenter: parent.verticalCenter }
+          Icon { name: window.replayMode ? (Capture.replaying ? "stop" : "restart") : window.recordMode ? "record" : "photo"; size: 15; color: window.replayMode && Capture.replaying ? Theme.text : Theme.onAccent; anchors.verticalCenter: parent.verticalCenter }
+          Label {
+            id: goLabel
+            text: window.replayMode ? (Capture.replaying ? "Stop replay" : "Start replay") : window.recordMode ? "Start recording" : "Capture"
+            font.weight: Font.Bold
+            color: window.replayMode && Capture.replaying ? Theme.text : Theme.onAccent
+            anchors.verticalCenter: parent.verticalCenter
+          }
         }
 
         MouseArea {

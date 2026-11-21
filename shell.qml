@@ -20,11 +20,15 @@ import "./modules/pickers"
 import "./modules/windows"
 import "./modules/settings"
 import "./modules/mainmenu"
+import "./modules/wallpaper"
 import "./dev"
 
 Scope {
 
   Bar {}
+
+  // Video wallpapers (images are drawn by awww)
+  VideoWallpaper {}
 
   // Notification pop-ups, and the clock panel (calendar + notifications)
   Toasts {}
@@ -204,10 +208,16 @@ Scope {
     function random(): void {
       Wallpapers.set(Wallpapers.random());
     }
+    // A picture or video as wallpaper, e.g. from a script
+    function set(file: string): void {
+      Wallpapers.set(file);
+    }
   }
 
   // Print: screenshot and recording toolbar
   CaptureToolbar {}
+  // Drawing on a screenshot (Edit on its notification, or after the shot)
+  Annotator {}
 
   // `qs ipc call capture toggle`, `shot region|window|screen`, `record …`, `stop`, `pause`
   IpcHandler {
@@ -226,6 +236,27 @@ Scope {
     }
     function pause(): void {
       Capture.pause();
+    }
+    // Opens a picture in the drawing editor
+    function edit(file: string): void {
+      Annotate.edit(file);
+    }
+    // Replay buffer: start or stop it, save the last part
+    function replay(): void {
+      Capture.toggleReplay();
+    }
+    function replaySave(): void {
+      Capture.saveReplay();
+    }
+    function replayStop(): void {
+      Capture.stopReplay();
+    }
+    // The editor's Save and Copy (Enter)
+    function editSave(): void {
+      Annotate.finishRequested(false);
+    }
+    function editCopy(): void {
+      Annotate.finishRequested(true);
     }
   }
 
