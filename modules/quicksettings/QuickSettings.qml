@@ -42,14 +42,12 @@ PanelWindow {
     right: 8
   }
   implicitWidth: 390 + 24
-  implicitHeight: heldHeight.value + 24
-
-  // The window keeps its size while the card animates (see HeldHeight)
-  HeldHeight {
-    id: heldHeight
-    target: card.implicitHeight
-    delay: Theme.anim.panelIn
-  }
+  // The window never changes size: resizing a Wayland window makes the
+  // content shake (every frame) or go blank (a frame or two after a jump).
+  // It's as tall as the screen allows; only the card takes clicks (mask),
+  // so clicks beside it reach the windows below and close the panel.
+  implicitHeight: (screen ? screen.height : 1080) - Theme.size.bar - 24
+  mask: Region { item: card }
 
   HyprlandFocusGrab {
     active: window.shown
@@ -75,7 +73,7 @@ PanelWindow {
     // Open: slide / fade / scale from Config; close a bit faster
     opacity: window.shown ? 1 : 0
     // With the bar at the bottom the card hugs the bottom of the (held) window
-    y: (window.fromBottom ? heldHeight.value - height : 0) + 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
+    y: (window.fromBottom ? window.height - 24 - height : 0) + 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
     scale: window.shown || window.style !== "scale" ? 1 : 0.92
 
     Behavior on opacity {
@@ -123,8 +121,9 @@ PanelWindow {
           default: return mainPage;
           }
         }
+        // Fades in from 35 %, so the panel never looks empty for a frame
         onLoaded: {
-          item.opacity = 0;
+          item.opacity = 0.35;
           fadeIn.restart();
         }
       }
