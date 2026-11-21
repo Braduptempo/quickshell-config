@@ -112,7 +112,7 @@ PanelWindow {
       Rectangle {
         Layout.fillWidth: true
         implicitHeight: 144
-        radius: 14
+        radius: Theme.r(14)
         color: Theme.alpha(Theme.crust, 0.35)
         clip: true
 
@@ -138,7 +138,7 @@ PanelWindow {
           Rectangle {
             implicitWidth: 116
             implicitHeight: 116
-            radius: 16
+            radius: Theme.r(16)
             color: Theme.accent
             clip: true
 
@@ -166,7 +166,7 @@ PanelWindow {
               maskEnabled: true
               maskSource: artMask
             }
-            Rectangle { id: artMask; anchors.fill: art; radius: 16; visible: false; layer.enabled: true }
+            Rectangle { id: artMask; anchors.fill: art; radius: Theme.r(16); visible: false; layer.enabled: true }
           }
 
           ColumnLayout {
@@ -264,13 +264,13 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width
             height: 4
-            radius: 2
+            radius: Theme.r(2)
             color: Theme.alpha(Theme.text, 0.15)
 
             Rectangle {
               width: parent.width * seek.progress
               height: parent.height
-              radius: 2
+              radius: Theme.r(2)
               color: Theme.accent
             }
           }
@@ -381,7 +381,7 @@ PanelWindow {
             anchors.margins: 4
             width: 13
             height: 13
-            radius: 7
+            radius: Theme.r(7)
             color: Theme.onAccent
             Label { anchors.centerIn: parent; text: "1"; font.pixelSize: 8; font.weight: Font.Bold; color: Theme.accent }
           }
@@ -437,7 +437,7 @@ PanelWindow {
                 readonly property string appIcon: Media.iconOf(playerRow.modelData)
                 implicitWidth: 30
                 implicitHeight: 30
-                radius: 15
+                radius: Theme.r(15)
                 color: appIcon !== "" ? "transparent" : playerRow.current ? Theme.accent : Theme.overlay
                 IconImage {
                   visible: parent.appIcon !== ""

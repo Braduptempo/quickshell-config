@@ -191,7 +191,7 @@ PanelWindow {
 
               Layout.fillWidth: true
               implicitHeight: 78
-              radius: 14
+              radius: Theme.r(14)
               color: toolMouse.containsMouse && available ? Theme.hover(Theme.item) : Theme.item
               opacity: available ? 1 : 0.45
 
@@ -205,7 +205,7 @@ PanelWindow {
                   anchors.horizontalCenter: parent.horizontalCenter
                   width: 32
                   height: 32
-                  radius: 16
+                  radius: Theme.r(16)
                   color: tool.modelData.tint
                   Icon { anchors.centerIn: parent; name: tool.modelData.icon; size: 15; color: Theme.crust }
                 }
@@ -279,7 +279,7 @@ PanelWindow {
         Rectangle {
           implicitWidth: 32
           implicitHeight: 32
-          radius: 16
+          radius: Theme.r(16)
           color: Theme.surface
           Icon { anchors.centerIn: parent; name: "user"; size: 16; color: Theme.subtext }
         }

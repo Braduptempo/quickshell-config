@@ -138,7 +138,7 @@ Rectangle {
           Rectangle {
             implicitWidth: 22
             implicitHeight: 22
-            radius: 11
+            radius: Theme.r(11)
             color: colorRow.value
             border.width: 1
             border.color: Theme.border

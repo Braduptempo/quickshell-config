@@ -12,6 +12,7 @@ SettingsPage {
   resetAction: () => {
     Config.bar.position = "top";
     Config.bar.style = "floating";
+    Config.bar.size = "normal";
     Config.bar.showMedia = true;
     Config.bar.showWindowTitle = false;
     Config.bar.showClipboard = true;
@@ -36,12 +37,25 @@ SettingsPage {
 
   SettingRow {
     title: "Style"
-    subtitle: "A floating pill with a gap around it, or attached to the edge of the screen."
+    subtitle: "A floating pill with a gap around it, attached to the edge of the screen, or only the pills with the wallpaper between them."
     Segmented {
-      model: ["Floating pill", "Attached"]
-      currentIndex: Config.bar.style === "attached" ? 1 : 0
+      readonly property var styles: ["floating", "attached", "pills"]
+      model: ["Floating", "Attached", "Pills only"]
+      currentIndex: Math.max(0, styles.indexOf(Config.bar.style))
       accessibleName: "Bar style"
-      onActivated: index => Config.bar.style = index === 1 ? "attached" : "floating"
+      onActivated: index => Config.bar.style = styles[index]
+    }
+  }
+
+  SettingRow {
+    title: "Size"
+    subtitle: "How tall the bar and its pills are."
+    Segmented {
+      readonly property var sizes: ["compact", "normal", "large"]
+      model: ["Compact", "Normal", "Large"]
+      currentIndex: Math.max(0, sizes.indexOf(Config.bar.size))
+      accessibleName: "Bar size"
+      onActivated: index => Config.bar.size = sizes[index]
     }
   }
 

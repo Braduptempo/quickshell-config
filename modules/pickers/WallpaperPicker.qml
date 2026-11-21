@@ -116,8 +116,8 @@ PanelWindow {
     width: 1060
     implicitHeight: column.implicitHeight + 28
     height: implicitHeight
-    radius: 22
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.85))
+    radius: Theme.r(22)
+    color: Theme.panelSolid
     opacity: window.shown ? 1 : 0
     y: 12 + (window.shown ? 0 : 10)
 
@@ -259,7 +259,7 @@ PanelWindow {
             y: 10
             width: 192
             height: 108
-            radius: 14
+            radius: Theme.r(14)
             color: Theme.surface
             border.width: wall.current ? 2 : 0
             border.color: Theme.accent
@@ -293,7 +293,7 @@ PanelWindow {
               anchors.margins: 6
               width: 22
               height: 22
-              radius: 11
+              radius: Theme.r(11)
               color: Theme.alpha(Theme.crust, 0.7)
               Icon { anchors.centerIn: parent; name: "star"; size: 12; color: Theme.warn }
             }
@@ -305,7 +305,7 @@ PanelWindow {
               anchors.margins: 6
               implicitWidth: inUseLabel.implicitWidth + 14
               implicitHeight: 20
-              radius: 10
+              radius: Theme.r(10)
               color: Theme.accent
               Label { id: inUseLabel; anchors.centerIn: parent; text: "In use"; color: Theme.onAccent; font.pixelSize: Theme.font.label; font.weight: Font.Bold }
             }

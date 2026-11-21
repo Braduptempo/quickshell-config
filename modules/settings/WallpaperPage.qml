@@ -38,7 +38,7 @@ SettingsPage {
       anchors.margins: 12
       implicitWidth: nameLabel.implicitWidth + 24
       implicitHeight: 30
-      radius: 15
+      radius: Theme.r(15)
       color: Theme.alpha(Theme.crust, 0.75)
       Label { id: nameLabel; anchors.centerIn: parent; text: Wallpapers.currentPath.split("/").pop() || "No wallpaper"; font.pixelSize: Theme.font.small }
     }

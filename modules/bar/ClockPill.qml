@@ -89,7 +89,7 @@ BarItem {
     visible: Notifications.unread > 0 && !Notifications.quiet
     width: 7
     height: 7
-    radius: 4
+    radius: Theme.r(4)
     color: Theme.error
     anchors.verticalCenter: parent.verticalCenter
   }

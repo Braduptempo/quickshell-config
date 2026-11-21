@@ -87,7 +87,7 @@ ColumnLayout {
           Rectangle {
             width: 16
             height: 16
-            radius: 8
+            radius: Theme.r(8)
             color: deviceRow.selected ? Theme.accent : "transparent"
             border.width: 2
             border.color: deviceRow.selected ? Theme.accent : Theme.overlay

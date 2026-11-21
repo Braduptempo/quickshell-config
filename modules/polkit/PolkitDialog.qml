@@ -76,7 +76,7 @@ PanelWindow {
     y: Math.round((parent.height - height) / 2) + (window.shown ? 0 : 10)
     width: 440
     height: column.implicitHeight + 44
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.88))
+    color: Theme.panelSolid
     opacity: window.shown ? 1 : 0
     scale: window.shown ? 1 : 0.97
 
@@ -102,7 +102,7 @@ PanelWindow {
         Rectangle {
           implicitWidth: 48
           implicitHeight: 48
-          radius: 24
+          radius: Theme.r(24)
           color: window.ok ? Theme.alpha(Theme.good, 0.18) : window.cancelled ? Theme.overlay : Theme.alpha(Theme.warn, 0.18)
 
           Icon {
@@ -135,7 +135,7 @@ PanelWindow {
       Rectangle {
         Layout.fillWidth: true
         implicitHeight: messageColumn.implicitHeight + 24
-        radius: 14
+        radius: Theme.r(14)
         color: Theme.alpha(Theme.crust, 0.45)
 
         ColumnLayout {
@@ -155,7 +155,7 @@ PanelWindow {
           Rectangle {
             implicitHeight: 24
             implicitWidth: detailsRow.implicitWidth + 16
-            radius: 12
+            radius: Theme.r(12)
             color: detailsMouse.containsMouse ? Theme.item : "transparent"
 
             Accessible.role: Accessible.Button
@@ -212,7 +212,7 @@ PanelWindow {
           Rectangle {
             implicitWidth: 30
             implicitHeight: 30
-            radius: 15
+            radius: Theme.r(15)
             color: Theme.surface
             border.width: 2
             border.color: Theme.accent

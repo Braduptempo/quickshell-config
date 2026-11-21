@@ -255,7 +255,7 @@ Item {
           id: notifRow
           anchors.centerIn: parent
           spacing: 8
-          Rectangle { width: 7; height: 7; radius: 4; color: Theme.error; anchors.verticalCenter: parent.verticalCenter }
+          Rectangle { width: 7; height: 7; radius: Theme.r(4); color: Theme.error; anchors.verticalCenter: parent.verticalCenter }
           Label {
             text: Notifications.count + (Notifications.count === 1 ? " notification" : " notifications")
             font.pixelSize: Theme.font.small
@@ -274,7 +274,7 @@ Item {
           id: nextRow
           anchors.centerIn: parent
           spacing: 8
-          Rectangle { width: 7; height: 7; radius: 4; color: Calendar.next ? Calendar.next.color : Theme.accent; anchors.verticalCenter: parent.verticalCenter }
+          Rectangle { width: 7; height: 7; radius: Theme.r(4); color: Calendar.next ? Calendar.next.color : Theme.accent; anchors.verticalCenter: parent.verticalCenter }
           Label {
             text: Calendar.next ? "Next at " + Qt.formatDateTime(new Date(Calendar.next.start), "HH:mm") : ""
             font.pixelSize: Theme.font.small
@@ -327,7 +327,7 @@ Item {
     y: root.height * 0.47 + (root.resting ? 10 : 0)
     width: 380
     height: cardColumn.implicitHeight + 44
-    radius: 24
+    radius: Theme.r(24)
     color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.7))
 
     Accessible.role: Accessible.Dialog
@@ -348,7 +348,7 @@ Item {
         Layout.alignment: Qt.AlignHCenter
         implicitWidth: 76
         implicitHeight: 76
-        radius: 38
+        radius: Theme.r(38)
         color: Theme.surface
         border.width: 3
         border.color: root.ring
@@ -610,7 +610,7 @@ Item {
         Rectangle {
           implicitWidth: 52
           implicitHeight: 52
-          radius: 12
+          radius: Theme.r(12)
           color: Theme.accent
           clip: true
 
@@ -646,12 +646,12 @@ Item {
         Rectangle {
           Layout.fillWidth: true
           implicitHeight: 4
-          radius: 2
+          radius: Theme.r(2)
           color: Theme.alpha(Theme.text, 0.15)
           Rectangle {
             width: parent.width * Math.min(1, (root.player?.position ?? 0) / Math.max(1, root.player?.length ?? 1))
             height: parent.height
-            radius: 2
+            radius: Theme.r(2)
             color: Theme.accent
           }
         }

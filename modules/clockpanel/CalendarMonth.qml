@@ -151,7 +151,7 @@ ColumnLayout {
               anchors.centerIn: parent
               width: 34
               height: 34
-              radius: 17
+              radius: Theme.r(17)
               color: cell.today ? Theme.accent : dayMouse.containsMouse ? Theme.item : "transparent"
               border.width: cell.selected && !cell.today ? 1 : 0
               border.color: Theme.accent
@@ -167,7 +167,7 @@ ColumnLayout {
               anchors.bottomMargin: 3
               width: 4
               height: 4
-              radius: 2
+              radius: Theme.r(2)
               color: cell.today ? Theme.onAccent : Theme.accent
             }
 

@@ -51,7 +51,7 @@ Item {
       id: circle
       width: 36
       height: 36
-      radius: 18
+      radius: Theme.r(18)
       anchors.left: parent.left
       anchors.leftMargin: 8
       anchors.verticalCenter: parent.verticalCenter

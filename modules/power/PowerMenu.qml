@@ -213,8 +213,8 @@ PanelWindow {
     y: Math.round(parent.height * 0.46 - height / 2) + (window.shown ? 0 : 12)
     width: 720
     height: column.implicitHeight + 44
-    radius: 24
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.85))
+    radius: Theme.r(24)
+    color: Theme.panelSolid
     opacity: window.shown ? 1 : 0
     scale: window.shown ? 1 : 0.97
 
@@ -244,7 +244,7 @@ PanelWindow {
         Rectangle {
           implicitWidth: 44
           implicitHeight: 44
-          radius: 22
+          radius: Theme.r(22)
           color: Theme.surface
           border.width: 2
           border.color: Theme.accent
@@ -320,7 +320,7 @@ PanelWindow {
             Layout.fillWidth: true
             Layout.preferredWidth: 1
             implicitHeight: tileColumn.implicitHeight + 26
-            radius: 20
+            radius: Theme.r(20)
             color: active ? Theme.alpha(toneColor, 0.12) : tileMouse.containsMouse ? Theme.item : "transparent"
             border.width: 1
             border.color: active ? Theme.alpha(toneColor, 0.5) : "transparent"
@@ -340,7 +340,7 @@ PanelWindow {
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: 64
                 implicitHeight: 64
-                radius: 32
+                radius: Theme.r(32)
                 color: tile.active ? tile.toneColor : Theme.item
                 scale: tileMouse.pressed ? 0.94 : tileMouse.containsMouse && !tile.active ? 1.04 : 1
 
@@ -366,7 +366,7 @@ PanelWindow {
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: Math.max(20, keyLabel.implicitWidth + 12)
                 implicitHeight: 20
-                radius: 10
+                radius: Theme.r(10)
                 color: Theme.alpha(Theme.crust, 0.5)
                 Label { id: keyLabel; anchors.centerIn: parent; text: tile.modelData.key; kind: "muted"; font.pixelSize: Theme.font.label }
               }
@@ -419,7 +419,7 @@ PanelWindow {
         visible: window.needsConfirm
         Layout.fillWidth: true
         implicitHeight: confirmColumn.implicitHeight + 28
-        radius: 18
+        radius: Theme.r(18)
         color: Theme.alpha(Theme.crust, 0.45)
         border.width: 1
         border.color: Theme.alpha(window.tone, 0.35)
@@ -474,7 +474,7 @@ PanelWindow {
               Rectangle {
                 visible: window.when > 0
                 anchors.fill: parent
-                radius: 22
+                radius: Theme.r(22)
                 color: Theme.alpha(window.tone, 0.18)
                 Icon { anchors.centerIn: parent; name: "clock"; size: 18; color: window.tone }
               }

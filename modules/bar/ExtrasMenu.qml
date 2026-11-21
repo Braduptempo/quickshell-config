@@ -69,7 +69,7 @@ PanelWindow {
     Rectangle {
       implicitWidth: 32
       implicitHeight: 32
-      radius: 16
+      radius: Theme.r(16)
       color: Theme.alpha(line.tint, 0.16)
       Icon { anchors.centerIn: parent; name: line.icon; size: 15; color: line.tint }
     }

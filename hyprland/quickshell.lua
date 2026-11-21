@@ -9,7 +9,8 @@
 
 hl.layer_rule({
     name  = "quickshell-glass",
-    match = { namespace = "^quickshell" },
+    -- Rules match the whole name, so ".*": "^quickshell" alone matched nothing
+    match = { namespace = "quickshell.*" },
 
     blur         = true,
     -- Only blur behind pixels that are at least 20% opaque, so the rounded

@@ -167,7 +167,7 @@ PanelWindow {
     width: 320
     height: 56
     radius: Theme.pill(height)
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.88))
+    color: Theme.panelSolid
     border.width: 1
     border.color: Theme.border
 
@@ -191,7 +191,7 @@ PanelWindow {
       Rectangle {
         implicitWidth: 40
         implicitHeight: 40
-        radius: 20
+        radius: Theme.r(20)
         color: pill.toneColor
 
         Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
@@ -230,13 +230,13 @@ PanelWindow {
           visible: Osd.value >= 0
           Layout.fillWidth: true
           implicitHeight: 5
-          radius: 3
+          radius: Theme.r(3)
           color: Theme.alpha(Theme.text, 0.15)
 
           Rectangle {
             width: parent.width * Math.max(0, Math.min(1, Osd.value))
             height: parent.height
-            radius: 3
+            radius: Theme.r(3)
             color: pill.toneColor
 
             Behavior on width {

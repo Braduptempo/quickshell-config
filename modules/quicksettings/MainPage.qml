@@ -32,7 +32,7 @@ ColumnLayout {
     Rectangle {
       implicitHeight: 34
       implicitWidth: batteryRow.implicitWidth + 24
-      radius: 17
+      radius: Theme.r(17)
       color: Theme.item
 
       Row {
@@ -55,7 +55,7 @@ ColumnLayout {
         required property int index
         implicitHeight: 34
         implicitWidth: oneRow.implicitWidth + 20
-        radius: 17
+        radius: Theme.r(17)
         color: Theme.item
 
         Accessible.role: Accessible.StaticText

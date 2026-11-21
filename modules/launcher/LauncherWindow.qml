@@ -130,7 +130,7 @@ PanelWindow {
     width: 680
     implicitHeight: content.implicitHeight + 20
     height: implicitHeight
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.82))
+    color: Theme.panelSolid
     transformOrigin: Item.Top
 
     opacity: window.shown ? 1 : 0
@@ -303,7 +303,7 @@ PanelWindow {
               Rectangle {
                 anchors.fill: parent
                 visible: (row.modelData.swatch ?? "") !== ""
-                radius: 16
+                radius: Theme.r(16)
                 color: row.modelData.swatch ?? "transparent"
                 border.width: 1
                 border.color: Theme.border
@@ -312,7 +312,7 @@ PanelWindow {
               Rectangle {
                 anchors.fill: parent
                 visible: !appIcon.visible && (row.modelData.glyph ?? "") === "" && (row.modelData.swatch ?? "") === ""
-                radius: 16
+                radius: Theme.r(16)
                 color: row.hasAppIcon ? Theme.overlay : Theme.alpha(row.confirming ? Theme.error : Theme.accent, 0.2)
 
                 Icon {

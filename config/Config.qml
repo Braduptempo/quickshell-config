@@ -18,6 +18,18 @@ Singleton {
     property real glass: 0.45
     property string fontFamily: "JetBrains Mono"
     property real fontScale: 1.0
+    // Panels and menus with text (the bar uses glass): 0.5 … 1
+    property real panelOpacity: 0.86
+    // Corner rounding: 1 round as designed, 0 square
+    property real roundness: 1.0
+    property bool borders: true
+    property bool shadows: true
+    // Hyprland's blur behind the glass
+    property bool blur: true
+    // The palette made from the wallpaper (theme "Wallpaper"), by WallpaperTheme
+    property var wallpaperPalette: ({})
+    // The wallpaper theme: "auto" (from the picture), "dark" or "light"
+    property string wallpaperMode: "auto"
     // Themes made in Settings → Theme: [{ name, light, crust, base, surface,
     // overlay, text, subtext, accent, good, warn, error }]
     property var customThemes: []
@@ -33,8 +45,11 @@ Singleton {
   component BarSettings: JsonObject {
     // "top" or "bottom"
     property string position: "top"
-    // "floating" (a pill with a gap) or "attached" (edge to edge)
+    // "floating" (a pill with a gap), "attached" (edge to edge) or
+    // "pills" (no bar behind the pills)
     property string style: "floating"
+    // "compact", "normal" or "large"
+    property string size: "normal"
     property bool showMedia: true
     property bool showWindowTitle: false
     property bool showClipboard: true

@@ -35,7 +35,7 @@ ColumnLayout {
     visible: BluetoothCheck.command !== ""
     Layout.fillWidth: true
     implicitHeight: commandLabel.implicitHeight + 16
-    radius: 10
+    radius: Theme.r(10)
     color: commandMouse.containsMouse ? Theme.hover(Theme.item) : Theme.item
 
     Accessible.role: Accessible.Button

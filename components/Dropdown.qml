@@ -64,7 +64,7 @@ Item {
     y: button.height + 4
     width: parent.width
     height: Math.min(root.listHeight, list.contentHeight + 8)
-    radius: 14
+    radius: Theme.r(14)
     color: Theme.surface
     border.width: 1
     border.color: Theme.border
@@ -84,7 +84,7 @@ Item {
         required property int index
         width: list.width
         height: 28
-        radius: 14
+        radius: Theme.r(14)
         color: index === root.currentIndex ? Theme.alpha(Theme.accent, 0.18) : optionMouse.containsMouse ? Theme.item : "transparent"
 
         Accessible.role: Accessible.ListItem
