@@ -96,8 +96,8 @@ PanelWindow {
     width: 760
     implicitHeight: column.implicitHeight + 28
     height: implicitHeight
-    radius: 22
-    color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.85))
+    radius: Theme.r(22)
+    color: Theme.panelSolid
     opacity: window.shown ? 1 : 0
     y: 12 + (window.shown ? 0 : -10)
 
@@ -219,7 +219,7 @@ PanelWindow {
             y: 8
             width: 140
             height: 92
-            radius: 14
+            radius: Theme.r(14)
             color: themeCard.modelData.base
             border.width: themeCard.current ? 2 : 1
             border.color: themeCard.current ? (Config.appearance.accent !== "" ? Config.appearance.accent : themeCard.modelData.accent)
@@ -230,11 +230,11 @@ PanelWindow {
             Behavior on scale { NumberAnimation { duration: Theme.anim.fast } }
 
             // A tiny bar and panel in the theme's own colours
-            Rectangle { x: 8; y: 8; width: parent.width - 16; height: 10; radius: 5; color: themeCard.modelData.surface }
-            Rectangle { x: 8; y: 24; width: 58; height: 38; radius: 8; color: themeCard.modelData.surface }
-            Rectangle { x: 14; y: 32; width: 36; height: 5; radius: 2; color: themeCard.modelData.text }
-            Rectangle { x: 14; y: 42; width: 26; height: 5; radius: 2; color: themeCard.modelData.subtext }
-            Rectangle { x: 72; y: 24; width: 60; height: 18; radius: 9; color: themeCard.modelData.accent }
+            Rectangle { x: 8; y: 8; width: parent.width - 16; height: 10; radius: Theme.r(5); color: themeCard.modelData.surface }
+            Rectangle { x: 8; y: 24; width: 58; height: 38; radius: Theme.r(8); color: themeCard.modelData.surface }
+            Rectangle { x: 14; y: 32; width: 36; height: 5; radius: Theme.r(2); color: themeCard.modelData.text }
+            Rectangle { x: 14; y: 42; width: 26; height: 5; radius: Theme.r(2); color: themeCard.modelData.subtext }
+            Rectangle { x: 72; y: 24; width: 60; height: 18; radius: Theme.r(9); color: themeCard.modelData.accent }
 
             Row {
               x: 8
@@ -247,7 +247,7 @@ PanelWindow {
                   required property string modelData
                   width: 10
                   height: 10
-                  radius: 5
+                  radius: Theme.r(5)
                   color: modelData
                 }
               }
@@ -261,7 +261,7 @@ PanelWindow {
               anchors.margins: 6
               width: 18
               height: 18
-              radius: 9
+              radius: Theme.r(9)
               color: themeCard.modelData.accent
               Icon { anchors.centerIn: parent; name: "check"; size: 11; strokeWidth: 3; color: themeCard.modelData.base }
             }
@@ -318,7 +318,7 @@ PanelWindow {
 
               width: 26
               height: 26
-              radius: 13
+              radius: Theme.r(13)
               color: modelData.color !== "" ? modelData.color : Theme.palette.accent
               border.width: chosen ? 2 : 0
               border.color: Theme.text
@@ -333,7 +333,7 @@ PanelWindow {
                 anchors.centerIn: parent
                 width: 8
                 height: 8
-                radius: 4
+                radius: Theme.r(4)
                 color: Theme.base
               }
 

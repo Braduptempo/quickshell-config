@@ -20,7 +20,7 @@ BarItem {
   Rectangle {
     width: 8
     height: 8
-    radius: 4
+    radius: Theme.r(4)
     color: Capture.paused ? Theme.subtext : Theme.error
     anchors.verticalCenter: parent.verticalCenter
 

@@ -37,7 +37,7 @@ Item {
     Rectangle {
       width: 18
       height: 18
-      radius: 9
+      radius: Theme.r(9)
       y: 2
       x: root.checked ? parent.width - width - 2 : 2
       color: root.checked ? Theme.onAccent : Theme.text

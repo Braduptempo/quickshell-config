@@ -36,7 +36,9 @@ Row {
     implicitWidth: iconRow.implicitWidth + 12
     anchors.verticalCenter: parent.verticalCenter
     radius: Theme.pill(height)
-    color: Theme.item
+    color: Theme.barItem
+    border.width: Theme.barPills && Theme.borders ? 1 : 0
+    border.color: Theme.border
 
     Row {
       id: iconRow

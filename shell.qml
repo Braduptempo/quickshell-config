@@ -30,6 +30,10 @@ Scope {
   Toasts {}
   // Low-battery warnings (laptops); a singleton only starts when used
   readonly property int batteryStage: BatteryWarning.stage
+  // Blur on or off (Settings → Theme)
+  readonly property bool blurOn: Appearance.blur
+  // The "Wallpaper" theme follows the wallpaper
+  readonly property bool wallpaperTheme: WallpaperTheme.active
 
   ClockPanel {}
 

@@ -49,7 +49,7 @@ BarItem {
     ClippingRectangle {
       id: cover
       anchors.fill: parent
-      radius: 5
+      radius: Theme.r(5)
       color: "transparent"
       visible: coverImage.status === Image.Ready
       Image {

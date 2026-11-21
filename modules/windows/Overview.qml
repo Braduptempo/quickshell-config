@@ -170,7 +170,7 @@ PanelWindow {
 
           width: 176
           height: 124
-          radius: 16
+          radius: Theme.r(16)
           color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.7))
           border.width: 2
           border.color: drop.containsDrag ? Theme.good : chosen ? Theme.accent : Theme.border
@@ -185,7 +185,7 @@ PanelWindow {
             y: 6
             width: parent.width - 12
             height: 88
-            radius: 10
+            radius: Theme.r(10)
             color: Theme.alpha(Theme.accent, 0.12)
             clip: true
 
@@ -202,7 +202,7 @@ PanelWindow {
                 y: Math.max(0, (modelData.y % window.monitorSize.height) * sy)
                 width: Math.max(10, modelData.width * sx)
                 height: Math.max(8, modelData.height * sy)
-                radius: 4
+                radius: Theme.r(4)
                 color: Theme.surface
                 border.width: 1
                 border.color: Theme.border
@@ -223,7 +223,7 @@ PanelWindow {
             anchors.margins: 8
             anchors.bottomMargin: 6
             Label { text: ws.modelData; font.weight: Font.Bold; font.pixelSize: Theme.font.small }
-            Rectangle { visible: ws.active; width: 6; height: 6; radius: 3; color: Theme.accent }
+            Rectangle { visible: ws.active; width: 6; height: 6; radius: Theme.r(3); color: Theme.accent }
             Item { Layout.fillWidth: true }
             Label {
               text: ws.windowsHere.length === 0 ? "Empty" : ws.windowsHere.length + (ws.windowsHere.length === 1 ? " window" : " windows")
@@ -312,7 +312,7 @@ PanelWindow {
           width: tile.width - 16
           height: tile.height - 16
           z: tileMouse.drag.active ? 10 : 0
-          radius: 18
+          radius: Theme.r(18)
           color: Theme.alpha(Theme.base, Math.max(Theme.glass, 0.8))
           border.width: 2
           border.color: tile.chosen ? Theme.accent : Theme.border
@@ -337,7 +337,7 @@ PanelWindow {
             Rectangle {
               Layout.fillWidth: true
               Layout.fillHeight: true
-              radius: 12
+              radius: Theme.r(12)
               color: Theme.crust
               clip: true
 

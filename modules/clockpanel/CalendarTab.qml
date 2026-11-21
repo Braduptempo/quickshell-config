@@ -144,7 +144,7 @@ RowLayout {
         radius: Theme.radiusCard
         color: Theme.item
 
-        Rectangle { x: 8; y: 9; width: 4; height: parent.height - 18; radius: 2; color: eventRow.modelData.color }
+        Rectangle { x: 8; y: 9; width: 4; height: parent.height - 18; radius: Theme.r(2); color: eventRow.modelData.color }
 
         ColumnLayout {
           id: eventColumn

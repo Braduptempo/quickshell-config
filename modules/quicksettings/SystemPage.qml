@@ -156,13 +156,13 @@ ColumnLayout {
               required property real modelData
               width: Math.max(2, (coreBars.width - (SystemStats.cores.length - 1) * 2) / Math.max(1, SystemStats.cores.length))
               height: 18
-              radius: 1
+              radius: Theme.r(1)
               color: Theme.alpha(Theme.text, 0.1)
               Rectangle {
                 anchors.bottom: parent.bottom
                 width: parent.width
                 height: Math.max(1, parent.height * coreBar.modelData)
-                radius: 1
+                radius: Theme.r(1)
                 color: Theme.accent
               }
             }
@@ -192,12 +192,12 @@ ColumnLayout {
         visible: SystemStats.vramTotal > 0
         Layout.fillWidth: true
         implicitHeight: 6
-        radius: 3
+        radius: Theme.r(3)
         color: Theme.alpha(Theme.text, 0.1)
         Rectangle {
           width: parent.width * Math.min(1, SystemStats.vramUsed / Math.max(1, SystemStats.vramTotal))
           height: parent.height
-          radius: 3
+          radius: Theme.r(3)
           color: Theme.palette.dots[5] ?? Theme.accent
         }
       }
@@ -228,12 +228,12 @@ ColumnLayout {
     Rectangle {
       Layout.fillWidth: true
       implicitHeight: 6
-      radius: 3
+      radius: Theme.r(3)
       color: Theme.alpha(Theme.text, 0.1)
       Rectangle {
         width: parent.width * Math.max(0, Math.min(1, meter.fraction))
         height: parent.height
-        radius: 3
+        radius: Theme.r(3)
         color: meter.barColor
         Behavior on width { NumberAnimation { duration: Theme.anim.toggle } }
       }

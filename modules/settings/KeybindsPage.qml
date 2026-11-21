@@ -302,7 +302,7 @@ SettingsPage {
             Rectangle {
               implicitHeight: 24
               implicitWidth: keysLabel.implicitWidth + 16
-              radius: 12
+              radius: Theme.r(12)
               color: Theme.surface
               border.width: bind.modelData.conflict ? 1 : 0
               border.color: Theme.error

@@ -124,7 +124,7 @@ ColumnLayout {
           required property int index
           width: 52
           height: hourColumn.implicitHeight + 16
-          radius: 14
+          radius: Theme.r(14)
           color: index === 0 ? Theme.alpha(Theme.accent, 0.14) : Theme.item
           Column {
             id: hourColumn
@@ -182,14 +182,14 @@ ColumnLayout {
           Rectangle {
             Layout.fillWidth: true
             implicitHeight: 6
-            radius: 3
+            radius: Theme.r(3)
             color: Theme.alpha(Theme.text, 0.1)
             Rectangle {
               readonly property real span: Math.max(1, day.card.high - day.card.low)
               x: parent.width * (day.modelData.min - day.card.low) / span
               width: Math.max(6, parent.width * (day.modelData.max - day.modelData.min) / span)
               height: parent.height
-              radius: 3
+              radius: Theme.r(3)
               color: Theme.accent
             }
           }

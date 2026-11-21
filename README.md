@@ -105,9 +105,9 @@ Settings (Super + ,) changes everything right away and saves it in `settings.jso
 
 | Page | What you set |
 |---|---|
-| Theme | 12 themes, your own themes (New theme: every colour, light or dark), accent, glass |
+| Theme | 12 themes, your own themes (New theme: every colour, light or dark), a theme from your wallpaper, accent; bar glass, panels, corners, blur, borders and shadows, with a live preview |
 | Wallpaper, Font, Animations | Wallpaper folder, font and size, speed and style of the panels |
-| Bar & panels | Position, which pills show, other screens |
+| Bar & panels | Position, style (floating, attached, pills only), size, which pills show, tray click, other screens |
 | Sound | Maximum volume, feedback click, following new devices |
 | Network & Bluetooth | Saved networks, VPNs, paired devices |
 | Notifications | Do not disturb, quiet hours, muted apps |
@@ -161,7 +161,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 
 Rules:
 - No hard-coded colours or sizes: always use `Theme`.
-- Every control is a pill: `radius: Theme.pill(height)`.
+- Every control is a pill: `radius: Theme.pill(height)`; any other radius goes through `Theme.r(n)`, so the Corners setting reaches it.
 - Animations use `Theme.anim.*`, so the speed setting and "Off" work everywhere.
 - Panels with text use `Theme.panelSolid`, so they stay readable over bright windows.
 

@@ -61,7 +61,7 @@ SettingsPage {
           Rectangle {
             implicitWidth: 40
             implicitHeight: 26
-            radius: 13
+            radius: Theme.r(13)
             color: Theme.overlay
             Label { anchors.centerIn: parent; text: layoutRow.modelData.code.toUpperCase(); font.weight: Font.Bold; font.pixelSize: Theme.font.label }
           }

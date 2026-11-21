@@ -1,8 +1,8 @@
 // Bar.qml
 // The bar, on every monitor (see Config.bar and Settings → Bar & panels).
 // Left: workspaces, window title, media. Centre: clock. Right: tray,
-// clipboard and status. At the top or bottom, as a floating pill or attached
-// to the edge. Other monitors can get the full bar, a light one (workspaces
+// clipboard and status. At the top or bottom, as a floating pill, attached
+// to the edge, or only the pills with nothing behind them. Other monitors can get the full bar, a light one (workspaces
 // and clock) or none.
 pragma ComponentBehavior: Bound
 
@@ -19,6 +19,8 @@ Scope {
 
   readonly property bool bottom: Config.bar.position === "bottom"
   readonly property bool attached: Config.bar.style === "attached"
+  // No bar behind the pills: they float on their own
+  readonly property bool pills: Config.bar.style === "pills"
 
   // The main monitor (Settings → Displays), or the first one
   readonly property ShellScreen mainScreen: Quickshell.screens.find(s => s.name === Config.displays.primary) ?? Quickshell.screens[0] ?? null
@@ -60,6 +62,9 @@ Scope {
         anchors.leftMargin: root.attached ? 0 : 8
         anchors.rightMargin: root.attached ? 0 : 8
         radius: root.attached ? 0 : Theme.pill(height)
+        color: root.pills ? "transparent" : Theme.panel
+        border.width: root.pills || !Theme.borders ? 0 : 1
+        shadow: false
 
         Row {
           anchors.left: parent.left

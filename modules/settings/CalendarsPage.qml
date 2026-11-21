@@ -71,7 +71,7 @@ SettingsPage {
           implicitHeight: 46
           spacing: 10
 
-          Rectangle { implicitWidth: 12; implicitHeight: 12; radius: 6; color: source.modelData.color }
+          Rectangle { implicitWidth: 12; implicitHeight: 12; radius: Theme.r(6); color: source.modelData.color }
           ColumnLayout {
             Layout.fillWidth: true
             spacing: 1
@@ -167,7 +167,7 @@ SettingsPage {
             required property string modelData
             width: 22
             height: 22
-            radius: 11
+            radius: Theme.r(11)
             color: modelData
             border.width: page.newColor === modelData ? 2 : 0
             border.color: Theme.text

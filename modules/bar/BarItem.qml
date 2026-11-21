@@ -28,10 +28,10 @@ Item {
     anchors.fill: parent
     radius: Theme.pill(height)
     color: root.active ? Theme.alpha(root.activeColor, 0.16)
-         : root.flat ? (root.hovered ? Theme.item : "transparent")
-         : root.hovered ? Theme.hover(Theme.item) : Theme.item
+         : root.flat && !Theme.barPills ? (root.hovered ? Theme.item : "transparent")
+         : root.hovered ? Theme.hover(Theme.barItem) : Theme.barItem
     border.width: 1
-    border.color: root.active ? root.activeColor : "transparent"
+    border.color: root.active ? root.activeColor : Theme.barPills && Theme.borders ? Theme.border : "transparent"
 
     Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
     Behavior on border.color { ColorAnimation { duration: Theme.anim.fast } }

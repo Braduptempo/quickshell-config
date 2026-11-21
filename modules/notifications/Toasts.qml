@@ -64,7 +64,7 @@ PanelWindow {
         required property Notification modelData
         notification: modelData
         width: column.width
-        fill: Math.max(Theme.glass, 0.88)
+        fill: Config.appearance.panelOpacity
         onActivated: {
           if (!Notifications.activate(modelData)) Panels.openClockPanel(null, "notifications");
           Notifications.dismiss(modelData);
@@ -99,7 +99,7 @@ PanelWindow {
           notification: slot.modelData
           width: parent.width
           maxLines: 3
-          fill: Math.max(Theme.glass, 0.88)
+          fill: Config.appearance.panelOpacity
           contentVisible: window.expanded || slot.index === 0
           y: window.expanded || slot.index === 0 ? 0 : slot.height - height
           scale: window.expanded || slot.index === 0 ? 1 : 1 - slot.index * 0.04
@@ -144,7 +144,7 @@ PanelWindow {
           z: 2
           implicitWidth: more.implicitWidth + 14
           implicitHeight: 20
-          radius: 10
+          radius: Theme.r(10)
           color: Theme.overlay
 
           Label {

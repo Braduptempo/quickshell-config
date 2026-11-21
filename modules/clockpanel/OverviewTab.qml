@@ -91,7 +91,7 @@ GridLayout {
         required property var modelData
         Layout.fillWidth: true
         spacing: 8
-        Rectangle { implicitWidth: 3; implicitHeight: 28; radius: 2; color: ev.modelData.color }
+        Rectangle { implicitWidth: 3; implicitHeight: 28; radius: Theme.r(2); color: ev.modelData.color }
         ColumnLayout {
           Layout.fillWidth: true
           spacing: 0
