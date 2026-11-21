@@ -269,8 +269,12 @@ Singleton {
     }
   }
 
-  // Caps Lock: read it again a moment after the key
+  // Caps Lock: read it again a moment after the key. The Caps Lock bind
+  // (`qs ipc call osd caps`) calls this too, so Lock.capsLock is always
+  // current for the bar and every password field
   function capsChanged(): void {
     keyboardDelay.restart();
   }
+
+  Component.onCompleted: refreshKeyboard()
 }

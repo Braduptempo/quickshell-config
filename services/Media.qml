@@ -63,6 +63,39 @@ Singleton {
     return name.charAt(0).toUpperCase() + name.slice(1);
   }
 
+  // The app's own icon name ("spotify", "firefox"), or ""
+  function iconOf(p: MprisPlayer): string {
+    if (!p) return "";
+    const entry = DesktopEntries.heuristicLookup(p.desktopEntry || p.identity || "");
+    return entry ? entry.icon : "";
+  }
+
+  // The Hyprland window the player plays in: the same app, and for a
+  // browser with several windows the one whose title has the track in it
+  function windowOf(p: MprisPlayer): var {
+    if (!p) return null;
+    const keys = [p.desktopEntry, p.identity, p.dbusName.split(".")[3] ?? ""]
+      .filter(k => k && k !== "")
+      .map(k => k.toLowerCase().replace(/^mozilla /, ""));
+    const same = Windows.windows.filter(w => {
+      const app = w.app.toLowerCase();
+      return keys.some(k => app === k || app.endsWith("." + k) || app.includes(k) || k.includes(app));
+    });
+    if (same.length === 0) return null;
+    return same.find(w => p.trackTitle !== "" && w.title.includes(p.trackTitle)) ?? same[0];
+  }
+
+  function canShow(p: MprisPlayer): bool {
+    return windowOf(p) !== null || (p?.canRaise ?? false);
+  }
+
+  // Go to the player's window, on whatever workspace or screen it is
+  function show(p: MprisPlayer): void {
+    const w = windowOf(p);
+    if (w) Hypr.run("hl.dsp.focus({ window = \"address:" + w.address + "\" })", "focuswindow address:" + w.address);
+    else if (p?.canRaise) p.raise();
+  }
+
   function stateOf(p: MprisPlayer): string {
     if (!p) return "";
     const what = p.isPlaying ? "Playing" : p.playbackState === MprisPlaybackState.Paused ? "Paused" : "Stopped";

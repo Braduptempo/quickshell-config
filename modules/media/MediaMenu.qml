@@ -9,6 +9,7 @@ import QtQuick.Layouts
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Widgets
 import Quickshell.Hyprland
 import Quickshell.Services.Mpris
 import "../../config"
@@ -141,7 +142,14 @@ PanelWindow {
             color: Theme.accent
             clip: true
 
-            Icon { anchors.centerIn: parent; visible: art.status !== Image.Ready; name: "music"; size: 40; color: Theme.onAccent }
+            // No cover: the app's own icon, or a note
+            IconImage {
+              anchors.centerIn: parent
+              visible: art.status !== Image.Ready && Media.iconOf(window.player) !== ""
+              implicitSize: 56
+              source: Quickshell.iconPath(Media.iconOf(window.player), true)
+            }
+            Icon { anchors.centerIn: parent; visible: art.status !== Image.Ready && Media.iconOf(window.player) === ""; name: "music"; size: 40; color: Theme.onAccent }
 
             Image {
               id: art
@@ -219,12 +227,12 @@ PanelWindow {
             Item { Layout.fillHeight: true }
 
             Button {
-              visible: window.player?.canRaise ?? false
+              visible: Media.canShow(window.player)
               text: "Open " + Media.nameOf(window.player)
               size: Theme.size.buttonRow
               variant: "ghost"
               onClicked: {
-                window.player.raise();
+                Media.show(window.player);
                 Media.open = false;
               }
             }
@@ -426,11 +434,19 @@ PanelWindow {
               spacing: 10
 
               Rectangle {
+                readonly property string appIcon: Media.iconOf(playerRow.modelData)
                 implicitWidth: 30
                 implicitHeight: 30
                 radius: 15
-                color: playerRow.current ? Theme.accent : Theme.overlay
+                color: appIcon !== "" ? "transparent" : playerRow.current ? Theme.accent : Theme.overlay
+                IconImage {
+                  visible: parent.appIcon !== ""
+                  anchors.centerIn: parent
+                  implicitSize: 26
+                  source: Quickshell.iconPath(parent.appIcon, true)
+                }
                 Label {
+                  visible: parent.appIcon === ""
                   anchors.centerIn: parent
                   text: Media.nameOf(playerRow.modelData).charAt(0).toUpperCase()
                   font.weight: Font.Bold

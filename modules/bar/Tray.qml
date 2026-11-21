@@ -23,49 +23,62 @@ Row {
   spacing: 6
   visible: SystemTray.items.values.length > 0
 
-  BarItem {
+  // A plain pill, not a BarItem: a BarItem's own MouseArea lies over its
+  // content and would catch the clicks meant for the icons
+  Rectangle {
     id: icons
     visible: root.showIcons
-    padding: 6
+    implicitHeight: Theme.size.barItem
+    implicitWidth: iconRow.implicitWidth + 12
+    anchors.verticalCenter: parent.verticalCenter
+    radius: Theme.pill(height)
+    color: Theme.item
 
-    Repeater {
-      model: SystemTray.items
+    Row {
+      id: iconRow
+      anchors.centerIn: parent
+      spacing: 8
 
-      Item {
-        id: trayItem
-        required property SystemTrayItem modelData
+      Repeater {
+        model: SystemTray.items
 
-        width: 22
-        height: 22
-        anchors.verticalCenter: parent.verticalCenter
+        Item {
+          id: trayItem
+          required property SystemTrayItem modelData
 
-        Accessible.role: Accessible.Button
-        Accessible.name: modelData.tooltipTitle !== "" ? modelData.tooltipTitle : modelData.title
+          width: 22
+          height: 22
+          anchors.verticalCenter: parent.verticalCenter
 
-        IconImage {
-          anchors.centerIn: parent
-          implicitSize: 18
-          source: trayItem.modelData.icon
-        }
+          Accessible.role: Accessible.Button
+          Accessible.name: modelData.tooltipTitle !== "" ? modelData.tooltipTitle : modelData.title
 
-        MouseArea {
-          anchors.fill: parent
-          acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-          cursorShape: Qt.PointingHandCursor
-          onClicked: mouse => {
-            const item = trayItem.modelData;
-            if (mouse.button === Qt.RightButton || item.onlyMenu) {
-              if (item.hasMenu) {
-                const pos = trayItem.mapToItem(null, 0, trayItem.height + 14);
-                item.display(root.window, pos.x, pos.y);
-              }
-            } else if (mouse.button === Qt.MiddleButton) {
-              item.secondaryActivate();
-            } else {
-              item.activate();
-            }
+          IconImage {
+            anchors.centerIn: parent
+            implicitSize: 18
+            source: trayItem.modelData.icon
           }
-          onWheel: wheel => trayItem.modelData.scroll(wheel.angleDelta.y, false)
+
+          MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: mouse => {
+              const item = trayItem.modelData;
+              if (mouse.button === Qt.RightButton || item.onlyMenu) {
+                if (item.hasMenu) {
+                  const pos = trayItem.mapToItem(null, 0, trayItem.height + 14);
+                  item.display(root.window, pos.x, pos.y);
+                }
+              } else if (mouse.button === Qt.MiddleButton) {
+                item.secondaryActivate();
+              } else {
+                item.activate();
+              }
+            }
+            onWheel: wheel => trayItem.modelData.scroll(wheel.angleDelta.y, false)
+          }
         }
       }
     }

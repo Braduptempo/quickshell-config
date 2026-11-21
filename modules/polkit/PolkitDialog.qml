@@ -43,6 +43,7 @@ PanelWindow {
     if (shown) {
       details = false;
       field.forceActiveFocus();
+      Lock.refreshKeyboard();
     }
   }
 
@@ -264,6 +265,7 @@ PanelWindow {
             Accessible.name: "Password"
             Accessible.passwordEdit: !Polkit.echo
 
+            Keys.onPressed: event => { if (event.key === Qt.Key_CapsLock) Lock.capsChanged(); }
             Keys.onReturnPressed: Polkit.submit(text)
             Keys.onEnterPressed: Polkit.submit(text)
             Keys.onEscapePressed: Polkit.cancel()
@@ -285,6 +287,26 @@ PanelWindow {
           NumberAnimation { target: shake; property: "x"; to: -7; duration: 90 }
           NumberAnimation { target: shake; property: "x"; to: 7; duration: 90 }
           NumberAnimation { target: shake; property: "x"; to: 0; duration: 45 }
+        }
+
+        // Caps Lock on: the most common reason a password is "wrong"
+        Rectangle {
+          visible: Lock.capsLock
+          implicitHeight: 26
+          implicitWidth: polkitCaps.implicitWidth + 24
+          radius: Theme.pill(height)
+          color: Theme.alpha(Theme.warn, 0.14)
+
+          Accessible.role: Accessible.AlertMessage
+          Accessible.name: "Caps Lock is on"
+
+          Row {
+            id: polkitCaps
+            anchors.centerIn: parent
+            spacing: 6
+            Icon { name: "caps"; size: 13; color: Theme.warn; anchors.verticalCenter: parent.verticalCenter }
+            Label { text: "Caps Lock is on"; color: Theme.warn; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
+          }
         }
 
         Rectangle {
