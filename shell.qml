@@ -258,7 +258,7 @@ Scope {
   }
 
   // `qs ipc call notifications toggle` (Super + N), `overview`, `calendar`,
-  // `weather`, `dnd`, `clear`
+  // `weather`, `tab <name>` (switch without closing), `dnd`, `clear`
   IpcHandler {
     target: "notifications"
     function toggle(): void {
@@ -269,6 +269,11 @@ Scope {
     }
     function overview(): void {
       Panels.toggleClockPanel(Panels.focusedScreen(), "overview");
+    }
+    // Opens the clock panel on a tab, or switches to it while it's open
+    function tab(name: string): void {
+      if (Panels.clockPanelOpen) Panels.clockTab = name;
+      else Panels.openClockPanel(Panels.focusedScreen(), name);
     }
     function weather(): void {
       Panels.toggleClockPanel(Panels.focusedScreen(), "weather");

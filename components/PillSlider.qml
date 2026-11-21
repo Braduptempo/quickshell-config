@@ -18,6 +18,8 @@ Item {
   property string label
   property color fillColor: Theme.accent
   property bool showValue: true
+  // What the value reads as; by default a percentage
+  property var formatValue: v => Math.round(v * 100) + "%"
   property real step: 0.05
   property int throttle: 0
 
@@ -105,7 +107,7 @@ Item {
 
   Label {
     visible: root.showValue
-    text: Math.round(root.shownValue * 100) + "%"
+    text: root.formatValue(root.shownValue)
     kind: "small"
     font.weight: Font.Bold
     anchors.right: parent.right

@@ -130,7 +130,15 @@ Singleton {
 
   // --- Motion --------------------------------------------------------------
   // Speed from Settings: off, slow, normal, fast
-  readonly property real speed: [0, 1.5, 1, 0.6][Config.animations.speed] ?? 1
+  // Durations are multiplied by this: 0 is off. The slider's rate (2 = twice
+  // as fast) wins; the old Slow / Fast steps count until it's moved.
+  readonly property real speed: {
+    const step = Config.animations.speed;
+    if (step === 0) return 0;
+    const rate = Config.animations.rate;
+    if (rate !== 1 || step === 2) return 1 / Math.max(0.25, Math.min(2, rate));
+    return [0, 1.5, 1, 0.6][step] ?? 1;
+  }
 
   readonly property AnimTokens anim: AnimTokens { speed: root.speed }
 }

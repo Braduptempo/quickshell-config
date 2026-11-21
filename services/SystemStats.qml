@@ -11,6 +11,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../config"
 
 Singleton {
   id: root
@@ -104,6 +105,35 @@ Singleton {
       if (root.ticks % 30 === 0) diskProc.running = true;
       root.ticks++;
       root.gpuHistory = root.push(root.gpuHistory, root.gpu);
+    }
+  }
+
+  // The bar's load pill: a slow look every 5 s while the panel is closed
+  // (Settings → Bar & panels → High load). Two hot samples in a row count.
+  property int hotSamples: 0
+  readonly property bool heavy: hotSamples >= 2 || Fake.has("load")
+  readonly property real hottest: Math.max(cpuTemp, gpuTemp)
+
+  Timer {
+    running: !root.active && Config.bar.showLoad
+    interval: 5000
+    repeat: true
+    onTriggered: {
+      statFile.reload();
+      if (root.cpuTempPath !== "") tempProc.running = true;
+      if (root.gpuKind === "nvidia") nvidiaProc.running = true;
+      else if (root.gpuKind === "amd") amdProc.running = true;
+    }
+  }
+
+  // Judged every 5 s, open or closed
+  Timer {
+    running: Config.bar.showLoad
+    interval: 5000
+    repeat: true
+    onTriggered: {
+      const hot = root.cpu >= 90 || root.gpu >= 90 || root.hottest >= 85;
+      root.hotSamples = hot ? Math.min(root.hotSamples + 1, 2) : 0;
     }
   }
 

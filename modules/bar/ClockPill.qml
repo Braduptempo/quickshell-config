@@ -20,7 +20,7 @@ BarItem {
   accessibleName: "Clock " + Time.time
                   + (Config.weather.showInBar && Weather.current ? ", " + Weather.degrees(Weather.current.temperature) + " " + Weather.describe(Weather.current.code) : "")
                   + (Notifications.unread > 0 ? ", " + Notifications.unread + " unread notifications" : "")
-                  + (Notifications.quiet ? ", do not disturb" : "")
+                  + (Notifications.quiet ? ", do not disturb" + (Notifications.unread > 0 ? ", " + Notifications.unread + " silenced" : "") : "")
                   + (Power.scheduled ? ", " + (Power.action(Power.scheduledId)?.label ?? "") + " at " + Power.scheduledTime : "")
 
   onClicked: mouse => {
@@ -82,6 +82,15 @@ BarItem {
     name: "moon"
     size: 13
     color: Theme.subtext
+    anchors.verticalCenter: parent.verticalCenter
+  }
+  // How many wait in the clock panel while it's quiet
+  Label {
+    visible: Notifications.quiet && Notifications.unread > 0
+    text: Notifications.unread
+    color: Theme.subtext
+    font.pixelSize: Theme.font.small
+    font.weight: Font.Bold
     anchors.verticalCenter: parent.verticalCenter
   }
 

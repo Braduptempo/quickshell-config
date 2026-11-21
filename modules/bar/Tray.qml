@@ -15,8 +15,10 @@ import "../../config"
 import "../../components"
 import "../../services"
 
-Row {
+SmoothRow {
   id: root
+  // The icons pop in when the arrow opens them; no sliding (right half)
+  slide: false
 
   required property QsWindow window
   // Settings → Bar & panels: icons hidden behind the arrow, or always shown
@@ -34,14 +36,16 @@ Row {
     visible: root.showIcons
     implicitHeight: Theme.size.barItem
     implicitWidth: iconRow.implicitWidth + 12
+    Behavior on implicitWidth { NumberAnimation { duration: Theme.anim.segment; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard } }
     anchors.verticalCenter: parent.verticalCenter
     radius: Theme.pill(height)
     color: Theme.barItem
     border.width: Theme.barPills && Theme.borders ? 1 : 0
     border.color: Theme.border
 
-    Row {
+    SmoothRow {
       id: iconRow
+      slide: false
       anchors.centerIn: parent
       spacing: 8
 

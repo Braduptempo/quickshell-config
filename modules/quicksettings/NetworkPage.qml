@@ -8,6 +8,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Networking
 import "../../config"
 import "../../components"
@@ -56,6 +57,60 @@ ColumnLayout {
     visible: stats.visible
     text: "In use"
     kind: "label"
+  }
+
+  // Connected, but the internet isn't reachable (or a login page is in the way)
+  readonly property bool portal: Networking.connectivity === NetworkConnectivity.Portal || Fake.has("portal")
+  readonly property bool noInternet: (root.network.primary !== "none"
+    && (Networking.connectivity === NetworkConnectivity.Limited || Networking.connectivity === NetworkConnectivity.Portal))
+    || Fake.has("no-internet") || Fake.has("portal")
+
+  Rectangle {
+    visible: root.noInternet
+    Layout.fillWidth: true
+    implicitHeight: warnColumn.implicitHeight + 24
+    radius: Theme.radiusCard
+    color: Theme.alpha(Theme.warn, 0.12)
+    border.width: 1
+    border.color: Theme.alpha(Theme.warn, 0.4)
+
+    Accessible.role: Accessible.AlertMessage
+    Accessible.name: warnTitle.text
+
+    ColumnLayout {
+      id: warnColumn
+      x: 12
+      y: 12
+      width: parent.width - 24
+      spacing: 8
+      RowLayout {
+        spacing: 10
+        Icon { name: "warning"; size: 18; color: Theme.warn }
+        Label {
+          id: warnTitle
+          Layout.fillWidth: true
+          text: root.portal ? "This network wants you to log in" : "Connected, but no internet"
+          font.weight: Font.Bold
+          wrapMode: Text.Wrap
+        }
+      }
+      Label {
+        Layout.fillWidth: true
+        text: root.portal
+          ? "Hotels, trains and schools often show a login page first. Open it to get online."
+          : "Check that the router is online. Some networks need a login page first."
+        kind: "muted"
+        font.pixelSize: Theme.font.small
+        wrapMode: Text.Wrap
+      }
+      RowLayout {
+        Layout.fillWidth: true
+        spacing: 8
+        Button { Layout.fillWidth: true; text: "Try again"; variant: "primary"; size: Theme.size.buttonRow; onClicked: Networking.checkConnectivity() }
+        // A plain http page, so the network's login page can take over
+        Button { Layout.fillWidth: true; text: "Open login page"; variant: "secondary"; size: Theme.size.buttonRow; onClicked: Quickshell.execDetached(["xdg-open", "http://neverssl.com"]) }
+      }
+    }
   }
 
   ConnectionStats {
@@ -133,11 +188,15 @@ ColumnLayout {
     Layout.fillWidth: true
   }
 
-  Label {
-    visible: root.network.hasWifiDevice && !Networking.wifiEnabled
-    text: "Wi-Fi is off"
-    kind: "muted"
+  EmptyState {
+    visible: (root.network.hasWifiDevice && !Networking.wifiEnabled) || Fake.has("wifi-off")
     Layout.fillWidth: true
+    icon: "wifi"
+    crossed: true
+    title: "Wi-Fi is off"
+    text: "Turn it on to see networks nearby."
+    action: "Turn on Wi-Fi"
+    onActivated: Networking.wifiEnabled = true
   }
 
   Card {

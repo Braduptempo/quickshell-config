@@ -23,6 +23,7 @@ SettingsPage {
     Config.bar.showPrivacy = true;
     Config.bar.showUpdates = true;
     Config.bar.showDrives = true;
+    Config.bar.showLoad = true;
   }
 
   SettingRow {
@@ -62,7 +63,7 @@ SettingsPage {
   SettingRow {
     visible: Quickshell.screens.length > 1
     title: "Other monitors"
-    subtitle: "The main monitor (" + (Config.displays.primary || Quickshell.screens[0]?.name || "") + ", set in Displays) always has the full bar. Light: workspaces and the clock."
+    subtitle: "The main monitor (" + (Config.displays.primary || Quickshell.screens[0]?.name || "") + ", set in Displays) always has the full bar. Light: workspaces, the window on that screen and the clock."
     Segmented {
       model: ["Full bar", "Light bar", "No bar"]
       currentIndex: Math.max(0, ["full", "light", "none"].indexOf(Config.bar.otherMonitors))
@@ -107,6 +108,11 @@ SettingsPage {
     title: "Privacy"
     subtitle: "A red pill while an app uses the microphone, camera or your screen."
     Toggle { checked: Config.bar.showPrivacy; accessibleName: "Privacy"; onToggled: value => Config.bar.showPrivacy = value }
+  }
+  SettingRow {
+    title: "High load"
+    subtitle: "A yellow pill while the CPU or GPU runs at 90 % or more, or at 85 °C. Click it for the system page."
+    Toggle { checked: Config.bar.showLoad; accessibleName: "High load"; onToggled: value => Config.bar.showLoad = value }
   }
   SettingRow {
     title: "Updates"

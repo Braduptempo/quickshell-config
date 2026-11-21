@@ -28,8 +28,12 @@ GridLayout {
     property string tab
     default property alias content: body.data
 
+    // A third each, whatever the text inside: all start from 0 and share the
+    // width equally, so long titles elide instead of pushing a card out
     Layout.fillWidth: true
-    Layout.preferredWidth: 1
+    Layout.minimumWidth: 0
+    Layout.preferredWidth: 0
+    implicitWidth: 0
     Layout.fillHeight: true
     Layout.alignment: Qt.AlignTop
     implicitHeight: body.implicitHeight + head.height + 28
