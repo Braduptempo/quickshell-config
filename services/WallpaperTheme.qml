@@ -14,8 +14,10 @@ Singleton {
   id: root
 
   readonly property string path: {
-    const map = Wallpapers.current;
-    return map[Config.displays.primary] ?? Object.values(map)[0] ?? "";
+    const map = Object.assign({}, Wallpapers.current, Wallpapers.videos);
+    const file = map[Config.displays.primary] ?? Object.values(map)[0] ?? "";
+    // A video: its still frame
+    return Wallpapers.isVideo(file) ? Wallpapers.posterFor(file) : file;
   }
   readonly property bool active: Config.appearance.theme === "Wallpaper"
   // Read the picture only when the theme is in use or being shown

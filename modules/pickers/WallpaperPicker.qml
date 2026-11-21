@@ -298,6 +298,21 @@ PanelWindow {
               Icon { anchors.centerIn: parent; name: "star"; size: 12; color: Theme.warn }
             }
 
+            // A video: it moves once it's the wallpaper
+            Rectangle {
+              visible: wall.modelData.video === true
+              anchors.right: parent.right
+              anchors.top: parent.top
+              anchors.margins: 6
+              width: 22
+              height: 22
+              radius: Theme.r(11)
+              color: Theme.alpha(Theme.crust, 0.7)
+              Accessible.role: Accessible.StaticText
+              Accessible.name: "Video"
+              Icon { anchors.centerIn: parent; name: "play"; size: 11; color: Theme.text }
+            }
+
             Rectangle {
               visible: wall.inUse
               anchors.right: parent.right

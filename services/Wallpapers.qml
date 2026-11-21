@@ -1,6 +1,8 @@
 // Wallpapers.qml
-// The wallpapers in ~/Pictures/wallpapers, set
-// with awww (or swww). Videos are skipped: awww shows images and GIFs.
+// The wallpapers in ~/Pictures/wallpapers: images and GIFs with awww (or
+// swww), videos (mp4, webm, mkv, mov) played by the shell itself
+// (modules/wallpaper/VideoWallpaper.qml). Under a video awww shows a still
+// frame of it, so the lock screen and the wallpaper theme have a picture.
 //   Wallpapers.set(path)           on the chosen screen(s), with the transition
 //   Wallpapers.preview(path)       the same, for browsing; restore() undoes it
 //   Wallpapers.toggleFavorite(path), random()
@@ -44,8 +46,16 @@ Singleton {
   property bool hasAwww: true
   property bool available: false
 
-  // [{ path, name, thumb }]
+  // [{ path, name, thumb, video }]
   property var items: []
+
+  function isVideo(path: string): bool {
+    return /\.(mp4|webm|mkv|mov)$/i.test(path);
+  }
+  // A full-size still of a video, for awww under it
+  function posterFor(path: string): string {
+    return thumbDir + "/posters/" + path.split("/").pop().replace(/\.[^.]+$/, "") + ".jpg";
+  }
   // output name -> path
   property var current: ({})
 
@@ -68,6 +78,8 @@ Singleton {
       // "" = every screen, or an output name
       property string output: ""
       property bool rotate: false
+      // output name -> video playing there
+      property var videos: ({})
     }
   }
 
@@ -97,7 +109,8 @@ Singleton {
     id: listProc
     command: ["sh", "-c",
       "command -v awww >/dev/null && echo tool:awww || { command -v swww >/dev/null && echo tool:swww; };" +
-      "find \"$1\" -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' \\) | sort -f",
+      "find \"$1\" -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif'" +
+      " -o -iname '*.mp4' -o -iname '*.webm' -o -iname '*.mkv' -o -iname '*.mov' \\) | sort -f",
       "sh", root.folder]
     stdout: StdioCollector {
       onStreamFinished: {
@@ -110,7 +123,8 @@ Singleton {
           return {
             path,
             name: file.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "),
-            thumb: root.thumbDir + "/" + file.replace(/\.[^.]+$/, "") + ".jpg"
+            thumb: root.thumbDir + "/" + file.replace(/\.[^.]+$/, "") + ".jpg",
+            video: root.isVideo(path)
           };
         });
         thumbProc.running = true;
@@ -124,9 +138,14 @@ Singleton {
   Process {
     id: thumbProc
     command: ["sh", "-c",
-      "command -v magick >/dev/null || exit 0; mkdir -p \"$1\"; shift;" +
+      "mkdir -p \"$1\"; shift;" +
       "for f in \"$@\"; do t=\"$THUMBS/$(basename \"${f%.*}\").jpg\"; [ -s \"$t\" ] && continue;" +
-      " magick \"$f[0]\" -thumbnail 384x216^ -gravity center -extent 384x216 -quality 85 \"$t\" 2>/dev/null && echo made; done",
+      " case \"$f\" in" +
+      // Videos: a frame a second in, with ffmpeg
+      "  *.mp4|*.MP4|*.webm|*.mkv|*.mov) command -v ffmpeg >/dev/null && ffmpeg -loglevel error -y -ss 1 -i \"$f\" -frames:v 1" +
+      "   -vf 'scale=384:216:force_original_aspect_ratio=increase,crop=384:216' -q:v 4 \"$t\" && echo made ;;" +
+      "  *) command -v magick >/dev/null && magick \"$f[0]\" -thumbnail 384x216^ -gravity center -extent 384x216 -quality 85 \"$t\" 2>/dev/null && echo made ;;" +
+      " esac; done",
       "sh", root.thumbDir].concat(root.items.map(i => i.path))
     environment: ({ THUMBS: root.thumbDir })
     stdout: SplitParser {
@@ -149,8 +168,20 @@ Singleton {
     }
   }
 
-  // The wallpaper on the screen the picker is for (or any screen)
-  readonly property string currentPath: current[output] ?? current[screen?.name ?? ""] ?? Object.values(current)[0] ?? ""
+  // Videos per screen: while browsing, the one being tried
+  property var previewVideos: null
+  readonly property var videos: previewVideos ?? saved.videos
+
+  function videoFor(output: string): string {
+    return videos[output] ?? "";
+  }
+
+  // The wallpaper on the screen the picker is for (or any screen); a video
+  // counts over the still under it
+  readonly property string currentPath: {
+    const name = output !== "" ? output : (screen?.name ?? "");
+    return saved.videos[name] ?? current[name] ?? Object.values(saved.videos)[0] ?? Object.values(current)[0] ?? "";
+  }
 
   // --- Setting them ------------------------------------------------------------------------
   function transitionArgs(fast: bool): var {
@@ -162,11 +193,33 @@ Singleton {
     }
   }
 
-  function apply(path: string, fast: bool): void {
-    if (!available || path === "") return;
-    const args = [tool, "img", path, "--resize", fit === "fit" ? "fit" : "crop"].concat(transitionArgs(fast));
+  // keep: false while browsing (the video only plays until restore() or set())
+  function apply(path: string, fast: bool, keep: bool): void {
+    if (path === "") return;
+    const targets = output !== "" ? [output] : Quickshell.screens.map(s => s.name);
+    const map = Object.assign({}, keep ? saved.videos : videos);
+    for (const name of targets) {
+      if (isVideo(path)) map[name] = path;
+      else delete map[name];
+    }
+    if (keep) {
+      saved.videos = map;
+      previewVideos = null;
+    } else {
+      previewVideos = map;
+    }
+    if (!available) return;
+    const args = [tool, "img", isVideo(path) ? posterFor(path) : path, "--resize", fit === "fit" ? "fit" : "crop"].concat(transitionArgs(fast));
     if (output !== "") args.push("--outputs", output);
-    Quickshell.execDetached(args);
+    if (!isVideo(path)) {
+      Quickshell.execDetached(args);
+      return;
+    }
+    // The still is made once, then shown under the video
+    Quickshell.execDetached(["sh", "-c",
+      "p=\"$1\"; f=\"$2\"; shift 2; mkdir -p \"$(dirname \"$p\")\";" +
+      " [ -s \"$p\" ] || ffmpeg -loglevel error -y -ss 1 -i \"$f\" -frames:v 1 -q:v 2 \"$p\"; exec \"$@\"",
+      "sh", posterFor(path), path].concat(args));
   }
 
   // What was on screen before browsing, so Esc can put it back
@@ -187,13 +240,13 @@ Singleton {
     id: previewDelay
     property string path: ""
     interval: 350
-    onTriggered: root.apply(path, true)
+    onTriggered: root.apply(path, true, false)
   }
 
   function set(path: string): void {
     previewDelay.stop();
     previewing = false;
-    apply(path, false);
+    apply(path, false, true);
     const map = Object.assign({}, current);
     for (const name of output !== "" ? [output] : Quickshell.screens.map(s => s.name)) map[name] = path;
     current = map;
@@ -203,6 +256,8 @@ Singleton {
     previewDelay.stop();
     if (!previewing) return;
     previewing = false;
+    // The saved videos come back by themselves
+    previewVideos = null;
     for (const name of Object.keys(before)) {
       Quickshell.execDetached([tool, "img", before[name], "--outputs", name, "--resize", fit === "fit" ? "fit" : "crop"].concat(transitionArgs(true)));
     }

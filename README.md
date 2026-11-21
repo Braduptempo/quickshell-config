@@ -59,7 +59,7 @@ Arch package names, all in the official repos. Everything except the first group
 | Bluetooth | `bluez`, `bluez-utils` (and `systemctl enable --now bluetooth`) |
 | Clipboard history | `cliphist` |
 | Screenshots and recording | `grim`, `slurp`, `gpu-screen-recorder` |
-| Wallpapers | `awww` (or `swww`) |
+| Wallpapers | `awww` (or `swww`); videos play in the shell itself (`qt6-multimedia`, `qt6-multimedia-ffmpeg`), with `ffmpeg` for their thumbnails |
 | Night light | `hyprsunset` |
 | Brightness | `brightnessctl` |
 | Colour picker (launcher, theme editor) | `hyprpicker` |
@@ -156,7 +156,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `notifications` | `toggle`, `overview`, `calendar`, `weather`, `tab <name>` (switch while open), `dnd`, `clear` |
 | `media` | `toggle` |
 | `clipboard` | `toggle` |
-| `pickers` | `theme`, `wallpaper`, `random` |
+| `pickers` | `theme`, `wallpaper`, `random`, `set <file>` (a picture or video as wallpaper) |
 | `lock` | `lock`, `suspend` |
 | `power` | `toggle`, `open <letter>`, `cancel` (a scheduled action) |
 | `capture` | `toggle`, `shot <region\|window\|screen>`, `record <region\|window\|screen>`, `pause`, `stop`, `edit <file>` (draw on a picture), `editSave`, `editCopy`, `replay` (start / stop the replay buffer), `replaySave`, `replayStop` |

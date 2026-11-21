@@ -78,7 +78,7 @@ optional=(
   "bluez bluez-utils|Bluetooth"
   "cliphist|clipboard history"
   "grim slurp gpu-screen-recorder|screenshots and recording"
-  "awww|wallpapers"
+  "awww qt6-multimedia qt6-multimedia-ffmpeg ffmpeg|wallpapers (images and videos)"
   "hyprsunset|night light"
   "brightnessctl|brightness keys"
   "hyprpicker|colour picker"

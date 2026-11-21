@@ -20,11 +20,15 @@ import "./modules/pickers"
 import "./modules/windows"
 import "./modules/settings"
 import "./modules/mainmenu"
+import "./modules/wallpaper"
 import "./dev"
 
 Scope {
 
   Bar {}
+
+  // Video wallpapers (images are drawn by awww)
+  VideoWallpaper {}
 
   // Notification pop-ups, and the clock panel (calendar + notifications)
   Toasts {}
@@ -203,6 +207,10 @@ Scope {
     }
     function random(): void {
       Wallpapers.set(Wallpapers.random());
+    }
+    // A picture or video as wallpaper, e.g. from a script
+    function set(file: string): void {
+      Wallpapers.set(file);
     }
   }
 
