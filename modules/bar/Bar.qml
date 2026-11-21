@@ -134,6 +134,11 @@ Scope {
             anchors.verticalCenter: parent.verticalCenter
           }
 
+          // While the replay buffer runs
+          ReplayPill {
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
           Tray {
             window: panel
             anchors.verticalCenter: parent.verticalCenter

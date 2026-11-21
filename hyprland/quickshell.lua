@@ -44,6 +44,9 @@ hl.bind("CTRL + Print", hl.dsp.exec_cmd("qs ipc call capture shot screen"))
 -- toolbar, Super + Ctrl + R stops a recording
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("qs ipc call capture toggle"))
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("qs ipc call capture stop"))
+-- Replay buffer (start it in the capture toolbar's Replay mode): Alt + F10
+-- saves the last 30 s – 5 min, like ShadowPlay
+hl.bind("ALT + F10", hl.dsp.exec_cmd("qs ipc call capture replaySave"))
 -- Super + P (an area) and Super + Shift + P (a window) take the shell's
 -- screenshots too, so their notification has Edit. They replace hyprshot from
 -- modules/keybinds.lua (loaded before this file); remove these four lines to
