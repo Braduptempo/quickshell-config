@@ -49,14 +49,14 @@ Singleton {
 
   // --- Clock panel (calendar + notifications) ------------------------------
   property bool clockPanelOpen: false
-  // "calendar" or "notifications"
-  property string clockTab: "calendar"
+  // "overview", "calendar", "weather" or "notifications"
+  property string clockTab: "overview"
   property ShellScreen clockScreen: null
   property double clockClosedAt: 0
 
   function openClockPanel(onScreen: ShellScreen, tab: string): void {
     clockScreen = onScreen ?? focusedScreen();
-    clockTab = tab !== "" ? tab : "calendar";
+    clockTab = tab !== "" ? tab : "overview";
     clockPanelOpen = true;
   }
 

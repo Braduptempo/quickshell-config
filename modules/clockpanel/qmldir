@@ -1,2 +1,6 @@
 CalendarMonth 1.0 CalendarMonth.qml
 ClockPanel 1.0 ClockPanel.qml
+OverviewTab 1.0 OverviewTab.qml
+CalendarTab 1.0 CalendarTab.qml
+WeatherTab 1.0 WeatherTab.qml
+NotificationsTab 1.0 NotificationsTab.qml

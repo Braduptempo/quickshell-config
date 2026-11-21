@@ -12,10 +12,11 @@ import "../../services"
 SettingsPage {
   id: page
   title: "Weather"
-  description: "Shown in the clock panel and on the lock screen. Only the coordinates of the place you choose are sent to Open-Meteo; your location is never detected."
+  description: "Shown next to the clock, in the clock panel and on the lock screen. Only the coordinates of the place you choose are sent to Open-Meteo; your location is never detected."
   resetAction: () => {
     Config.weather.units = "celsius";
     Config.weather.showOnLock = true;
+    Config.weather.showInBar = true;
   }
 
   // --- Where ------------------------------------------------------------------------------
@@ -154,6 +155,11 @@ SettingsPage {
       accessibleName: "Units"
       onActivated: index => Config.weather.units = index === 1 ? "fahrenheit" : "celsius"
     }
+  }
+  SettingRow {
+    title: "In the bar"
+    subtitle: "The temperature and sky next to the clock. Click the clock for the Weather tab."
+    Toggle { checked: Config.weather.showInBar; accessibleName: "Weather in the bar"; onToggled: value => Config.weather.showInBar = value }
   }
   SettingRow {
     title: "On the lock screen"
