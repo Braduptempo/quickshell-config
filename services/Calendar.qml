@@ -7,6 +7,10 @@
 //   Calendar.eventsOn(day)   that day's events, sorted
 //   Calendar.hasEvents(day)  for the dots in the month
 //   Calendar.next            the next event that hasn't ended
+// Your own events (made in the clock panel) live in the state folder as
+// local-events.json, in the "This computer" calendar:
+//   Calendar.addLocal({ title, start, end, allDay, location })
+//   Calendar.removeLocal(id)
 // Times with a TZID are taken as local time.
 pragma Singleton
 
@@ -18,8 +22,10 @@ import "../config"
 Singleton {
   id: root
 
-  // [{ title, start, end, allDay, location, color, calendar }], start/end in ms
+  // [{ title, start, end, allDay, location, color, calendar, id?, local? }], start/end in ms
+  // The downloaded ones and your own together, sorted
   property var events: []
+  property var remote: []
   // "2026-11-20" -> number of events, for the month dots
   property var days: ({})
   property bool syncing: false
@@ -51,8 +57,8 @@ Singleton {
   // --- Syncing ---------------------------------------------------------------------------
   function sync(): void {
     if (sources.length === 0) {
-      events = [];
-      days = {};
+      remote = [];
+      rebuild();
       return;
     }
     syncing = true;
@@ -109,7 +115,22 @@ Singleton {
       }
       for (const e of parseIcs(chunk, source)) list.push(e);
     }
-    list.sort((a, b) => a.start - b.start);
+    remote = list;
+    rebuild();
+    if (fresh) {
+      root.errors = errors;
+      lastSync = Date.now();
+      if (Object.keys(errors).length < chunks.length) cache.setText(text);
+    }
+  }
+
+  // Downloaded and local events together, and the month dots
+  function rebuild(): void {
+    const local = (localFile.list ?? []).map(e => ({
+      id: e.id, title: e.title, start: e.start, end: e.end, allDay: e.allDay === true,
+      location: e.location ?? "", color: Theme.accent, calendar: "This computer", local: true
+    }));
+    const list = remote.concat(local).sort((a, b) => a.start - b.start);
     const map = {};
     for (const e of list) {
       // Mark every day the event touches (a few days at most)
@@ -120,10 +141,32 @@ Singleton {
     }
     events = list;
     days = map;
-    if (fresh) {
-      root.errors = errors;
-      lastSync = Date.now();
-      if (Object.keys(errors).length < chunks.length) cache.setText(text);
+  }
+
+  // --- Your own events -------------------------------------------------------------------
+  function addLocal(e: var): void {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    localFile.list = (localFile.list ?? []).concat([{ id: id, title: e.title, start: e.start, end: e.end, allDay: e.allDay === true, location: e.location ?? "" }]);
+    rebuild();
+  }
+
+  function removeLocal(id: string): void {
+    localFile.list = (localFile.list ?? []).filter(e => e.id !== id);
+    rebuild();
+  }
+
+  FileView {
+    path: Quickshell.statePath("local-events.json")
+    printErrors: false
+    onLoaded: root.rebuild()
+    onAdapterUpdated: writeAdapter()
+    onLoadFailed: error => {
+      if (error === FileViewError.FileNotFound) writeAdapter();
+    }
+
+    JsonAdapter {
+      id: localFile
+      property var list: []
     }
   }
 

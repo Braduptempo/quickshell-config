@@ -3,8 +3,9 @@
 // from Open-Meteo (free, no account or key; only the place's coordinates are
 // sent). Refreshed every 30 minutes and kept in the state folder for when
 // you're offline.
-//   Weather.current   { temperature, feelsLike, code, wind, humidity, isDay }
-//   Weather.days      [{ date, code, max, min, rain }]
+//   Weather.current   { temperature, feelsLike, code, wind, windDir, humidity, isDay }
+//   Weather.hours     the next 24 hours [{ time, temperature, code, rain, isDay }]
+//   Weather.days      7 days [{ date, code, max, min, rain, rainSum, wind, uv, sunrise, sunset }]
 //   Weather.rainNote  "Rain from 17:00" (next 12 hours), or ""
 //   Weather.search(name) fills Weather.places for the settings page
 pragma Singleton
@@ -22,6 +23,7 @@ Singleton {
   readonly property bool fahrenheit: Config.weather.units === "fahrenheit"
   property var current: null
   property var days: []
+  property var hours: []
   property string rainNote: ""
   property double updated: 0
   property string error: ""
@@ -30,6 +32,18 @@ Singleton {
   function degrees(t: real): string {
     return Math.round(t) + "°";
   }
+
+  // "NW": where the wind comes from
+  function compass(degrees: real): string {
+    return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(((degrees % 360) + 360) % 360 / 45) % 8];
+  }
+
+  // "Low", "Moderate", "High", "Very high", "Extreme"
+  function uvLevel(uv: real): string {
+    return uv < 3 ? "Low" : uv < 6 ? "Moderate" : uv < 8 ? "High" : uv < 11 ? "Very high" : "Extreme";
+  }
+
+  readonly property string windUnit: fahrenheit ? "mph" : "km/h"
 
   // --- WMO weather codes -----------------------------------------------------------
   function describe(code: int): string {
@@ -60,6 +74,7 @@ Singleton {
     if (!configured) {
       current = null;
       days = [];
+      hours = [];
       rainNote = "";
       return;
     }
@@ -93,10 +108,10 @@ Singleton {
     id: fetch
     command: ["curl", "-sf", "--max-time", "20",
       "https://api.open-meteo.com/v1/forecast?latitude=" + Config.weather.latitude.toFixed(3) + "&longitude=" + Config.weather.longitude.toFixed(3)
-      + "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,is_day"
-      + "&hourly=precipitation_probability,weather_code"
-      + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
-      + "&timezone=auto&forecast_days=6"
+      + "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,is_day"
+      + "&hourly=temperature_2m,precipitation_probability,weather_code,is_day"
+      + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,uv_index_max,sunrise,sunset"
+      + "&timezone=auto&forecast_days=7"
       + (root.fahrenheit ? "&temperature_unit=fahrenheit&wind_speed_unit=mph" : "")]
     stdout: StdioCollector {
       onStreamFinished: {
@@ -131,6 +146,7 @@ Singleton {
       feelsLike: c.apparent_temperature,
       code: c.weather_code,
       wind: Math.round(c.wind_speed_10m ?? 0),
+      windDir: c.wind_direction_10m ?? 0,
       humidity: c.relative_humidity_2m,
       isDay: c.is_day === 1
     };
@@ -140,11 +156,24 @@ Singleton {
       code: d.weather_code[i],
       max: d.temperature_2m_max[i],
       min: d.temperature_2m_min[i],
-      rain: d.precipitation_probability_max[i] ?? 0
+      rain: d.precipitation_probability_max[i] ?? 0,
+      rainSum: d.precipitation_sum?.[i] ?? 0,
+      wind: Math.round(d.wind_speed_10m_max?.[i] ?? 0),
+      uv: Math.round(d.uv_index_max?.[i] ?? 0),
+      sunrise: d.sunrise?.[i] ? new Date(d.sunrise[i]) : null,
+      sunset: d.sunset?.[i] ? new Date(d.sunset[i]) : null
     }));
     // The first hour in the next 12 with a good chance of rain
     const h = data.hourly ?? {};
     const now = Date.now();
+    // From the current hour on, 24 of them
+    const next = [];
+    for (let i = 0; i < (h.time ?? []).length && next.length < 24; i++) {
+      const at = new Date(h.time[i]);
+      if (at.getTime() < now - 3600000) continue;
+      next.push({ time: at, temperature: h.temperature_2m?.[i] ?? 0, code: h.weather_code[i], rain: h.precipitation_probability[i] ?? 0, isDay: h.is_day?.[i] === 1 });
+    }
+    hours = next;
     rainNote = "";
     for (let i = 0; i < (h.time ?? []).length; i++) {
       const at = new Date(h.time[i]).getTime();

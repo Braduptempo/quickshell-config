@@ -78,6 +78,8 @@ Singleton {
     // "celsius" or "fahrenheit"
     property string units: "celsius"
     property bool showOnLock: true
+    // The temperature and sky next to the clock in the bar
+    property bool showInBar: true
   }
 
   component DisplaySettings: JsonObject {

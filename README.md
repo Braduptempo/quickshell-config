@@ -79,7 +79,7 @@ No Print key? Super + Shift + R opens the same toolbar.
 
 **Panels from the bar.**
 - *Quick settings:* Wi-Fi, Ethernet, Bluetooth, do not disturb, night light, caffeine, microphone, volume per app and per device, system stats, and the charge of every battery. Without a Bluetooth adapter it says why (service off, blocked, no hardware) and can fix the usual causes.
-- *Clock panel:* month calendar with your calendars' events, the weather, and the notification history.
+- *Clock panel:* four tabs. Overview (today's events, the weather and the latest notifications), Calendar (month, the chosen day, and your own events with New event), Weather (the next 24 hours and 7 days with rain, wind, UV and the sun) and Notifications. The weather can show next to the clock too.
 - *Media menu:* cover, controls, seeking, the player's volume, and every player with its own play/pause.
 - *Extras menu:* updates and drives.
 
@@ -131,7 +131,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `mainmenu` | `toggle` |
 | `quicksettings` | `toggle`, `open <page>` (`main`, `network`, `bluetooth`, `audio`) |
 | `settings` | `toggle`, `open <page>` (`theme`, `wallpaper`, `power`, …) |
-| `notifications` | `toggle`, `calendar`, `dnd`, `clear` |
+| `notifications` | `toggle`, `overview`, `calendar`, `weather`, `dnd`, `clear` |
 | `media` | `toggle` |
 | `clipboard` | `toggle` |
 | `pickers` | `theme`, `wallpaper`, `random` |

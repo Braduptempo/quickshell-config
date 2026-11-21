@@ -237,7 +237,8 @@ Scope {
     }
   }
 
-  // `qs ipc call notifications toggle` (Super + N), `dnd`, `clear`
+  // `qs ipc call notifications toggle` (Super + N), `overview`, `calendar`,
+  // `weather`, `dnd`, `clear`
   IpcHandler {
     target: "notifications"
     function toggle(): void {
@@ -245,6 +246,12 @@ Scope {
     }
     function calendar(): void {
       Panels.toggleClockPanel(Panels.focusedScreen(), "calendar");
+    }
+    function overview(): void {
+      Panels.toggleClockPanel(Panels.focusedScreen(), "overview");
+    }
+    function weather(): void {
+      Panels.toggleClockPanel(Panels.focusedScreen(), "weather");
     }
     function dnd(): void {
       Notifications.dnd = !Notifications.dnd;
