@@ -73,6 +73,7 @@ PanelWindow {
 
   GlassPanel {
     id: card
+    color: Theme.panelSolid
 
     x: 12
     width: 400
@@ -421,7 +422,7 @@ PanelWindow {
             RowLayout {
               anchors.fill: parent
               anchors.leftMargin: 6
-              anchors.rightMargin: 14
+              anchors.rightMargin: 6
               spacing: 10
 
               Rectangle {
@@ -448,16 +449,21 @@ PanelWindow {
                   elide: Text.ElideRight
                 }
               }
-              Icon {
-                visible: playerRow.modelData.isPlaying
-                name: "music"
-                size: 13
-                color: Theme.accent
+              // Pause or play this player without switching to it
+              IconButton {
+                visible: playerRow.modelData.canTogglePlaying
+                icon: playerRow.modelData.isPlaying ? "pause" : "play"
+                variant: playerRow.modelData.isPlaying ? "primary" : "ghost"
+                size: 30
+                accessibleName: (playerRow.modelData.isPlaying ? "Pause " : "Play ") + Media.nameOf(playerRow.modelData)
+                onClicked: playerRow.modelData.togglePlaying()
               }
             }
 
+            // Under the row's buttons: a click elsewhere on the row picks the player
             MouseArea {
               id: playerMouse
+              z: -1
               anchors.fill: parent
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor

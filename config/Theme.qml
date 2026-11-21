@@ -82,6 +82,8 @@ Singleton {
   // (layerrule blur on the quickshell namespace)
   readonly property real glass: Config.appearance.glass
   readonly property color panel: Qt.rgba(base.r, base.g, base.b, glass)
+  // Menus and panels with text to read: never more see-through than this
+  readonly property color panelSolid: Qt.rgba(base.r, base.g, base.b, Math.max(glass, 0.86))
   readonly property color item: light ? Qt.rgba(0, 0, 0, 0.06) : Qt.rgba(crust.r, crust.g, crust.b, 0.45)
   readonly property color border: light ? Qt.rgba(0, 0, 0, 0.1) : Qt.rgba(1, 1, 1, 0.14)
   readonly property color highlight: light ? Qt.rgba(1, 1, 1, 0.8) : Qt.rgba(1, 1, 1, 0.22)

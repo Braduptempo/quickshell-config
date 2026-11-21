@@ -13,6 +13,7 @@ import Quickshell.Networking
 import "../../config"
 import "../../components"
 import "../../services"
+import "../bluetooth"
 
 SettingsPage {
   id: page
@@ -210,13 +211,15 @@ SettingsPage {
   // --- Bluetooth ---------------------------------------------------------------------------------
   Section {
     heading: "Bluetooth · devices"
-    showSwitch: page.adapter !== null
+    showSwitch: !BluetoothCheck.missing
     switchOn: page.adapter?.enabled ?? false
     onSwitched: on => { if (page.adapter) page.adapter.enabled = on; }
 
+    BluetoothHint { Layout.fillWidth: true }
+
     Label {
-      visible: page.adapter === null || page.devices.length === 0
-      text: page.adapter === null ? "No Bluetooth adapter found" : "No paired devices. Pair one in quick settings (Super + A → Bluetooth)."
+      visible: !BluetoothCheck.missing && page.devices.length === 0
+      text: "No paired devices. Pair one in quick settings (Super + A → Bluetooth)."
       kind: "muted"
       wrapMode: Text.Wrap
       Layout.fillWidth: true

@@ -10,17 +10,8 @@ QtObject {
 
   property var battery: UPower.displayDevice
 
-  // Controleer of er daadwerkelijk een batterij aanwezig is op het systeem
-  readonly property bool hasBattery: {
-    if (!battery) return false;
-    let devices = UPower.devices.values;
-    for (let i = 0; i < devices.length; i++) {
-      if (devices[i].type === UPowerDeviceType.Battery) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // Is there a laptop battery at all
+  readonly property bool hasBattery: battery !== null && batteries.length > 0
 
   property bool charging: battery.state === UPowerDeviceState.Charging
   readonly property int batteryLevel: Math.floor(battery.percentage * 100)
@@ -40,6 +31,17 @@ QtObject {
   }
 
   readonly property var allDevices: UPower.devices
+
+  // The laptop's own batteries, each on its own (some laptops have two:
+  // an internal one and a removable one). [UPowerDevice], BAT0 first.
+  readonly property var batteries: allDevices.values
+    .filter(d => d.isLaptopBattery && d.isPresent)
+    .sort((a, b) => a.nativePath.localeCompare(b.nativePath))
+
+  // "62%"
+  function levelOf(d: var): string {
+    return Math.round(d.percentage * 100) + "%";
+  }
 
   readonly property var iconMap: {
     "0": "",

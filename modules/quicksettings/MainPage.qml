@@ -23,9 +23,11 @@ ColumnLayout {
   spacing: 12
 
   // --- Header: battery (laptop only) ---------------------------------------
-  RowLayout {
+  // Wraps when there are several batteries
+  Flow {
     visible: Battery.hasBattery
     Layout.fillWidth: true
+    spacing: 8
 
     Rectangle {
       implicitHeight: 34
@@ -40,6 +42,32 @@ ColumnLayout {
         Icon { name: "battery"; size: 16; color: Battery.charging ? Theme.good : Theme.text; anchors.verticalCenter: parent.verticalCenter }
         Label { text: Battery.batteryLevel + "%"; font.weight: Font.Bold; anchors.verticalCenter: parent.verticalCenter }
         Label { text: Battery.timeRemainingStr; kind: "muted"; anchors.verticalCenter: parent.verticalCenter }
+      }
+    }
+
+    // Two batteries or more: each one's own charge next to the total
+    Repeater {
+      model: Battery.batteries.length > 1 ? Battery.batteries : []
+
+      Rectangle {
+        id: oneBattery
+        required property var modelData
+        required property int index
+        implicitHeight: 34
+        implicitWidth: oneRow.implicitWidth + 20
+        radius: 17
+        color: Theme.item
+
+        Accessible.role: Accessible.StaticText
+        Accessible.name: "Battery " + (index + 1) + ", " + Battery.levelOf(modelData)
+
+        Row {
+          id: oneRow
+          anchors.centerIn: parent
+          spacing: 6
+          Label { text: "Battery " + (oneBattery.index + 1); kind: "muted"; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
+          Label { text: Battery.levelOf(oneBattery.modelData); font.weight: Font.Bold; anchors.verticalCenter: parent.verticalCenter }
+        }
       }
     }
   }
@@ -84,15 +112,22 @@ ColumnLayout {
 
     Tile {
       Layout.fillWidth: true
-      visible: root.adapter !== null
+      // Without an adapter it stays, so the details can say how to fix it
+      // (hidden only on machines without Bluetooth hardware)
+      visible: !BluetoothCheck.missing || BluetoothCheck.problem !== "nohardware"
       icon: "bluetooth"
       label: "Bluetooth"
-      status: !root.adapter?.enabled ? "Off"
+      status: BluetoothCheck.missing ? "Not set up"
+            : !root.adapter?.enabled ? "Off"
             : root.btConnected.length === 1 ? root.btConnected[0].name
             : root.btConnected.length > 1 ? root.btConnected.length + " devices" : "On"
-      checked: root.adapter?.enabled ?? false
+      statusColor: BluetoothCheck.missing ? Theme.warn : Theme.subtext
+      checked: !BluetoothCheck.missing && (root.adapter?.enabled ?? false)
       hasDetails: true
-      onToggled: if (root.adapter) root.adapter.enabled = !root.adapter.enabled
+      onToggled: {
+        if (BluetoothCheck.missing) Panels.quickSettingsPage = "bluetooth";
+        else if (root.adapter) root.adapter.enabled = !root.adapter.enabled;
+      }
       onDetailsRequested: Panels.quickSettingsPage = "bluetooth"
     }
 
