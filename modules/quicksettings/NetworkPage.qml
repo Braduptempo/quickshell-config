@@ -60,8 +60,10 @@ ColumnLayout {
   }
 
   // Connected, but the internet isn't reachable (or a login page is in the way)
-  readonly property bool noInternet: root.network.primary !== "none"
-    && (Networking.connectivity === NetworkConnectivity.Limited || Networking.connectivity === NetworkConnectivity.Portal)
+  readonly property bool portal: Networking.connectivity === NetworkConnectivity.Portal || Fake.has("portal")
+  readonly property bool noInternet: (root.network.primary !== "none"
+    && (Networking.connectivity === NetworkConnectivity.Limited || Networking.connectivity === NetworkConnectivity.Portal))
+    || Fake.has("no-internet") || Fake.has("portal")
 
   Rectangle {
     visible: root.noInternet
@@ -87,14 +89,14 @@ ColumnLayout {
         Label {
           id: warnTitle
           Layout.fillWidth: true
-          text: Networking.connectivity === NetworkConnectivity.Portal ? "This network wants you to log in" : "Connected, but no internet"
+          text: root.portal ? "This network wants you to log in" : "Connected, but no internet"
           font.weight: Font.Bold
           wrapMode: Text.Wrap
         }
       }
       Label {
         Layout.fillWidth: true
-        text: Networking.connectivity === NetworkConnectivity.Portal
+        text: root.portal
           ? "Hotels, trains and schools often show a login page first. Open it to get online."
           : "Check that the router is online. Some networks need a login page first."
         kind: "muted"
@@ -187,7 +189,7 @@ ColumnLayout {
   }
 
   EmptyState {
-    visible: root.network.hasWifiDevice && !Networking.wifiEnabled
+    visible: (root.network.hasWifiDevice && !Networking.wifiEnabled) || Fake.has("wifi-off")
     Layout.fillWidth: true
     icon: "wifi"
     crossed: true

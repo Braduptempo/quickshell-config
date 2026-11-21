@@ -204,6 +204,7 @@ These variables make the risky parts safe to try:
 | `QS_POWER_DRYRUN=1` | Power actions (and the critical-battery action) only show a notification |
 | `QS_LOCK_TEST=1` | The lock screen really locks, but unlocks by itself after 20 seconds |
 | `QS_BATTERY_FAKE=<percent>` | Pretends to be a discharging battery at that level |
+| `QS_FAKE=<states>` | Shows states without causing them, comma-separated: `wifi-off`, `no-internet`, `portal`, `bt-off`, `no-audio`, `load` |
 | `QS_BT_FAKE=<problem>` | Shows the Bluetooth hint: `service`, `blocked`, `hardblocked`, `notinstalled`, `nohardware` |
 | `QS_CLIPHIST_DB=<file>` | Clipboard history from another cliphist database |
 | `QS_GALLERY=1` | Opens the component gallery at start |

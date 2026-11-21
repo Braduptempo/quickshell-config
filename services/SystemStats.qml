@@ -111,7 +111,7 @@ Singleton {
   // The bar's load pill: a slow look every 5 s while the panel is closed
   // (Settings → Bar & panels → High load). Two hot samples in a row count.
   property int hotSamples: 0
-  readonly property bool heavy: hotSamples >= 2
+  readonly property bool heavy: hotSamples >= 2 || Fake.has("load")
   readonly property real hottest: Math.max(cpuTemp, gpuTemp)
 
   Timer {

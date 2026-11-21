@@ -10,7 +10,7 @@ import Quickshell.Io
 import "../../config"
 import "../../components"
 
-Card {
+Rectangle {
   id: root
 
   required property var network
@@ -22,7 +22,11 @@ Card {
   property real up: 0
 
   visible: stats.connected === true && network.primary !== "none"
-  implicitHeight: header.implicitHeight + grid.implicitHeight + 20
+  implicitHeight: content.implicitHeight + 24
+  radius: Theme.radiusCard
+  color: Theme.alpha(Theme.accent, 0.08)
+  border.width: 1
+  border.color: Theme.alpha(Theme.accent, 0.3)
 
   function linkSpeed(mbit: real): string {
     if (!mbit || mbit <= 0) return "";
@@ -66,60 +70,86 @@ Card {
     }
   }
 
-  ListRow {
-    id: header
-    width: parent.width
-    first: true
-    title: root.wired ? "Ethernet · " + (root.stats.iface ?? root.network.wiredName)
-                      : "Wi-Fi · " + (root.network.activeNetwork?.name ?? "")
-    subtitle: root.wired ? root.linkSpeed(root.stats.speed ?? 0)
-            : "Signal " + ((root.stats.all_signals ?? {})[root.network.activeNetwork?.name ?? ""] ?? "–") + "%"
-
-    Icon {
-      name: root.wired ? "ethernet" : "wifi"
-      size: 16
-      color: Theme.good
+  // One of the three numbers: a label over a value
+  component Stat: Rectangle {
+    id: stat
+    property string label
+    property string value
+    property color valueColor: Theme.text
+    Layout.fillWidth: true
+    Layout.preferredWidth: 1
+    implicitHeight: statColumn.implicitHeight + 14
+    radius: Theme.r(10)
+    color: Theme.item
+    Column {
+      id: statColumn
+      x: 10
       anchors.verticalCenter: parent.verticalCenter
-    }
-
-    Chip {
-      text: "In use"
-      tone: "good"
-      anchors.verticalCenter: parent.verticalCenter
+      spacing: 1
+      Label { text: stat.label; kind: "muted"; font.pixelSize: Theme.font.label }
+      Label { text: stat.value; color: stat.valueColor; font.weight: Font.Bold; font.pixelSize: Theme.font.small }
     }
   }
 
-  Rectangle {
-    y: header.height
-    width: parent.width
-    height: 1
-    color: Theme.hairline
-  }
-
-  GridLayout {
-    id: grid
+  ColumnLayout {
+    id: content
     x: 12
-    y: header.height + 10
+    y: 12
     width: parent.width - 24
-    columns: 4
-    columnSpacing: 10
-    rowSpacing: 6
+    spacing: 10
 
-    Label { text: "IP"; kind: "muted" }
-    Label { text: root.stats.ip ?? "–"; font.weight: Font.Bold; Layout.fillWidth: true }
-    Label { text: "Down"; kind: "muted" }
-    Label { text: root.speed(root.down); color: Theme.good; font.weight: Font.Bold; Layout.fillWidth: true }
+    // The connection: icon, name, and how it's connected
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: 10
+      Rectangle {
+        implicitWidth: 32
+        implicitHeight: 32
+        radius: Theme.pill(height)
+        color: Theme.accent
+        Icon { anchors.centerIn: parent; name: root.wired ? "ethernet" : "wifi"; size: 16; color: Theme.onAccent }
+      }
+      ColumnLayout {
+        Layout.fillWidth: true
+        spacing: 1
+        Label {
+          Layout.fillWidth: true
+          text: root.wired ? "Ethernet" : (root.network.activeNetwork?.name ?? "Wi-Fi")
+          font.weight: Font.Bold
+          elide: Text.ElideRight
+        }
+        Label {
+          Layout.fillWidth: true
+          text: ["Connected · in use",
+                 root.wired ? (root.stats.iface ?? root.network.wiredName) : "",
+                 root.wired ? root.linkSpeed(root.stats.speed ?? 0)
+                            : "signal " + ((root.stats.all_signals ?? {})[root.network.activeNetwork?.name ?? ""] ?? "–") + "%"]
+                .filter(t => t !== "").join(" · ")
+          color: Theme.good
+          font.pixelSize: Theme.font.label
+          elide: Text.ElideRight
+        }
+      }
+    }
 
-    Label { text: "Gateway"; kind: "muted" }
-    Label { text: root.stats.gw ?? "–"; Layout.fillWidth: true }
-    Label { text: "Up"; kind: "muted" }
-    Label { text: root.speed(root.up); color: Theme.accent; font.weight: Font.Bold; Layout.fillWidth: true }
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: 6
+      Stat { label: "Download"; value: root.speed(root.down); valueColor: Theme.good }
+      Stat { label: "Upload"; value: root.speed(root.up); valueColor: Theme.accent }
+      Stat {
+        label: "Ping"
+        value: (root.stats.ping ?? 0) + " ms" + ((root.stats.loss ?? 0) > 0 ? " · " + root.stats.loss + "% loss" : "")
+        valueColor: (root.stats.loss ?? 0) > 0 ? Theme.error : (root.stats.ping ?? 0) > 50 ? Theme.warn : Theme.text
+      }
+    }
 
-    Label { text: "Ping"; kind: "muted" }
     Label {
-      text: (root.stats.ping ?? 0) + " ms" + ((root.stats.loss ?? 0) > 0 ? " · " + root.stats.loss + "% loss" : "")
-      color: (root.stats.loss ?? 0) > 0 ? Theme.error : (root.stats.ping ?? 0) > 50 ? Theme.warn : Theme.text
-      Layout.columnSpan: 3
+      Layout.fillWidth: true
+      text: "IP " + (root.stats.ip ?? "–") + " · Gateway " + (root.stats.gw ?? "–")
+      kind: "muted"
+      font.pixelSize: Theme.font.label
+      elide: Text.ElideRight
     }
   }
 }

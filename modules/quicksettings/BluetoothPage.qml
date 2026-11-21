@@ -60,7 +60,7 @@ ColumnLayout {
 
   EmptyState {
     readonly property int paired: root.devices.filter(d => d.paired).length
-    visible: !BluetoothCheck.missing && root.adapter !== null && !root.adapter.enabled
+    visible: (!BluetoothCheck.missing && root.adapter !== null && !root.adapter.enabled) || Fake.has("bt-off")
     Layout.fillWidth: true
     icon: "bluetooth"
     crossed: true

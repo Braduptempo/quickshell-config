@@ -100,11 +100,18 @@ PanelWindow {
           }
         }
 
-        Item { Layout.fillWidth: true }
+        Item { Layout.fillWidth: true; visible: Panels.clockTab === "overview" }
 
+        // The date (the overview's Today card has it already); shortens
+        // rather than pushing out of the panel
         Label {
+          visible: Panels.clockTab !== "overview"
+          Layout.fillWidth: true
+          Layout.minimumWidth: 0
+          horizontalAlignment: Text.AlignRight
           text: Qt.formatDate(Time.date, "dddd d MMMM")
           kind: "muted"
+          elide: Text.ElideLeft
         }
       }
 
