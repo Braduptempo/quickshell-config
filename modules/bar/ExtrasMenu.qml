@@ -84,6 +84,7 @@ PanelWindow {
 
   GlassPanel {
     id: card
+    color: Theme.panelSolid
 
     x: 12
     width: 340

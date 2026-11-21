@@ -7,6 +7,8 @@ import QtQuick.Layouts
 import Quickshell.Bluetooth
 import "../../config"
 import "../../components"
+import "../../services"
+import "../bluetooth"
 
 ColumnLayout {
   id: root
@@ -37,12 +39,12 @@ ColumnLayout {
   PageHeader {
     Layout.fillWidth: true
     title: "Bluetooth"
-    showToggle: root.adapter !== null
+    showToggle: !BluetoothCheck.missing
     checked: root.adapter?.enabled ?? false
     onToggled: value => { if (root.adapter) root.adapter.enabled = value; }
 
     Button {
-      visible: root.adapter?.enabled ?? false
+      visible: !BluetoothCheck.missing && (root.adapter?.enabled ?? false)
       size: Theme.size.buttonList
       variant: root.adapter?.discovering ? "outline" : "ghost"
       text: root.adapter?.discovering ? "Scanning…" : "Scan"
@@ -50,9 +52,15 @@ ColumnLayout {
     }
   }
 
+  // No adapter: why, and how to fix it
+  BluetoothHint {
+    Layout.fillWidth: true
+    Layout.topMargin: 4
+  }
+
   Label {
-    visible: root.adapter === null || !root.adapter.enabled
-    text: root.adapter === null ? "No Bluetooth adapter found" : "Bluetooth is off"
+    visible: !BluetoothCheck.missing && root.adapter !== null && !root.adapter.enabled
+    text: "Bluetooth is off"
     kind: "muted"
     horizontalAlignment: Text.AlignHCenter
     Layout.fillWidth: true
@@ -61,7 +69,7 @@ ColumnLayout {
   }
 
   Card {
-    visible: (root.adapter?.enabled ?? false) && root.devices.length > 0
+    visible: !BluetoothCheck.missing && (root.adapter?.enabled ?? false) && root.devices.length > 0
     Layout.fillWidth: true
     implicitHeight: list.implicitHeight
 
@@ -109,7 +117,7 @@ ColumnLayout {
   }
 
   Label {
-    visible: (root.adapter?.enabled ?? false) && root.devices.length === 0
+    visible: !BluetoothCheck.missing && (root.adapter?.enabled ?? false) && root.devices.length === 0
     text: "No devices yet. Press Scan and put your device in pairing mode."
     kind: "muted"
     wrapMode: Text.WordWrap

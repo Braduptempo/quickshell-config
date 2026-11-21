@@ -19,6 +19,7 @@ BarItem {
   padding: 12
   active: Panels.quickSettingsOpen && Panels.screen === screen
   accessibleName: "Quick settings. " + networkText + ", volume " + Sound.volume + " percent" + (Battery.hasBattery ? ", battery " + Battery.batteryLevel + " percent" : "")
+    + (Battery.batteries.length > 1 ? " (" + Battery.batteries.map((d, i) => "battery " + (i + 1) + " " + Battery.levelOf(d)).join(", ") + ")" : "")
 
   // Follows the connection that carries the traffic, not just "a cable is in"
   readonly property string networkText: network.primary === "ethernet" ? "Ethernet"
