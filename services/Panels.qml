@@ -124,4 +124,20 @@ Singleton {
       extrasMenu = kind;
     }
   }
+
+  // --- Main menu: the button at the far left of the bar (Super + X) ----------------
+  property bool mainMenuOpen: false
+  property ShellScreen mainMenuScreen: null
+  property double mainMenuClosedAt: 0
+
+  onMainMenuOpenChanged: if (!mainMenuOpen) mainMenuClosedAt = Date.now()
+
+  function toggleMainMenu(onScreen: ShellScreen): void {
+    if (mainMenuOpen) {
+      mainMenuOpen = false;
+    } else if (Date.now() - mainMenuClosedAt > 250) {
+      mainMenuScreen = onScreen ?? focusedScreen();
+      mainMenuOpen = true;
+    }
+  }
 }
