@@ -150,6 +150,7 @@ PanelWindow {
     target: "osd"
     function caps(): void {
       capsDelay.restart();
+      Lock.capsChanged();
     }
     function brightness(): void {
       Session.refreshBrightness();
