@@ -11,7 +11,7 @@ import "../../services"
 SettingsPage {
   id: page
   title: "Theme"
-  description: "Colours of the whole shell. Changes apply right away. Super + T switches quickly."
+  description: "Colours of the whole shell. Changes apply right away. Super + T switches quickly. New theme starts from the current one; your own themes can be edited below the list."
   resetAction: () => {
     Config.appearance.theme = "Mocha";
     Config.appearance.accent = "";
@@ -82,6 +82,27 @@ SettingsPage {
           color: card.modelData.accent
         }
 
+        // Your own themes are marked
+        Rectangle {
+          visible: card.modelData.custom === true
+          anchors.right: parent.right
+          anchors.top: parent.top
+          anchors.margins: 6
+          implicitWidth: customLabel.implicitWidth + 10
+          implicitHeight: 16
+          radius: 8
+          color: card.modelData.accent
+          Text {
+            id: customLabel
+            anchors.centerIn: parent
+            text: "Yours"
+            color: card.modelData.light ? card.modelData.base : card.modelData.crust
+            font.family: Theme.font.family
+            font.pixelSize: Theme.font.label
+            font.weight: Font.Bold
+          }
+        }
+
         MouseArea {
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
@@ -89,7 +110,37 @@ SettingsPage {
         }
       }
     }
+
+    // A copy of the current theme to edit
+    Rectangle {
+      Layout.fillWidth: true
+      implicitHeight: 96
+      radius: Theme.radiusCard
+      color: newMouse.containsMouse ? Theme.hover(Theme.item) : "transparent"
+      border.width: 1
+      border.color: Theme.border
+
+      Accessible.role: Accessible.Button
+      Accessible.name: "New theme from the current one"
+
+      Column {
+        anchors.centerIn: parent
+        spacing: 6
+        Icon { anchors.horizontalCenter: parent.horizontalCenter; name: "plus"; size: 20; color: Theme.subtext }
+        Label { anchors.horizontalCenter: parent.horizontalCenter; text: "New theme"; font.pixelSize: Theme.font.small; color: Theme.subtext }
+      }
+
+      MouseArea {
+        id: newMouse
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: Palettes.create(Theme.palette)
+      }
+    }
   }
+
+  ThemeEditor { Layout.fillWidth: true }
 
   SettingRow {
     title: "Accent"

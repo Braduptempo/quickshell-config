@@ -82,6 +82,7 @@ Singleton {
     "close": "M6 6l12 12M18 6 6 18",
     "check": "M5 12l5 5 9-10",
     "plus": "M12 5v14M5 12h14",
+    "pipette": "M2 22l1-1h3l9-9M3 21v-3l9-9M15 6l3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z",
     "minus": "M5 12h14",
     "arrow-right": "M5 12h14M13 6l6 6-6 6",
     "shuffle": "M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5",
