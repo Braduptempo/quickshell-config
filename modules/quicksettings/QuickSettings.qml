@@ -42,7 +42,14 @@ PanelWindow {
     right: 8
   }
   implicitWidth: 390 + 24
-  implicitHeight: card.implicitHeight + 24
+  implicitHeight: heldHeight.value + 24
+
+  // The window keeps its size while the card animates (see HeldHeight)
+  HeldHeight {
+    id: heldHeight
+    target: card.implicitHeight
+    delay: Theme.anim.panelIn
+  }
 
   HyprlandFocusGrab {
     active: window.shown
@@ -67,7 +74,8 @@ PanelWindow {
 
     // Open: slide / fade / scale from Config; close a bit faster
     opacity: window.shown ? 1 : 0
-    y: 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
+    // With the bar at the bottom the card hugs the bottom of the (held) window
+    y: (window.fromBottom ? heldHeight.value - height : 0) + 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
     scale: window.shown || window.style !== "scale" ? 1 : 0.92
 
     Behavior on opacity {
@@ -83,7 +91,8 @@ PanelWindow {
     Behavior on scale {
       NumberAnimation { duration: window.shown ? Theme.anim.panelIn : Theme.anim.panelOut; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
     }
-    Behavior on implicitHeight {
+    // Pages have different heights; the card animates, the window holds still
+    Behavior on height {
       NumberAnimation { duration: Theme.anim.panelIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard }
     }
 

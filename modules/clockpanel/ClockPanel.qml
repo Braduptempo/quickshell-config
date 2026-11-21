@@ -39,7 +39,14 @@ PanelWindow {
   margins.top: 6
   margins.bottom: 6
   implicitWidth: 720 + 24
-  implicitHeight: card.implicitHeight + 24
+  implicitHeight: heldHeight.value + 24
+
+  // The window keeps its size while the card animates (see HeldHeight)
+  HeldHeight {
+    id: heldHeight
+    target: card.implicitHeight
+    delay: Theme.anim.panelIn
+  }
 
   readonly property var tabs: ["overview", "calendar", "weather", "notifications"]
 
@@ -68,13 +75,15 @@ PanelWindow {
     implicitHeight: content.implicitHeight + 32
     height: implicitHeight
     // Tabs have different heights: grow or shrink to the next one smoothly
-    Behavior on implicitHeight { NumberAnimation { duration: Theme.anim.panelIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard } }
+    // (the card's height animates, the window around it holds still)
+    Behavior on height { NumberAnimation { duration: Theme.anim.panelIn; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.standard } }
     clip: true
     focus: true
     transformOrigin: window.fromBottom ? Item.Bottom : Item.Top
 
     opacity: window.shown ? 1 : 0
-    y: 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
+    // With the bar at the bottom the card hugs the bottom of the (held) window
+    y: (window.fromBottom ? heldHeight.value - height : 0) + 12 + (window.shown || window.style !== "slide" ? 0 : window.fromBottom ? 14 : -14)
     scale: window.shown || window.style !== "scale" ? 1 : 0.94
 
     Behavior on opacity {

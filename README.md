@@ -151,7 +151,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `mainmenu` | `toggle` |
 | `quicksettings` | `toggle`, `open <page>` (`main`, `network`, `bluetooth`, `audio`) |
 | `settings` | `toggle`, `open <page>` (`theme`, `wallpaper`, `power`, …) |
-| `notifications` | `toggle`, `overview`, `calendar`, `weather`, `dnd`, `clear` |
+| `notifications` | `toggle`, `overview`, `calendar`, `weather`, `tab <name>` (switch while open), `dnd`, `clear` |
 | `media` | `toggle` |
 | `clipboard` | `toggle` |
 | `pickers` | `theme`, `wallpaper`, `random` |
