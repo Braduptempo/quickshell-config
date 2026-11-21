@@ -119,6 +119,14 @@ Singleton {
     property var knownApps: []
   }
 
+  component BatterySettings: JsonObject {
+    // Percentages for the low and critical warnings; 0 turns that one off
+    property int warnAt: 15
+    property int criticalAt: 5
+    // At critical, after a minute without a charger: "none", "suspend" or "hibernate"
+    property string criticalAction: "none"
+  }
+
   component LockSettings: JsonObject {
     // Lock after this many minutes without input; 0 = never
     property int idleMinutes: 10
@@ -139,6 +147,7 @@ Singleton {
   property alias calendar: adapter.calendar
   property alias weather: adapter.weather
   property alias apps: adapter.apps
+  property alias battery: adapter.battery
 
   property double lastWrite: 0
 
@@ -190,6 +199,8 @@ Singleton {
       property WeatherSettings weather: WeatherSettings {}
 
       property AppSettings apps: AppSettings {}
+
+      property BatterySettings battery: BatterySettings {}
     }
   }
 }
