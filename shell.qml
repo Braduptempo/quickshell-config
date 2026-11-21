@@ -1,10 +1,8 @@
-//@ pragma UseQApplication
 //shell.qml
-// UseQApplication (must be the first lines): tray menus are platform menus,
-// which Quickshell can only show in QApplication mode
 
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.SystemTray
 import "./modules/bar"
 import "./modules/quicksettings"
 import "./services"
@@ -101,6 +99,21 @@ Scope {
 
   // Under the privacy, updates and drives pills
   ExtrasMenu {}
+
+  // Under a tray icon: the app's menu
+  TrayMenu {}
+
+  // `qs ipc call tray menu 0`: the menu of the first tray app; `close`
+  IpcHandler {
+    target: "tray"
+    function menu(index: int): void {
+      const item = SystemTray.items.values[index] ?? null;
+      if (item && item.hasMenu) Panels.toggleTrayMenu(item, Panels.focusedScreen(), (Panels.focusedScreen()?.width ?? 1920) - 300);
+    }
+    function close(): void {
+      Panels.trayMenuItem = null;
+    }
+  }
 
   // `qs ipc call extras open privacy|updates|drives`, `check` (updates now)
   IpcHandler {

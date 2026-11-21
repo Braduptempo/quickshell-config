@@ -3,7 +3,8 @@
 // Icon: left click opens the app's menu (or the app itself, Settings → Bar &
 // panels → Tray click), right click always the menu, middle click opens the
 // app. Many apps (Spotify, Electron apps) ignore "open" and only have a menu,
-// which is why the menu is the default.
+// which is why the menu is the default. The menu is drawn by the shell
+// (TrayMenu.qml), in its own style.
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -12,6 +13,7 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import "../../config"
 import "../../components"
+import "../../services"
 
 Row {
   id: root
@@ -21,7 +23,6 @@ Row {
   readonly property bool collapsible: Config.bar.collapseTray
   property bool expanded: false
   readonly property bool showIcons: expanded || !collapsible
-  readonly property bool fromBottom: Config.bar.position === "bottom"
 
   spacing: 6
   visible: SystemTray.items.values.length > 0
@@ -62,15 +63,6 @@ Row {
             source: trayItem.modelData.icon
           }
 
-          // The app's own menu, opened under the icon
-          QsMenuAnchor {
-            id: menuAnchor
-            menu: trayItem.modelData.menu
-            anchor.item: trayItem
-            anchor.edges: root.fromBottom ? Edges.Top : Edges.Bottom
-            anchor.gravity: root.fromBottom ? Edges.Top : Edges.Bottom
-          }
-
           MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -80,7 +72,7 @@ Row {
               const item = trayItem.modelData;
               const wantsMenu = mouse.button === Qt.RightButton || item.onlyMenu
                                 || (mouse.button === Qt.LeftButton && Config.bar.trayClick === "menu");
-              if (wantsMenu && item.hasMenu) menuAnchor.open();
+              if (wantsMenu && item.hasMenu) Panels.toggleTrayMenu(item, root.window.screen, trayItem.mapToItem(null, trayItem.width / 2, 0).x);
               else if (mouse.button === Qt.MiddleButton && Config.bar.trayClick !== "menu") item.secondaryActivate();
               else item.activate();
             }
