@@ -58,14 +58,16 @@ ColumnLayout {
     Layout.topMargin: 4
   }
 
-  Label {
+  EmptyState {
+    readonly property int paired: root.devices.filter(d => d.paired).length
     visible: !BluetoothCheck.missing && root.adapter !== null && !root.adapter.enabled
-    text: "Bluetooth is off"
-    kind: "muted"
-    horizontalAlignment: Text.AlignHCenter
     Layout.fillWidth: true
-    Layout.topMargin: 8
-    Layout.bottomMargin: 8
+    icon: "bluetooth"
+    crossed: true
+    title: "Bluetooth is off"
+    text: paired > 0 ? "Your " + paired + " paired device" + (paired === 1 ? "" : "s") + " show up again when it is on." : "Turn it on to find headphones, mice and more."
+    action: "Turn on Bluetooth"
+    onActivated: if (root.adapter) root.adapter.enabled = true
   }
 
   Card {
