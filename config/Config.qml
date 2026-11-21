@@ -66,6 +66,8 @@ Singleton {
     property bool showUpdates: true
     // USB sticks and other removable drives
     property bool showDrives: true
+    // A warning pill while CPU or GPU runs at 90 % or above, or 85 °C
+    property bool showLoad: true
   }
 
   component SoundSettings: JsonObject {

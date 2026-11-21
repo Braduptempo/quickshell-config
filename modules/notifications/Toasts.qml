@@ -128,11 +128,25 @@ PanelWindow {
         }
 
         // Settings → Notifications (5 s by default), or the app's own timeout;
-        // paused while hovered
-        Timer {
-          interval: slot.modelData.expireTimeout > 0 ? slot.modelData.expireTimeout * 1000 : Config.notifications.duration * 1000
-          running: !hover.hovered
-          onTriggered: Notifications.hidePopup(slot.modelData)
+        // paused while hovered. The thin bar along the bottom shows what's left.
+        property real remaining: 1
+        NumberAnimation on remaining {
+          from: 1
+          to: 0
+          duration: slot.modelData.expireTimeout > 0 ? slot.modelData.expireTimeout * 1000 : Config.notifications.duration * 1000
+          paused: hover.hovered
+          onFinished: Notifications.hidePopup(slot.modelData)
+        }
+
+        Rectangle {
+          visible: window.expanded || slot.index === 0
+          x: card.x + card.radius
+          y: card.y + card.height - 3
+          z: 2
+          width: Math.max(0, (card.width - 2 * card.radius) * slot.remaining)
+          height: 2
+          radius: Theme.r(1)
+          color: Theme.alpha(Theme.accent, 0.7)
         }
 
         // "+3 more" on the pile
@@ -155,6 +169,27 @@ PanelWindow {
             font.capitalization: Font.MixedCase
             color: Theme.text
           }
+        }
+      }
+    }
+
+    // Fanned out: the timers wait, and everything can go at once
+    Row {
+      visible: hover.hovered && window.normal.length > 1 && Config.notifications.stack
+      x: parent.width - width
+      spacing: 10
+      Label {
+        anchors.verticalCenter: parent.verticalCenter
+        text: "Timers are paused while you hover"
+        kind: "muted"
+        font.pixelSize: Theme.font.label
+      }
+      Button {
+        text: "Clear all"
+        variant: "secondary"
+        size: Theme.size.buttonList
+        onClicked: {
+          for (const n of window.normal.slice()) Notifications.dismiss(n);
         }
       }
     }

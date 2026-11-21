@@ -23,6 +23,7 @@ SettingsPage {
     Config.bar.showPrivacy = true;
     Config.bar.showUpdates = true;
     Config.bar.showDrives = true;
+    Config.bar.showLoad = true;
   }
 
   SettingRow {
@@ -107,6 +108,11 @@ SettingsPage {
     title: "Privacy"
     subtitle: "A red pill while an app uses the microphone, camera or your screen."
     Toggle { checked: Config.bar.showPrivacy; accessibleName: "Privacy"; onToggled: value => Config.bar.showPrivacy = value }
+  }
+  SettingRow {
+    title: "High load"
+    subtitle: "A yellow pill while the CPU or GPU runs at 90 % or more, or at 85 °C. Click it for the system page."
+    Toggle { checked: Config.bar.showLoad; accessibleName: "High load"; onToggled: value => Config.bar.showLoad = value }
   }
   SettingRow {
     title: "Updates"
