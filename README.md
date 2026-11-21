@@ -89,6 +89,7 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Super + Alt + Shift + ← / → | Move the window to the screen on the left / right |
 | Super + Alt + Tab | Next screen |
 | Print | Screenshot and recording toolbar (Shift: area right away, Ctrl: whole screen) |
+| Super + P / Super + Shift + P | Screenshot of an area / a window (replaces hyprshot) |
 | Super + Shift + R / Super + Ctrl + R | Recording toolbar / stop recording |
 
 No Print key? Super + Shift + R opens the same toolbar.
