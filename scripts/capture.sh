@@ -62,10 +62,10 @@ notify_saved() {
   # $1 title, $2 file, $3 folder; actions run when clicked
   local title="$1" file="$2" folder="$3" answer
   # Edit (the drawing editor) only for pictures
-  local edit=()
-  case "$file" in *.png|*.jpg) edit=(-A edit=Edit) ;; esac
+  local edit_action=()
+  case "$file" in *.png|*.jpg) edit_action=(-A edit=Edit) ;; esac
   answer="$(notify-send -a "$title" -i "$file" "$title" "$(basename "$file")" \
-    -A open=Open "${edit[@]}" -A folder="Show in folder")"
+    -A open=Open "${edit_action[@]}" -A folder="Show in folder")"
   case "$answer" in
     open) xdg-open "$file" >/dev/null 2>&1 & ;;
     edit) qs ipc call capture edit "$file" >/dev/null 2>&1 & ;;
