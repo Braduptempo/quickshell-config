@@ -20,3 +20,4 @@ InputPage 1.0 InputPage.qml
 NetworkSettingsPage 1.0 NetworkSettingsPage.qml
 CalendarsPage 1.0 CalendarsPage.qml
 WeatherPage 1.0 WeatherPage.qml
+ThemeEditor 1.0 ThemeEditor.qml

@@ -18,6 +18,9 @@ Singleton {
     property real glass: 0.45
     property string fontFamily: "JetBrains Mono"
     property real fontScale: 1.0
+    // Themes made in Settings → Theme: [{ name, light, crust, base, surface,
+    // overlay, text, subtext, accent, good, warn, error }]
+    property var customThemes: []
   }
 
   component AnimationSettings: JsonObject {
