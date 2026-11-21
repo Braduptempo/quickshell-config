@@ -59,7 +59,7 @@ Arch package names, all in the official repos. Everything except the first group
 | Bluetooth | `bluez`, `bluez-utils` (and `systemctl enable --now bluetooth`) |
 | Clipboard history | `cliphist` |
 | Screenshots and recording | `grim`, `slurp`, `gpu-screen-recorder` |
-| Wallpapers | `awww` (or `swww`) |
+| Wallpapers | `awww` (or `swww`); videos play in the shell itself (`qt6-multimedia`, `qt6-multimedia-ffmpeg`), with `ffmpeg` for their thumbnails |
 | Night light | `hyprsunset` |
 | Brightness | `brightnessctl` |
 | Colour picker (launcher, theme editor) | `hyprpicker` |
