@@ -140,4 +140,24 @@ Singleton {
       mainMenuOpen = true;
     }
   }
+
+  // --- Tray menu: the menu of a tray app, under its icon ---------------------------
+  property var trayMenuItem: null
+  property ShellScreen trayMenuScreen: null
+  // Centre of the icon, in screen coordinates
+  property real trayMenuX: 0
+  property double trayMenuClosedAt: 0
+  readonly property bool trayMenuOpen: trayMenuItem !== null
+
+  onTrayMenuItemChanged: if (trayMenuItem === null) trayMenuClosedAt = Date.now()
+
+  function toggleTrayMenu(item: var, onScreen: ShellScreen, x: real): void {
+    if (trayMenuItem === item) {
+      trayMenuItem = null;
+    } else if (trayMenuItem !== null || Date.now() - trayMenuClosedAt > 250) {
+      trayMenuScreen = onScreen ?? focusedScreen();
+      trayMenuX = x;
+      trayMenuItem = item;
+    }
+  }
 }

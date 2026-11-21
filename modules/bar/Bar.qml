@@ -76,6 +76,12 @@ Scope {
             screen: panel.modelData
           }
 
+          // Before the window title, so a changing title doesn't move it
+          MediaPill {
+            screen: panel.modelData
+            visible: Config.bar.showMedia && !panel.light && player !== null && player.trackTitle !== ""
+          }
+
           // What the focused window is called
           BarItem {
             id: titleItem
@@ -91,11 +97,6 @@ Scope {
               elide: Text.ElideRight
               anchors.verticalCenter: parent.verticalCenter
             }
-          }
-
-          MediaPill {
-            screen: panel.modelData
-            visible: Config.bar.showMedia && !panel.light && player !== null && player.trackTitle !== ""
           }
         }
 

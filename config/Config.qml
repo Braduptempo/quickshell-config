@@ -40,6 +40,8 @@ Singleton {
     property bool showClipboard: true
     // Tray icons hidden behind an arrow until clicked
     property bool collapseTray: true
+    // Left click on a tray icon: "menu" (the app's menu) or "open" (the app)
+    property string trayClick: "menu"
     property bool showDate: false
     // Monitors other than the first: "full", "light" (workspaces and clock) or "none"
     property string otherMonitors: "full"
