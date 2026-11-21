@@ -2,7 +2,7 @@
 # capture.sh: screenshots (grim + slurp) and screen recording
 # (gpu-screen-recorder) for the shell's capture toolbar.
 #
-#   capture.sh shot   <region|window|screen> [--delay N] [--copy] [--cursor] [--no-save] [--no-freeze]
+#   capture.sh shot   <region|window|screen> [--delay N] [--copy] [--cursor] [--no-save] [--no-freeze] [--edit]
 #   capture.sh record <region|window|screen> [--mic] [--audio] [--cursor] [--countdown]
 #   capture.sh stop       stop the recording and save it
 #   capture.sh pause      pause or resume the recording
@@ -55,16 +55,17 @@ notify_saved() {
   # $1 title, $2 file, $3 folder; actions run when clicked
   local title="$1" file="$2" folder="$3" answer
   answer="$(notify-send -a "$title" -i "$file" "$title" "$(basename "$file")" \
-    -A open=Open -A folder="Show in folder")"
+    -A open=Open -A edit=Edit -A folder="Show in folder")"
   case "$answer" in
     open) xdg-open "$file" >/dev/null 2>&1 & ;;
+    edit) qs ipc call capture edit "$file" >/dev/null 2>&1 & ;;
     folder) xdg-open "$folder" >/dev/null 2>&1 & ;;
   esac
 }
 
 shot() {
   local target="$1"; shift
-  local delay=0 copy=0 cursor=0 save=1 freeze=1
+  local delay=0 copy=0 cursor=0 save=1 freeze=1 edit=0
   while [ $# -gt 0 ]; do
     case "$1" in
       --delay) delay="$2"; shift ;;
@@ -72,6 +73,7 @@ shot() {
       --cursor) cursor=1 ;;
       --no-save) save=0 ;;
       --no-freeze) freeze=0 ;;
+      --edit) edit=1 ;;
     esac
     shift
   done
@@ -105,6 +107,10 @@ shot() {
   fi
 
   [ "$copy" = 1 ] && wl-copy --type image/png < "$file"
+  # Straight into the drawing editor; it saves or copies the result itself
+  if [ "$edit" = 1 ]; then
+    qs ipc call capture edit "$file" >/dev/null 2>&1 && exit 0
+  fi
   if [ "$save" = 1 ]; then
     # In the background: it waits for a click on Open / Show in folder
     notify_saved "Screenshot saved" "$file" "$dir" &

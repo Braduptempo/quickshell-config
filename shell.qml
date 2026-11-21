@@ -208,6 +208,8 @@ Scope {
 
   // Print: screenshot and recording toolbar
   CaptureToolbar {}
+  // Drawing on a screenshot (Edit on its notification, or after the shot)
+  Annotator {}
 
   // `qs ipc call capture toggle`, `shot region|window|screen`, `record …`, `stop`, `pause`
   IpcHandler {
@@ -226,6 +228,17 @@ Scope {
     }
     function pause(): void {
       Capture.pause();
+    }
+    // Opens a picture in the drawing editor
+    function edit(file: string): void {
+      Annotate.edit(file);
+    }
+    // The editor's Save and Copy (Enter)
+    function editSave(): void {
+      Annotate.finishRequested(false);
+    }
+    function editCopy(): void {
+      Annotate.finishRequested(true);
     }
   }
 
