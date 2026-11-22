@@ -24,12 +24,22 @@ PanelWindow {
   property int current: 0
   property string query: ""
 
-  // Workspaces to show: 1…5, plus any higher one with windows, plus the active one
+  // Workspaces to show: the first five, plus any with windows, plus the
+  // active one. With workspaces per screen (the default) only this screen's:
+  // its block (11…15 on the second screen) and what is on it.
   readonly property var workspaces: {
-    const ids = new Set([1, 2, 3, 4, 5]);
-    for (const w of Windows.windows) ids.add(w.workspace);
-    ids.add(Hyprland.focusedWorkspace?.id ?? 1);
-    return [...ids].filter(i => i > 0).sort((a, b) => a - b);
+    const perScreen = Config.bar.workspacesPerScreen;
+    const here = screen ? screen.name : "";
+    const onThisScreen = id => !perScreen || (Hyprland.workspaces.values.find(w => w.id === id)?.monitor?.name ?? here) === here;
+    const ids = new Set();
+    for (const w of Windows.windows) if (onThisScreen(w.workspace)) ids.add(w.workspace);
+    const focused = Hyprland.focusedWorkspace?.id ?? 1;
+    if (onThisScreen(focused)) ids.add(focused);
+    // The empty first five, unless one with the same number is already here
+    const base = perScreen ? Windows.blockOf(here) : 0;
+    const labels = new Set([...ids].map(i => Windows.workspaceLabel(i)));
+    for (let n = 1; n <= 5; n++) if (!labels.has(n)) ids.add(base + n);
+    return [...ids].filter(i => i > 0).sort((a, b) => Windows.workspaceLabel(a) - Windows.workspaceLabel(b) || a - b);
   }
 
   readonly property var shownWindows: query.trim() !== ""
@@ -136,8 +146,11 @@ PanelWindow {
             if (event.key === Qt.Key_Escape) {
               if (search.text !== "") search.text = "";
               else Windows.overviewOpen = false;
-            } else if (event.key === Qt.Key_Left && search.text === "") window.stepWorkspace(-1);
-            else if (event.key === Qt.Key_Right && search.text === "") window.stepWorkspace(1);
+            } else if ((event.key === Qt.Key_Left && search.text === "") || (ctrl && event.key === Qt.Key_H)) window.stepWorkspace(-1);
+            else if ((event.key === Qt.Key_Right && search.text === "") || (ctrl && event.key === Qt.Key_L)) window.stepWorkspace(1);
+            // Vim keys with Ctrl (plain letters go to the search): J / K step through the windows
+            else if (ctrl && event.key === Qt.Key_J) window.current = window.shownWindows.length > 0 ? (window.current + 1) % window.shownWindows.length : 0;
+            else if (ctrl && event.key === Qt.Key_K) window.current = window.shownWindows.length > 0 ? (window.current + window.shownWindows.length - 1) % window.shownWindows.length : 0;
             else if (event.key === Qt.Key_Tab) window.current = window.shownWindows.length > 0 ? (window.current + 1) % window.shownWindows.length : 0;
             else if (event.key === Qt.Key_Backtab) window.current = window.shownWindows.length > 0 ? (window.current + window.shownWindows.length - 1) % window.shownWindows.length : 0;
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
@@ -176,7 +189,7 @@ PanelWindow {
           border.color: drop.containsDrag ? Theme.good : chosen ? Theme.accent : Theme.border
 
           Accessible.role: Accessible.Button
-          Accessible.name: "Workspace " + modelData + ", " + windowsHere.length + " windows"
+          Accessible.name: "Workspace " + Windows.workspaceLabel(modelData) + ", " + windowsHere.length + " windows"
 
           // The workspace to scale, with its windows as blocks
           Rectangle {
@@ -222,7 +235,7 @@ PanelWindow {
             anchors.bottom: parent.bottom
             anchors.margins: 8
             anchors.bottomMargin: 6
-            Label { text: ws.modelData; font.weight: Font.Bold; font.pixelSize: Theme.font.small }
+            Label { text: Windows.workspaceLabel(ws.modelData); font.weight: Font.Bold; font.pixelSize: Theme.font.small }
             Rectangle { visible: ws.active; width: 6; height: 6; radius: Theme.r(3); color: Theme.accent }
             Item { Layout.fillWidth: true }
             Label {
@@ -263,7 +276,7 @@ PanelWindow {
       Layout.fillWidth: true
       spacing: 12
       Label {
-        text: window.query !== "" ? "Results" : "Workspace " + window.workspace
+        text: window.query !== "" ? "Results" : "Workspace " + Windows.workspaceLabel(window.workspace)
         kind: "title"
         font.pixelSize: Theme.font.title + 2
       }
@@ -361,7 +374,7 @@ PanelWindow {
                 spacing: 1
                 Label { text: Windows.appName(tile.modelData.app); font.weight: Font.Bold; elide: Text.ElideRight; Layout.fillWidth: true }
                 Label {
-                  text: (window.query !== "" ? "Workspace " + tile.modelData.workspace + " · " : "") + tile.modelData.title
+                  text: (window.query !== "" ? "Workspace " + Windows.workspaceLabel(tile.modelData.workspace) + " · " : "") + tile.modelData.title
                   kind: "muted"
                   font.pixelSize: Theme.font.label
                   elide: Text.ElideRight
@@ -410,8 +423,8 @@ PanelWindow {
     Row {
       Layout.alignment: Qt.AlignHCenter
       spacing: 14
-      Row { spacing: 6; Kbd { text: "← →" } Label { text: "workspace"; kind: "muted"; font.pixelSize: Theme.font.label; anchors.verticalCenter: parent.verticalCenter } }
-      Row { spacing: 6; Kbd { text: "Tab" } Label { text: "next window"; kind: "muted"; font.pixelSize: Theme.font.label; anchors.verticalCenter: parent.verticalCenter } }
+      Row { spacing: 6; Kbd { text: "← → / Ctrl H L" } Label { text: "workspace"; kind: "muted"; font.pixelSize: Theme.font.label; anchors.verticalCenter: parent.verticalCenter } }
+      Row { spacing: 6; Kbd { text: "Tab / Ctrl J K" } Label { text: "window"; kind: "muted"; font.pixelSize: Theme.font.label; anchors.verticalCenter: parent.verticalCenter } }
       Row { spacing: 6; Kbd { text: "Enter" } Label { text: "focus"; kind: "muted"; font.pixelSize: Theme.font.label; anchors.verticalCenter: parent.verticalCenter } }
       Row { spacing: 6; Kbd { text: "Ctrl + W" } Label { text: "close"; kind: "muted"; font.pixelSize: Theme.font.label; anchors.verticalCenter: parent.verticalCenter } }
       Row { spacing: 6; Kbd { text: "Esc" } Label { text: "back"; kind: "muted"; font.pixelSize: Theme.font.label; anchors.verticalCenter: parent.verticalCenter } }

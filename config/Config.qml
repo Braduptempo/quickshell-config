@@ -63,6 +63,8 @@ Singleton {
     // Left click on a tray icon: "menu" (the app's menu) or "open" (the app)
     property string trayClick: "menu"
     property bool showDate: false
+    // Super + 1…9 counts per screen: the left screen has 1–9, the next 11–19…
+    property bool workspacesPerScreen: true
     // Monitors other than the first: "full", "light" (workspaces and clock) or "none"
     property string otherMonitors: "full"
     // Mic, camera or screen in use

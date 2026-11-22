@@ -88,6 +88,8 @@ From `hyprland/quickshell.lua`. Settings → Keybinds lists every bind, includin
 | Super + Alt + ← / → | Focus the screen on the left / right |
 | Super + Alt + Shift + ← / → | Move the window to the screen on the left / right |
 | Super + Alt + Tab | Next screen |
+| Super + Alt + H / L | The same with vim keys (+ Shift moves the window) |
+| Super + 1…0 / + Shift | Workspace 1…10 of the screen you're on / move the window there (each screen has its own 1–9) |
 | Print | Screenshot and recording toolbar (Shift: area right away, Ctrl: whole screen) |
 | Super + P / Super + Shift + P | Screenshot of an area / a window (replaces hyprshot) |
 | Alt + F10 | Save the replay buffer (the last 30 s – 5 min) |
@@ -160,7 +162,7 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `lock` | `lock`, `suspend` |
 | `power` | `toggle`, `open <letter>`, `cancel` (a scheduled action) |
 | `capture` | `toggle`, `shot <region\|window\|screen>`, `record <region\|window\|screen>`, `pause`, `stop`, `edit <file>` (draw on a picture), `editSave`, `editCopy`, `replay` (start / stop the replay buffer), `replaySave`, `replayStop` |
-| `windows` | `next`, `previous`, `commit`, `cancel`, `overview` |
+| `windows` | `next`, `previous`, `commit`, `cancel`, `overview`, `workspace <n>`, `moveToWorkspace <n>` |
 | `extras` | `open <updates\|drives>`, `check` |
 | `osd` | `caps`, `brightness` |
 | `gallery` | `toggle` |
