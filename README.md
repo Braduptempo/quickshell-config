@@ -129,7 +129,7 @@ Settings (Super + ,) changes everything right away and saves it in `settings.jso
 
 | Page | What you set |
 |---|---|
-| Theme | 12 themes, your own themes (New theme: every colour, light or dark), a theme from your wallpaper, accent; bar glass, panels, corners, blur, borders and shadows, with a live preview |
+| Theme | 12 themes, your own themes (New theme: every colour, light or dark), a theme from your wallpaper, accent (presets, your own hex or pipette, or from the wallpaper with any theme); bar glass, panels, corners, blur, borders and shadows, with a live preview |
 | Wallpaper, Font, Animations | Wallpaper folder, font and size, speed and style of the panels |
 | Bar & panels | Position, style (floating, attached, pills only), size, which pills show, tray click, other screens |
 | Sound | Maximum volume, feedback click, following new devices |
@@ -142,6 +142,13 @@ Settings (Super + ,) changes everything right away and saves it in `settings.jso
 | Power & idle | Lock after, power profile, battery warnings |
 | Privacy & lock | What the lock screen shows (and a preview of it), clipboard history |
 | Keybinds, Default apps, About | Every bind; browser, files, terminal and more; versions |
+
+### Other apps follow the theme
+
+Whenever the theme, accent or wallpaper palette changes, `scripts/app-theme.py` passes the colours on (`services/AppTheme.qml` runs it):
+
+- **GTK 3 and 4**: colours in `~/.config/gtk-{3,4}.0/quickshell-colors.css`, imported from your `gtk.css` (the rest of that file stays yours), and dark or light for apps that ask.
+- **Spotify**: with [Spicetify](https://spicetify.app) and its `text` theme installed, it builds a theme **Glass** (the text theme's lined, labelled panes, fixed for Spotify 1.3, plus `apps/spicetify/glass.css`) with a colour scheme **Quickshell**. The first run switches Spicetify to it and runs `spicetify apply`; after that, the `quickshell-live.js` extension reloads the colours in a running Spotify. Hyprland makes the window glass (`spotify-glass` in `hyprland/quickshell.lua`); Blur off makes it solid.
 
 Monitor and input settings are written to `hyprland/monitors.lua` and `hyprland/input.lua` (per machine, not in git), loaded after your own Hyprland config. Delete them to go back to yours.
 
@@ -179,7 +186,8 @@ Everything the keybinds do can be called from a script: `qs ipc call <target> <f
 | `modules/` | Every window and panel: `bar`, `quicksettings`, `clockpanel`, `media`, `launcher`, `lock`, `settings`, `windows`, … |
 | `widgets/` | Network, sound and battery services from the first bar |
 | `hyprland/` | `quickshell.lua`: layer rules, keybinds, and loading the per-machine files |
-| `scripts/` | `capture.sh`, `ci/` checks, and `launcher/` (your scripts) |
+| `scripts/` | `capture.sh`, `app-theme.py` (GTK and Spotify colours), `ci/` checks, and `launcher/` (your scripts) |
+| `apps/` | Files for other apps, such as the Spicetify Glass theme |
 | `snippets/` | Launcher snippets, see `snippets/README.md` |
 | `dev/` | `Gallery`: a test window with every component |
 

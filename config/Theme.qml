@@ -73,7 +73,17 @@ Singleton {
   readonly property color overlay: palette.overlay
   readonly property color text: palette.text
   readonly property color subtext: palette.subtext
-  readonly property color accent: Config.appearance.accent !== "" ? Config.appearance.accent : palette.accent
+  readonly property color accent: {
+    const a = Config.appearance.accent;
+    if (a === "wallpaper") return wallpaperAccent ?? palette.accent;
+    return /^#[0-9a-fA-F]{6}$/.test(a) ? a : palette.accent;
+  }
+  // The wallpaper's accent in this theme's lightness; undefined until made
+  readonly property var wallpaperAccent: {
+    const w = Config.appearance.wallpaperAccent;
+    if (w?.hue === undefined) return undefined;
+    return Qt.hsla(w.hue, w.sat, light ? 0.42 : 0.72, 1);
+  }
   // Text on top of the accent: dark on dark themes, light on light themes
   readonly property color onAccent: light ? palette.base : palette.crust
   readonly property color good: palette.good

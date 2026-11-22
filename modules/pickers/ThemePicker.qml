@@ -30,7 +30,8 @@ PanelWindow {
     { label: "Blue", color: "#89b4fa" }, { label: "Lavender", color: "#b4befe" },
     { label: "Purple", color: "#cba6f7" }, { label: "Pink", color: "#f5c2e7" },
     { label: "Red", color: "#f38ba8" }, { label: "Peach", color: "#fab387" },
-    { label: "Yellow", color: "#f9e2af" }, { label: "Green", color: "#a6e3a1" }
+    { label: "Yellow", color: "#f9e2af" }, { label: "Green", color: "#a6e3a1" },
+    { label: "From the wallpaper", color: "wallpaper" }
   ]
 
   screen: Panels.themeScreen ?? Panels.focusedScreen()
@@ -222,7 +223,7 @@ PanelWindow {
             radius: Theme.r(14)
             color: themeCard.modelData.base
             border.width: themeCard.current ? 2 : 1
-            border.color: themeCard.current ? (Config.appearance.accent !== "" ? Config.appearance.accent : themeCard.modelData.accent)
+            border.color: themeCard.current ? Theme.accent
                                             : Qt.rgba(1, 1, 1, 0.12)
             scale: themeCard.current ? 1.06 : 1
             clip: true
@@ -319,13 +320,22 @@ PanelWindow {
               width: 26
               height: 26
               radius: Theme.r(13)
-              color: modelData.color !== "" ? modelData.color : Theme.palette.accent
+              color: modelData.color === "wallpaper" ? (Theme.wallpaperAccent ?? Theme.overlay)
+                   : modelData.color !== "" ? modelData.color : Theme.palette.accent
               border.width: chosen ? 2 : 0
               border.color: Theme.text
 
               Accessible.role: Accessible.RadioButton
               Accessible.name: modelData.label
               Accessible.checked: chosen
+
+              Icon {
+                visible: swatch.modelData.color === "wallpaper"
+                anchors.centerIn: parent
+                name: "image"
+                size: 14
+                color: Theme.onAccent
+              }
 
               // "Theme default": the theme's own accent, marked with a dot
               Rectangle {

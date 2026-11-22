@@ -19,6 +19,17 @@ hl.layer_rule({
     no_anim      = true,
 })
 
+-- Spotify as glass, like the shell: slightly see-through so Hyprland's blur
+-- shows behind it. Spotify can't make only its background transparent, so
+-- the whole window gets the opacity; the Glass theme (apps/spicetify) keeps
+-- its panes solid so text stays readable. Settings → Theme → Panels sets
+-- how see-through, Blur off makes it solid (services/Appearance.qml).
+hl.window_rule({
+    name    = "spotify-glass",
+    match   = { class = "^([Ss]potify)$" },
+    opacity = "0.75 0.75",
+})
+
 -- Shell keybinds. They call Quickshell over IPC, so they work as long as
 -- the shell runs (`qs ipc show` lists every target).
 hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc call quicksettings toggle"))
