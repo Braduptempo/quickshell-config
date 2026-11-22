@@ -38,6 +38,8 @@ Scope {
   readonly property bool blurOn: Appearance.blur
   // The "Wallpaper" theme follows the wallpaper
   readonly property bool wallpaperTheme: WallpaperTheme.active
+  // GTK and Spotify follow the theme (scripts/app-theme.py)
+  readonly property string appTheme: AppTheme.palette
 
   ClockPanel {}
 
