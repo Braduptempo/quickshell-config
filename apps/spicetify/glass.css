@@ -1,0 +1,119 @@
+
+/* ==========================================================================
+   Glass layer on top of the "text" theme
+   - Spotify 1.3.x dropped Root__globalNav / Root__main-view / Root__nav-bar;
+     the panes are now grid cells with stable ids. This draws the text
+     theme's lined, labelled boxes on those ids again.
+   - The see-through glass itself comes from Hyprland (window opacity + blur,
+     see quickshell/hyprland/quickshell.lua); Spotify can't paint a
+     transparent window, so the panes here only get a soft tint.
+   ========================================================================== */
+
+:root {
+    --glass-pane: rgba(var(--spice-rgb-main), 0.55);
+    --glass-gap: rgba(var(--spice-rgb-sidebar), 0.35);
+}
+
+/* the space between the panes */
+html,
+body,
+.Root,
+.Root > div:first-child {
+    background: var(--glass-gap) !important;
+}
+
+/* the panes: one line around each, label on the line */
+#global-nav-bar,
+#Desktop_LeftSidebar_Id,
+#main-view,
+.Root__right-sidebar-peek:has(#Desktop_PanelContainer_Id),
+[data-testid="now-playing-bar"] {
+    position: relative;
+    overflow: visible !important;
+    border: var(--border-width) var(--border-style) var(--spice-border-inactive) !important;
+    border-radius: var(--border-radius) !important;
+    background: var(--glass-pane) !important;
+    transition: border-color var(--border-transition);
+}
+#global-nav-bar {
+    margin: 10px 8px 0;
+    width: auto !important;
+    height: calc(100% - 10px) !important;
+}
+#Desktop_LeftSidebar_Id,
+#main-view,
+.Root__right-sidebar-peek:has(#Desktop_PanelContainer_Id) {
+    margin-top: 10px;
+    height: calc(100% - 10px) !important;
+}
+#global-nav-bar:hover,
+#Desktop_LeftSidebar_Id:hover,
+#main-view:hover,
+.Root__right-sidebar-peek:has(#Desktop_PanelContainer_Id):hover,
+[data-testid="now-playing-bar"]:hover {
+    border-color: var(--spice-border-active) !important;
+}
+
+/* inner layers keep their own black: let the pane tint through */
+#Desktop_LeftSidebar_Id *:not(img):not(button):not(input),
+#Desktop_PanelContainer_Id,
+#Desktop_PanelContainer_Id > div,
+.Root__right-sidebar-peek,
+.YourLibraryX,
+.main-view-container,
+[data-testid="now-playing-bar"] > div {
+    background-color: transparent !important;
+}
+.main-view-container__scroll-node-child > main > section > div:first-child,
+.main-home-filterChipsSection {
+    background: transparent !important;
+}
+
+/* the labels */
+#global-nav-bar::before,
+#Desktop_LeftSidebar_Id::before,
+#main-view::before,
+.Root__right-sidebar-peek:has(#Desktop_PanelContainer_Id)::before {
+    position: absolute;
+    top: -0.7em;
+    left: 8px;
+    padding: 0 4px;
+    z-index: 5;
+    font-size: 12px;
+    line-height: 1.4em;
+    color: var(--spice-header);
+    background: var(--spice-main);
+    border-radius: 2px;
+    pointer-events: none;
+    transition: color var(--border-transition);
+}
+#global-nav-bar::before { content: "Nav"; }
+#Desktop_LeftSidebar_Id::before { content: "Library"; }
+#main-view::before { content: "Main"; }
+.Root__right-sidebar-peek:has(#Desktop_PanelContainer_Id)::before { content: "Sidebar"; }
+[data-testid="now-playing-bar"]::before {
+    top: -0.7em !important;
+    margin: 0 !important;
+    left: 8px;
+    font-size: 12px;
+    line-height: 1.4em;
+    background: var(--spice-main) !important;
+}
+#global-nav-bar:hover::before,
+#Desktop_LeftSidebar_Id:hover::before,
+#main-view:hover::before,
+.Root__right-sidebar-peek:has(#Desktop_PanelContainer_Id):hover::before {
+    color: var(--spice-border-active);
+}
+
+/* cards and rows: a hairline instead of a filled block */
+.main-card-card,
+[data-encore-id="card"] {
+    background: rgba(var(--spice-rgb-card), 0.35) !important;
+}
+
+/* library rail: no black squares behind the icons */
+#Desktop_LeftSidebar_Id button:not(:hover),
+#global-nav-bar button:not(:hover):not([aria-label="Home"]) {
+    background-color: transparent !important;
+}

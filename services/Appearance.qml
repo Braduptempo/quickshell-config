@@ -20,6 +20,10 @@ Singleton {
     Quickshell.execDetached(["hyprctl", "eval",
       "hl.layer_rule({ name = \"quickshell-glass\", match = { namespace = \"quickshell.*\" }, blur = " + (blur ? "true" : "false")
       + ", ignore_alpha = 0.2, no_anim = true })"]);
+    // Spotify's glass (rule in hyprland/quickshell.lua): solid without blur
+    const opacity = blur ? "0.88 0.88" : "1.0 1.0";
+    Quickshell.execDetached(["hyprctl", "eval",
+      "hl.window_rule({ name = \"spotify-glass\", match = { class = \"^([Ss]potify)$\" }, opacity = \"" + opacity + "\" })"]);
   }
 
   onBlurChanged: apply()
