@@ -70,6 +70,24 @@ hl.bind("SUPER + ALT + right", hl.dsp.focus({ monitor = "r" }))
 hl.bind("SUPER + ALT + SHIFT + left", hl.dsp.window.move({ monitor = "l" }))
 hl.bind("SUPER + ALT + SHIFT + right", hl.dsp.window.move({ monitor = "r" }))
 hl.bind("SUPER + ALT + Tab", hl.dsp.focus({ monitor = "+1" }))
+-- The same with vim keys
+hl.bind("SUPER + ALT + H", hl.dsp.focus({ monitor = "l" }))
+hl.bind("SUPER + ALT + L", hl.dsp.focus({ monitor = "r" }))
+hl.bind("SUPER + ALT + SHIFT + H", hl.dsp.window.move({ monitor = "l" }))
+hl.bind("SUPER + ALT + SHIFT + L", hl.dsp.window.move({ monitor = "r" }))
+
+-- Workspaces per screen: Super + 1…0 goes to workspace 1…10 of the screen
+-- you're on (the shell works out which; the left screen has 1–9, the next
+-- 11–19…), Super + Shift + 1…0 moves the window there. They replace the
+-- binds from modules/keybinds.lua; Settings → Bar & panels turns the
+-- per-screen numbering off.
+for i = 1, 10 do
+    local key = tostring(i % 10)
+    hl.unbind("SUPER + " .. key)
+    hl.unbind("SUPER + SHIFT + " .. key)
+    hl.bind("SUPER + " .. key, hl.dsp.exec_cmd("qs ipc call windows workspace " .. i))
+    hl.bind("SUPER + SHIFT + " .. key, hl.dsp.exec_cmd("qs ipc call windows moveToWorkspace " .. i))
+end
 -- Settings
 hl.bind("SUPER + comma", hl.dsp.exec_cmd("qs ipc call settings toggle"))
 -- Theme and wallpaper pickers

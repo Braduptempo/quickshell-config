@@ -2,7 +2,7 @@
 // Alt + Tab: the open windows with a live preview, most recently used first.
 // Hold Alt and press Tab to step, release Alt to switch.
 //   Alt + Tab / Alt + Shift + Tab   next / previous      Alt + Q   close it
-//   ← →                             also step           Esc       cancel
+//   ← → or H L                      also step           Esc       cancel
 // The Hyprland binds (hyprland/quickshell.lua) call `qs ipc call windows next`
 // and, on releasing Alt, `commit`.
 pragma ComponentBehavior: Bound
@@ -44,8 +44,8 @@ PanelWindow {
     Keys.onPressed: event => {
       const shift = event.modifiers & Qt.ShiftModifier;
       if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) Windows.switcherStep(event.key === Qt.Key_Backtab || shift ? -1 : 1);
-      else if (event.key === Qt.Key_Right) Windows.switcherStep(1);
-      else if (event.key === Qt.Key_Left) Windows.switcherStep(-1);
+      else if (event.key === Qt.Key_Right || event.key === Qt.Key_L) Windows.switcherStep(1);
+      else if (event.key === Qt.Key_Left || event.key === Qt.Key_H) Windows.switcherStep(-1);
       else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) Windows.switcherCommit();
       else if (event.key === Qt.Key_Escape) Windows.switcherCancel();
       else if (event.key === Qt.Key_Q && window.selected) Windows.close(window.selected.address);
@@ -120,7 +120,7 @@ PanelWindow {
           border.color: current ? Theme.accent : "transparent"
 
           Accessible.role: Accessible.ListItem
-          Accessible.name: Windows.appName(modelData.app) + ": " + modelData.title + ", workspace " + modelData.workspace
+          Accessible.name: Windows.appName(modelData.app) + ": " + modelData.title + ", workspace " + Windows.workspaceLabel(modelData.workspace)
           Accessible.selected: current
 
           Rectangle {
@@ -148,7 +148,7 @@ PanelWindow {
               implicitHeight: 18
               radius: Theme.r(9)
               color: Theme.alpha(Theme.crust, 0.75)
-              Label { id: wsLabel; anchors.centerIn: parent; text: "WS " + entry.modelData.workspace; font.pixelSize: Theme.font.label; color: Theme.subtext }
+              Label { id: wsLabel; anchors.centerIn: parent; text: "WS " + Windows.workspaceLabel(entry.modelData.workspace); font.pixelSize: Theme.font.label; color: Theme.subtext }
             }
           }
 
@@ -199,7 +199,7 @@ PanelWindow {
         Label {
           Layout.fillWidth: true
           text: window.selected ? "Release Alt to switch to " + Windows.appName(window.selected.app)
-                                  + (Windows.switcherCurrentOnly ? "" : " on workspace " + window.selected.workspace) : ""
+                                  + (Windows.switcherCurrentOnly ? "" : " on workspace " + Windows.workspaceLabel(window.selected.workspace)) : ""
           color: Theme.subtext
           font.pixelSize: Theme.font.small
           elide: Text.ElideRight

@@ -24,6 +24,7 @@ SettingsPage {
     Config.bar.showUpdates = true;
     Config.bar.showDrives = true;
     Config.bar.showLoad = true;
+    Config.bar.workspacesPerScreen = true;
   }
 
   SettingRow {
@@ -58,6 +59,13 @@ SettingsPage {
       accessibleName: "Bar size"
       onActivated: index => Config.bar.size = sizes[index]
     }
+  }
+
+  SettingRow {
+    visible: Quickshell.screens.length > 1
+    title: "Workspaces per screen"
+    subtitle: "Super + 1…9 counts on the screen you're on: every screen has its own 1–9. Off: one numbering for all screens."
+    Toggle { checked: Config.bar.workspacesPerScreen; accessibleName: "Workspaces per screen"; onToggled: value => Config.bar.workspacesPerScreen = value }
   }
 
   SettingRow {
