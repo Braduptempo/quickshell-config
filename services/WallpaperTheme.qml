@@ -4,6 +4,8 @@
 // made again whenever the wallpaper changes. Palettes lists it like a theme.
 //   Light or dark follows the picture (Settings → Theme → From wallpaper:
 //   Auto), or is set by hand.
+// Also the wallpaper's accent (hue and saturation) for Accent: From wallpaper,
+// which works with any theme.
 pragma Singleton
 
 import QtQuick
@@ -20,8 +22,10 @@ Singleton {
     return Wallpapers.isVideo(file) ? Wallpapers.posterFor(file) : file;
   }
   readonly property bool active: Config.appearance.theme === "Wallpaper"
-  // Read the picture only when the theme is in use or being shown
-  property bool wanted: active
+  // The accent from the wallpaper, with any theme (Settings → Theme → Accent)
+  readonly property bool accentWanted: Config.appearance.accent === "wallpaper"
+  // Read the picture only when the theme or accent is in use, or being shown
+  property bool wanted: active || accentWanted
 
   ColorQuantizer {
     id: quantizer
@@ -60,6 +64,9 @@ Singleton {
     const pick = vivid.find(c => c.hsvValue > 0.35 && c.hsvSaturation > 0.25) ?? vivid[0];
     const hue = pick.hslHue < 0 ? 0.6 : pick.hslHue;
     const sat = clamp(pick.hslSaturation, 0.45, 0.85);
+
+    const accent = { hue: Math.round(hue * 1000) / 1000, sat: Math.round(sat * 1000) / 1000, source: root.path };
+    if (JSON.stringify(accent) !== JSON.stringify(Config.appearance.wallpaperAccent)) Config.appearance.wallpaperAccent = accent;
 
     // The background: the picture's most common hue, nearly grey
     const base = list[0];

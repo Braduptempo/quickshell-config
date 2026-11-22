@@ -129,7 +129,7 @@ Settings (Super + ,) changes everything right away and saves it in `settings.jso
 
 | Page | What you set |
 |---|---|
-| Theme | 12 themes, your own themes (New theme: every colour, light or dark), a theme from your wallpaper, accent; bar glass, panels, corners, blur, borders and shadows, with a live preview |
+| Theme | 12 themes, your own themes (New theme: every colour, light or dark), a theme from your wallpaper, accent (presets, your own hex or pipette, or from the wallpaper with any theme); bar glass, panels, corners, blur, borders and shadows, with a live preview |
 | Wallpaper, Font, Animations | Wallpaper folder, font and size, speed and style of the panels |
 | Bar & panels | Position, style (floating, attached, pills only), size, which pills show, tray click, other screens |
 | Sound | Maximum volume, feedback click, following new devices |

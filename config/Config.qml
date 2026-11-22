@@ -13,7 +13,8 @@ Singleton {
 
   component AppearanceSettings: JsonObject {
     property string theme: "Mocha"
-    // Empty means: use the theme's own accent
+    // Empty: the theme's own accent. "#rrggbb": that colour. "wallpaper":
+    // the most colourful colour of the wallpaper, with any theme
     property string accent: ""
     property real glass: 0.45
     property string fontFamily: "JetBrains Mono"
@@ -30,6 +31,9 @@ Singleton {
     property bool blur: true
     // The palette made from the wallpaper (theme "Wallpaper"), by WallpaperTheme
     property var wallpaperPalette: ({})
+    // The wallpaper's accent as { hue, sat }, made by WallpaperTheme; the
+    // lightness comes from the theme, so it reads on dark and light themes
+    property var wallpaperAccent: ({})
     // The wallpaper theme: "auto" (from the picture), "dark" or "light"
     property string wallpaperMode: "auto"
     // Themes made in Settings → Theme: [{ name, light, crust, base, surface,
