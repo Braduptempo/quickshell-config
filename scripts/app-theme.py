@@ -66,6 +66,12 @@ def rgb(c: str) -> str:
     return f"{int(h[0:2], 16)}, {int(h[2:4], 16)}, {int(h[4:6], 16)}"
 
 
+def mix(a: str, b: str, t: float) -> str:
+    """a blended toward b by t (0 = a, 1 = b)."""
+    x, y = hexpart(a), hexpart(b)
+    return "#" + "".join(f"{round(int(x[i:i+2], 16) * (1 - t) + int(y[i:i+2], 16) * t):02x}" for i in (0, 2, 4))
+
+
 # --- GTK ---------------------------------------------------------------------
 
 def gtk_css(p: dict) -> str:
@@ -129,6 +135,11 @@ def gtk(p: dict) -> None:
 # --- Spotify -------------------------------------------------------------------
 
 def spicetify_scheme(p: dict) -> str:
+    # The pane lines and their labels sit on the pane colour: mix them from
+    # the text colour so they show on every theme. "overlay" alone is nearly
+    # the background on light themes.
+    line = mix(p["base"], p["text"], 0.45 if p["light"] else 0.35)
+    label = mix(p["base"], p["text"], 0.7)
     c = {
         "text": p["text"], "subtext": p["subtext"],
         "main": p["base"], "main-elevated": p["surface"],
@@ -142,8 +153,8 @@ def spicetify_scheme(p: dict) -> str:
         "misc": p["overlay"],
         # used by the text theme
         "accent": p["accent"], "accent-active": p["accent"], "accent-inactive": p["crust"],
-        "banner": p["accent"], "header": p["subtext"],
-        "border-active": p["accent"], "border-inactive": p["overlay"],
+        "banner": p["accent"], "header": label,
+        "border-active": p["accent"], "border-inactive": line,
     }
     width = max(len(k) for k in c)
     body = "\n".join(f"{k:<{width}} = {hexpart(v)}" for k, v in c.items())

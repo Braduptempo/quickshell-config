@@ -5,13 +5,17 @@
      the panes are now grid cells with stable ids. This draws the text
      theme's lined, labelled boxes on those ids again.
    - The see-through glass itself comes from Hyprland (window opacity + blur,
-     see quickshell/hyprland/quickshell.lua); Spotify can't paint a
-     transparent window, so the panes here only get a soft tint.
+     see quickshell/hyprland/quickshell.lua). Spotify can't paint a
+     transparent window: anything see-through here would only blend with
+     black (grey on light themes), so every layer is solid and the whole
+     window gets Hyprland's opacity.
    ========================================================================== */
 
 :root {
-    --glass-pane: rgba(var(--spice-rgb-main), 0.55);
-    --glass-gap: rgba(var(--spice-rgb-sidebar), 0.35);
+    --glass-pane: var(--spice-main);
+    --glass-gap: var(--spice-sidebar);
+    /* the lit top edge of a pane of glass, as on the shell's panels */
+    --glass-edge: inset 0 1px 0 rgba(var(--spice-rgb-text), 0.10);
 }
 
 /* the space between the panes */
@@ -33,6 +37,7 @@ body,
     border: var(--border-width) var(--border-style) var(--spice-border-inactive) !important;
     border-radius: var(--border-radius) !important;
     background: var(--glass-pane) !important;
+    box-shadow: var(--glass-edge) !important;
     transition: border-color var(--border-transition);
 }
 #global-nav-bar {
@@ -109,11 +114,19 @@ body,
 /* cards and rows: a hairline instead of a filled block */
 .main-card-card,
 [data-encore-id="card"] {
-    background: rgba(var(--spice-rgb-card), 0.35) !important;
+    background: var(--spice-card) !important;
 }
 
 /* library rail: no black squares behind the icons */
 #Desktop_LeftSidebar_Id button:not(:hover),
 #global-nav-bar button:not(:hover):not([aria-label="Home"]) {
+    background-color: transparent !important;
+}
+
+/* the home page's top fade: Spotify darkens it with #0009, which turns grey
+   on light themes. No readable class name; this one is from dwp-home-header.css
+   (Spotify 1.3.8) and may need updating after a Spotify update. */
+.h1AjDPMDbQn9UTUl6owY {
+    background-image: none !important;
     background-color: transparent !important;
 }

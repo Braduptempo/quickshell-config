@@ -83,6 +83,12 @@ Singleton {
     if (JSON.stringify(p) !== JSON.stringify(Config.appearance.wallpaperPalette)) Config.appearance.wallpaperPalette = p;
   }
 
+  // Choosing this theme means its colours, accent included: a fixed accent
+  // from before would otherwise keep the lines and buttons of the shell and
+  // the apps (AppTheme) in the old colour. One can still be picked after.
+  // Later, so a settings.json being read in doesn't put the old one back.
+  onActiveChanged: if (active) Qt.callLater(() => { Config.appearance.accent = ""; })
+
   // Light or dark changed in Settings: make it again
   Connections {
     target: Config.appearance
