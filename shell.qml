@@ -161,6 +161,13 @@ Scope {
   // `qs ipc call windows next|previous|commit|cancel` (Alt + Tab), `overview` (Super + Tab)
   IpcHandler {
     target: "windows"
+    // Super + 1…0 and Super + Shift + 1…0: workspace n of this screen
+    function workspace(n: int): void {
+      Windows.goToWorkspace(n);
+    }
+    function moveToWorkspace(n: int): void {
+      Windows.moveToWorkspace(n);
+    }
     function next(): void {
       Windows.switcherStep(1);
     }

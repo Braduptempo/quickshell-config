@@ -11,6 +11,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import "../config"
 
 Singleton {
   id: root
@@ -82,10 +83,49 @@ Singleton {
     return Hyprland.toplevels.values.find(t => t.address === address || t.address === bare || ("0x" + t.address) === address) ?? null;
   }
 
+  // Through Hyprland, not a Wayland activation request: that one may not
+  // switch workspace or screen, so a window elsewhere seemed not to open
   function focus(address: string): void {
-    const t = toplevel(address);
-    if (t && t.wayland) t.wayland.activate();
-    else Hypr.run("hl.dsp.focus({ window = \"address:" + address + "\" })", "focuswindow address:" + address);
+    const a = address.startsWith("0x") ? address : "0x" + address;
+    Hypr.run("hl.dsp.focus({ window = \"address:" + a + "\" })", "focuswindow address:" + a);
+  }
+
+  // --- Workspaces per screen ---------------------------------------------------------------
+  // Screens left to right get blocks of ten: 1–10, 11–20, 21–30… so Super + 2
+  // on the second screen is workspace 12. Off (Settings → Bar & panels):
+  // Super + 2 is workspace 2 everywhere.
+  readonly property var screensLeftToRight: Quickshell.screens.slice().sort((a, b) => a.x - b.x)
+
+  function blockOf(monitorName: string): int {
+    if (!Config.bar.workspacesPerScreen) return 0;
+    const i = screensLeftToRight.findIndex(s => s.name === monitorName);
+    return Math.max(0, i) * 10;
+  }
+
+  // The number to show for a workspace: 11 is "1" on its screen
+  function workspaceLabel(id: int): int {
+    if (!Config.bar.workspacesPerScreen || id <= 10) return id;
+    return ((id - 1) % 10) + 1;
+  }
+
+  // Workspace n (1…10) of the focused screen. A workspace already on this
+  // screen that shows as n wins, so older ones (2, 3 on the second screen
+  // from before this setting) stay reachable until they are empty.
+  function workspaceHere(n: int): int {
+    const here = Hyprland.focusedMonitor?.name ?? "";
+    const own = blockOf(here) + n;
+    if (!Config.bar.workspacesPerScreen) return own;
+    const shown = Hyprland.workspaces.values.filter(w => w.id > 0 && w.monitor?.name === here && workspaceLabel(w.id) === n).map(w => w.id);
+    return shown.length === 0 || shown.includes(own) ? own : shown[0];
+  }
+
+  function goToWorkspace(n: int): void {
+    Hypr.focusWorkspace(workspaceHere(n));
+  }
+
+  function moveToWorkspace(n: int): void {
+    const id = workspaceHere(n);
+    Hypr.run("hl.dsp.window.move({ workspace = " + id + " })", "movetoworkspace " + id);
   }
 
   function close(address: string): void {
