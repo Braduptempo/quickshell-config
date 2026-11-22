@@ -108,9 +108,15 @@ Singleton {
     return ((id - 1) % 10) + 1;
   }
 
-  // Workspace n (1…10) of the focused screen
+  // Workspace n (1…10) of the focused screen. A workspace already on this
+  // screen that shows as n wins, so older ones (2, 3 on the second screen
+  // from before this setting) stay reachable until they are empty.
   function workspaceHere(n: int): int {
-    return blockOf(Hyprland.focusedMonitor?.name ?? "") + n;
+    const here = Hyprland.focusedMonitor?.name ?? "";
+    const own = blockOf(here) + n;
+    if (!Config.bar.workspacesPerScreen) return own;
+    const shown = Hyprland.workspaces.values.filter(w => w.id > 0 && w.monitor?.name === here && workspaceLabel(w.id) === n).map(w => w.id);
+    return shown.length === 0 || shown.includes(own) ? own : shown[0];
   }
 
   function goToWorkspace(n: int): void {
