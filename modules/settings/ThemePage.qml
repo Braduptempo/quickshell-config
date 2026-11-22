@@ -8,6 +8,7 @@ import QtQuick.Layouts
 import "../../config"
 import "../../components"
 import "../../services"
+import Quickshell.Io
 
 SettingsPage {
   id: page
@@ -278,7 +279,7 @@ SettingsPage {
 
   SettingRow {
     title: "Accent"
-    subtitle: "Buttons, sliders and highlights. The first one is the theme's own."
+    subtitle: "Buttons, sliders and highlights. The first one is the theme's own, the last one comes from your wallpaper and changes with it."
 
     Repeater {
       model: page.accents
@@ -303,6 +304,83 @@ SettingsPage {
           anchors.fill: parent
           cursorShape: Qt.PointingHandCursor
           onClicked: Config.appearance.accent = swatch.modelData
+        }
+      }
+    }
+
+    // From the wallpaper: its most colourful colour, in this theme's lightness
+    Rectangle {
+      id: wallSwatch
+      readonly property bool chosen: Config.appearance.accent === "wallpaper"
+      width: 24
+      height: 24
+      radius: Theme.r(12)
+      color: Theme.wallpaperAccent ?? Theme.overlay
+      border.width: chosen ? 2 : 0
+      border.color: Theme.text
+
+      Accessible.role: Accessible.RadioButton
+      Accessible.name: "From the wallpaper"
+      Accessible.checked: chosen
+
+      Icon { anchors.centerIn: parent; name: "image"; size: 13; color: Theme.onAccent }
+
+      MouseArea {
+        anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+        onClicked: Config.appearance.accent = "wallpaper"
+      }
+    }
+  }
+
+  SettingRow {
+    title: "Your own accent"
+    subtitle: "Any colour as a hex value like #ff8800, or the pipette to pick one from the screen."
+
+    Rectangle {
+      anchors.verticalCenter: parent.verticalCenter
+      width: 24
+      height: 24
+      radius: Theme.r(12)
+      color: Palettes.isValidColor(customHex.text.trim()) ? customHex.text.trim() : "transparent"
+      border.width: 1
+      border.color: Theme.border
+    }
+
+    TextField {
+      id: customHex
+      readonly property string current: Palettes.isValidColor(Config.appearance.accent) ? Config.appearance.accent : ""
+      anchors.verticalCenter: parent.verticalCenter
+      width: 110
+      implicitHeight: 30
+      placeholder: "#rrggbb"
+      text: current
+      error: text.trim() !== "" && !Palettes.isValidColor(text.trim())
+      Accessible.name: "Your own accent colour"
+      // Typing breaks the binding; follow swatches and the pipette
+      onCurrentChanged: if (!activeFocus) text = current
+      onTextChanged: {
+        const c = text.trim().toLowerCase();
+        if (Palettes.isValidColor(c) && c !== Config.appearance.accent) Config.appearance.accent = c;
+      }
+    }
+
+    IconButton {
+      anchors.verticalCenter: parent.verticalCenter
+      icon: "pipette"
+      size: 28
+      accessibleName: "Pick the accent from the screen"
+      checked: accentPicker.running
+      onClicked: accentPicker.running = true
+    }
+
+    Process {
+      id: accentPicker
+      command: ["hyprpicker", "-f", "hex", "-n"]
+      stdout: StdioCollector {
+        onStreamFinished: {
+          const c = text.trim().toLowerCase();
+          if (Palettes.isValidColor(c)) Config.appearance.accent = c;
         }
       }
     }
