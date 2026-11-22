@@ -67,6 +67,7 @@ Scope {
         shadow: false
 
         SmoothRow {
+          id: leftRow
           anchors.left: parent.left
           anchors.leftMargin: 7
           anchors.verticalCenter: parent.verticalCenter
@@ -102,7 +103,8 @@ Scope {
             Label {
               text: titleItem.title
               kind: "muted"
-              width: Math.min(implicitWidth, 300)
+              // Never under the clock: what's left before it, at most 300
+              width: Math.max(0, Math.min(implicitWidth, 300, clockPill.x - leftRow.x - titleItem.x - titleItem.padding * 2 - 16))
               elide: Text.ElideRight
               anchors.verticalCenter: parent.verticalCenter
             }
@@ -110,6 +112,7 @@ Scope {
         }
 
         ClockPill {
+          id: clockPill
           screen: panel.modelData
           anchors.centerIn: parent
         }
