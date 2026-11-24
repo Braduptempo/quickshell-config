@@ -1,0 +1,11 @@
+[SddmGreeterTheme]
+Name=Quickshell
+Description=The login screen in the style of the shell's lock screen: blurred wallpaper, big clock and a glass card
+Author=quickshell-config
+License=MIT
+Type=sddm-theme
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+QtVersion=6
+X-SDDM-Theme-InterfaceVersion=2

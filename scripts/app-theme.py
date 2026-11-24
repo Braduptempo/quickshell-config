@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Pass the shell's theme on to other apps: GTK 3/4 and Spotify (Spicetify).
+"""Pass the shell's theme on to other apps: GTK 3/4, Spotify (Spicetify) and
+the SDDM login screen.
 
-Run by services/AppTheme.qml whenever the theme, accent or wallpaper palette
-changes, with the palette as JSON:
+Run by services/AppTheme.qml whenever the theme, accent, font, corners or
+wallpaper changes, with the palette as JSON:
 
     app-theme.py '{"light": false, "base": "#1a1b26", "accent": "#7aa2f7", ...}'
 
 Keys: light, crust, base, surface, overlay, text, subtext, accent, good,
-warn, error (the same as config/Palettes.qml).
+warn, error (the same as config/Palettes.qml); optional for the login
+screen: font, roundness, glass, wallpaper.
 
 GTK
     Writes ~/.config/gtk-{3,4}.0/quickshell-colors.css and imports it from
@@ -22,6 +24,12 @@ Spotify
     extension apps/spicetify/quickshell-live.js then reloads the colours in
     a running Spotify. The first run switches Spicetify to Glass and runs
     `spicetify apply` once.
+
+SDDM
+    Needs the Quickshell SDDM theme and its folder /var/lib/quickshell-sddm
+    (apps/sddm/install.sh). Writes theme.conf there (the theme reads it as
+    theme.conf.user) and copies the wallpaper and avatar next to it, since
+    SDDM can't read your home folder. QS_SDDM_DIR points it elsewhere.
 
 Every file is only written when its content changes.
 """
@@ -199,6 +207,84 @@ def spotify(p: dict) -> None:
         run("spicetify", "-q", "refresh")
 
 
+# --- SDDM login screen -------------------------------------------------------
+
+SDDM_DIR = Path(os.environ.get("QS_SDDM_DIR", "/var/lib/quickshell-sddm"))
+
+
+def same_file(a: Path, b: Path) -> bool:
+    try:
+        sa, sb = a.stat(), b.stat()
+    except FileNotFoundError:
+        return False
+    return sa.st_size == sb.st_size and int(sa.st_mtime) == int(sb.st_mtime)
+
+
+def copy_as(src: Path, dest_stem: str) -> str:
+    """Copy src into SDDM_DIR as <dest_stem><ext>, readable for the sddm user;
+    drop an older copy with another extension. Returns the copy's path."""
+    dest = SDDM_DIR / (dest_stem + src.suffix.lower())
+    for old in SDDM_DIR.glob(dest_stem + ".*"):
+        if old != dest:
+            old.unlink(missing_ok=True)
+    if not same_file(src, dest):
+        tmp = dest.with_suffix(dest.suffix + ".tmp")
+        shutil.copy2(src, tmp)
+        tmp.chmod(0o644)
+        tmp.replace(dest)
+    return str(dest)
+
+
+def current_wallpaper(p: dict) -> str:
+    if p.get("wallpaper"):
+        return p["wallpaper"]
+    for cmd in (["awww", "query"], ["swww", "query"]):
+        if not shutil.which(cmd[0]):
+            continue
+        out = subprocess.run(cmd, capture_output=True, text=True, check=False, timeout=10).stdout
+        for line in out.splitlines():
+            if "image:" in line:
+                return line.split("image:", 1)[1].strip()
+    return ""
+
+
+def sddm(p: dict) -> None:
+    """The colours, font, corners, wallpaper and avatar for the Quickshell SDDM
+    theme (apps/sddm). SDDM can't read your home folder, so they go to
+    SDDM_DIR, made by apps/sddm/install.sh; without it this does nothing."""
+    if not SDDM_DIR.is_dir() or not os.access(SDDM_DIR, os.W_OK):
+        return
+
+    wallpaper = ""
+    src = Path(current_wallpaper(p)).expanduser()
+    if src.is_file():
+        wallpaper = copy_as(src, "wallpaper")
+
+    avatar = ""
+    user = os.environ.get("USER", "")
+    for face in (HOME / ".face", Path("/var/lib/AccountsService/icons") / user):
+        if face.is_file():
+            avatar = copy_as(face, "avatar")
+            break
+    else:
+        for old in SDDM_DIR.glob("avatar.*"):
+            old.unlink(missing_ok=True)
+
+    values = {k: p[k] for k in KEYS}
+    values.update({
+        "light": "true" if p["light"] else "false",
+        "glass": p.get("glass", 0.45),
+        "roundness": p.get("roundness", 1),
+        "font": p.get("font", "JetBrains Mono"),
+        "background": wallpaper,
+        "avatar": avatar,
+    })
+    body = "\n".join(f"{k}={v}" for k, v in values.items())
+    conf = SDDM_DIR / "theme.conf"
+    if write(conf, f"; Made by quickshell (scripts/app-theme.py)\n[General]\n{body}\n"):
+        conf.chmod(0o644)
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         print(__doc__.strip().splitlines()[0], file=sys.stderr)
@@ -206,7 +292,10 @@ def main() -> int:
     raw = json.loads(sys.argv[1])
     p = {k: str(raw[k]) for k in KEYS}
     p["light"] = bool(raw.get("light", False))
-    for step in (gtk, spotify):
+    for k in ("font", "roundness", "glass", "wallpaper"):
+        if k in raw:
+            p[k] = raw[k]
+    for step in (gtk, spotify, sddm):
         try:
             step(p)
         except Exception as e:  # one app failing shouldn't stop the others
