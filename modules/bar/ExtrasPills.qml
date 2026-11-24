@@ -56,13 +56,13 @@ SmoothRow {
     visible: Config.bar.showLoad && SystemStats.heavy
     padding: 10
     activeColor: Theme.warn
-    accessibleName: "High load: CPU " + Math.round(SystemStats.cpu) + " percent" + (SystemStats.gpu > 0 ? ", GPU " + Math.round(SystemStats.gpu) + " percent" : "")
+    accessibleName: "High load: CPU " + Math.round(SystemStats.cpu * 100) + " percent" + (SystemStats.gpu > 0 ? ", GPU " + Math.round(SystemStats.gpu * 100) + " percent" : "")
                     + (SystemStats.hottest > 0 ? ", " + Math.round(SystemStats.hottest) + " degrees" : "")
     onClicked: Panels.openQuickSettings(root.screen, "system")
 
     Icon { name: "activity"; size: 14; color: Theme.warn; anchors.verticalCenter: parent.verticalCenter }
     Label {
-      text: Math.round(Math.max(SystemStats.cpu, SystemStats.gpu)) + "%"
+      text: Math.round(Math.max(SystemStats.cpu, SystemStats.gpu) * 100) + "%"
       color: Theme.warn
       font.pixelSize: Theme.font.small
       anchors.verticalCenter: parent.verticalCenter

@@ -48,6 +48,9 @@ while IFS= read -r file; do
     fail "$file: qmllint exit code $rc (syntax error)"
     echo "$out"
   fi
+  # The SDDM theme runs inside SDDM, which hands it `sddm`, `config`, `userModel`
+  # and the like; qmllint can't know them, so only its syntax counts
+  case "$file" in apps/sddm/*) continue ;; esac
   # Quickshell registers `pragma Singleton` files itself, so qmllint's
   # "not declared as singleton in qmldir" is a false positive.
   imports="$(echo "$out" | grep -E '\[import\]$' | grep -v 'not declared as singleton in qmldir' || true)"

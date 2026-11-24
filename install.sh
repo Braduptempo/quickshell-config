@@ -10,7 +10,8 @@
 #   curl -fsSL https://raw.githubusercontent.com/Braduptempo/quickshell-config/main/install.sh | bash
 #
 # Steps: packages (pacman), the config in ~/.config/quickshell, the line in
-# hyprland.lua, starting the shell with Hyprland, and the system services.
+# hyprland.lua, starting the shell with Hyprland, the system services, and
+# (not with --minimal) the SDDM login screen and Spotify (Spicetify).
 # Nothing is overwritten without asking; an existing config is backed up.
 set -euo pipefail
 
@@ -77,7 +78,7 @@ required=(quickshell hyprland networkmanager pipewire wireplumber pipewire-pulse
 optional=(
   "bluez bluez-utils|Bluetooth"
   "cliphist|clipboard history"
-  "grim slurp gpu-screen-recorder|screenshots and recording"
+  "grim slurp gpu-screen-recorder jq|screenshots and recording"
   "awww qt6-multimedia qt6-multimedia-ffmpeg ffmpeg|wallpapers (images and videos)"
   "hyprsunset|night light"
   "brightnessctl|brightness keys"
@@ -190,6 +191,90 @@ if [ "${#off[@]}" -eq 0 ]; then
   ok "Running: ${services[*]}"
 elif ask "Turn on ${off[*]} (now and at every boot)?"; then
   run sudo systemctl enable --now "${off[@]}"
+fi
+
+if [ "$minimal" = 0 ]; then
+  # --- Login screen (SDDM) ---------------------------------------------------------------------
+  # The lock screen's look for SDDM: apps/sddm/install.sh (sudo) installs the theme and the
+  # folder the shell keeps its colours and wallpaper in (scripts/app-theme.py fills it)
+  step "Login screen (SDDM)"
+  sddm_theme=/usr/share/sddm/themes/quickshell
+  if ! pacman -Q sddm >/dev/null 2>&1; then
+    say "SDDM isn't installed: skipped (the shell's login screen is an SDDM theme)"
+  elif [ -d "$sddm_theme" ] && cmp -s "$TARGET/apps/sddm/quickshell/Main.qml" "$sddm_theme/Main.qml" \
+       && [ -d /var/lib/quickshell-sddm ] && grep -rqs '^Current=quickshell' /etc/sddm.conf.d; then
+    ok "SDDM uses the shell's login screen"
+  elif [ -d "$sddm_theme" ]; then
+    if ask "Update the shell's login screen for SDDM?"; then run sudo "$TARGET/apps/sddm/install.sh"; fi
+  elif ask "Give SDDM the shell's login screen (the lock screen's look, follows your theme)?"; then
+    run sudo "$TARGET/apps/sddm/install.sh"
+  fi
+
+  # --- Spotify (Spicetify) ---------------------------------------------------------------------
+  # Spotify follows the shell's theme through Spicetify and its "text" theme; scripts/app-theme.py
+  # builds the Glass theme on top of it and runs `spicetify apply` the next time the shell starts
+  step "Spotify"
+  spotify_dir=""
+  if pacman -Q spotify-launcher >/dev/null 2>&1; then
+    spotify_dir="$HOME/.local/share/spotify-launcher/install/usr/share/spotify"
+  elif pacman -Q spotify >/dev/null 2>&1; then
+    spotify_dir="/opt/spotify"
+  fi
+  aur=""
+  for helper in yay paru; do command -v "$helper" >/dev/null && { aur="$helper"; break; }; done
+  spicetify_conf="$HOME/.config/spicetify/config-xpui.ini"
+  text_theme="$HOME/.config/spicetify/Themes/text"
+
+  if [ -z "$spotify_dir" ]; then
+    if command -v flatpak >/dev/null && flatpak list 2>/dev/null | grep -qi spotify; then
+      warn "Spotify from Flatpak can't be themed by Spicetify; spotify-launcher can"
+    else
+      say "Spotify isn't installed (spotify-launcher or spotify): skipped"
+    fi
+  elif [ ! -d "$spotify_dir" ] || [ ! -f "$HOME/.config/spotify/prefs" ]; then
+    warn "Start Spotify once (and log in), then run this script again so it can follow your theme"
+  else
+    # spicetify itself, from the AUR
+    if ! command -v spicetify >/dev/null; then
+      if [ -z "$aur" ]; then
+        warn "Spicetify comes from the AUR: install yay or paru, then run this script again"
+      elif ask "Install Spicetify (AUR) so Spotify follows the shell's theme?"; then
+        run "$aur" -S --needed spicetify-cli
+      fi
+    fi
+
+    if command -v spicetify >/dev/null || [ "$dry" = 1 ]; then
+      # Where Spotify is: spicetify finds /opt/spotify, not spotify-launcher's copy
+      if ! grep -qE "^spotify_path\s*=\s*$spotify_dir\s*$" "$spicetify_conf" 2>/dev/null; then
+        run spicetify -q config spotify_path "$spotify_dir" prefs_path "$HOME/.config/spotify/prefs"
+      fi
+      # The AUR's /opt/spotify belongs to root; Spicetify has to write in it (its own advice)
+      if [ ! -w "$spotify_dir" ] || [ ! -w "$spotify_dir/Apps" ]; then
+        if ask "Let your user change $spotify_dir so Spicetify can theme it?"; then
+          run sudo chmod a+wr "$spotify_dir"
+          run sudo chmod -R a+wr "$spotify_dir/Apps"
+        fi
+      fi
+      # The "text" theme the shell's Glass theme builds on
+      if [ -f "$text_theme/user.css" ]; then
+        ok "Spicetify's text theme is there"
+      elif ask "Download Spicetify's text theme (the shell's Glass theme builds on it)?"; then
+        tmp="$(mktemp -d)"
+        run git clone -q --depth 1 --filter=blob:none --sparse https://github.com/spicetify/spicetify-themes "$tmp/themes"
+        run git -C "$tmp/themes" sparse-checkout set text
+        run mkdir -p "$HOME/.config/spicetify/Themes"
+        run cp -r "$tmp/themes/text" "$text_theme"
+        rm -rf "$tmp"
+      fi
+      # A backup of the untouched Spotify, which `spicetify apply` needs
+      if awk '/^\[Backup\]/{f=1;next} /^\[/{f=0} f && /^version *= *[^ ]/{b=1} END{exit !b}' "$spicetify_conf" 2>/dev/null; then
+        ok "Spicetify has a backup of Spotify"
+      else
+        run spicetify -q backup
+      fi
+      say "The shell themes Spotify the next time it starts (or after you pick a theme)."
+    fi
+  fi
 fi
 
 # --- Done -----------------------------------------------------------------------------------
