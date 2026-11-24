@@ -6,6 +6,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Bluetooth
 import Quickshell.Networking
+import Quickshell.Services.UPower
 import "../../config"
 import "../../components"
 import "../../services"
@@ -23,50 +24,123 @@ ColumnLayout {
   spacing: 12
 
   // --- Header: battery (laptop only) ---------------------------------------
-  // Wraps when there are several batteries
-  Flow {
+  // One pill across the panel: the total and the time on the left; with two
+  // batteries or more, each one's number, a small gauge filled to its level
+  // (green while it charges, red when low) and its percentage on the right.
+  // The time gives way (elides) before anything wraps.
+  Rectangle {
     visible: Battery.hasBattery
     Layout.fillWidth: true
-    spacing: 8
+    implicitHeight: 34
+    radius: Theme.r(17)
+    color: Theme.item
 
-    Rectangle {
-      implicitHeight: 34
-      implicitWidth: batteryRow.implicitWidth + 24
-      radius: Theme.r(17)
-      color: Theme.item
+    RowLayout {
+      anchors.fill: parent
+      anchors.leftMargin: 12
+      anchors.rightMargin: 12
+      spacing: 8
+
+      Icon { name: "battery"; size: 16; color: Battery.charging ? Theme.good : Theme.text; Layout.alignment: Qt.AlignVCenter }
+      Label { text: Battery.batteryLevel + "%"; font.weight: Font.Bold; Layout.alignment: Qt.AlignVCenter }
+      Label {
+        text: Battery.timeRemainingStr
+        kind: "muted"
+        elide: Text.ElideRight
+        Layout.fillWidth: true
+        Layout.minimumWidth: 0
+        Layout.alignment: Qt.AlignVCenter
+      }
 
       Row {
-        id: batteryRow
-        anchors.centerIn: parent
-        spacing: 8
-        Icon { name: "battery"; size: 16; color: Battery.charging ? Theme.good : Theme.text; anchors.verticalCenter: parent.verticalCenter }
-        Label { text: Battery.batteryLevel + "%"; font.weight: Font.Bold; anchors.verticalCenter: parent.verticalCenter }
-        Label { text: Battery.timeRemainingStr; kind: "muted"; anchors.verticalCenter: parent.verticalCenter }
-      }
-    }
+        visible: Battery.batteries.length > 1
+        spacing: 10
+        Layout.alignment: Qt.AlignVCenter
 
-    // Two batteries or more: each one's own charge next to the total
-    Repeater {
-      model: Battery.batteries.length > 1 ? Battery.batteries : []
+        Repeater {
+          model: Battery.batteries.length > 1 ? Battery.batteries : []
 
-      Rectangle {
-        id: oneBattery
-        required property var modelData
-        required property int index
-        implicitHeight: 34
-        implicitWidth: oneRow.implicitWidth + 20
-        radius: Theme.r(17)
-        color: Theme.item
+          Row {
+            id: oneBattery
+            required property var modelData
+            required property int index
+            readonly property real level: Math.max(0, Math.min(1, modelData.percentage))
+            readonly property bool charging: modelData.state === UPowerDeviceState.Charging
+            readonly property color tone: charging ? Theme.good : level <= 0.2 ? Theme.error : Theme.accent
+            spacing: 6
+            anchors.verticalCenter: parent.verticalCenter
 
-        Accessible.role: Accessible.StaticText
-        Accessible.name: "Battery " + (index + 1) + ", " + Battery.levelOf(modelData)
+            Accessible.role: Accessible.StaticText
+            Accessible.name: "Battery " + (index + 1) + ", " + Battery.levelOf(modelData) + (charging ? ", charging" : "")
 
-        Row {
-          id: oneRow
-          anchors.centerIn: parent
-          spacing: 6
-          Label { text: "Battery " + (oneBattery.index + 1); kind: "muted"; font.pixelSize: Theme.font.small; anchors.verticalCenter: parent.verticalCenter }
-          Label { text: Battery.levelOf(oneBattery.modelData); font.weight: Font.Bold; anchors.verticalCenter: parent.verticalCenter }
+            // Between two batteries
+            Rectangle {
+              visible: oneBattery.index > 0
+              width: 1
+              height: 16
+              color: Theme.alpha(Theme.text, 0.12)
+              anchors.verticalCenter: parent.verticalCenter
+            }
+
+            // Which one: a small round number
+            Rectangle {
+              width: 16
+              height: 16
+              radius: Theme.r(8)
+              color: Theme.alpha(Theme.text, 0.08)
+              anchors.verticalCenter: parent.verticalCenter
+              Label {
+                anchors.centerIn: parent
+                text: oneBattery.index + 1
+                kind: "muted"
+                font.pixelSize: Theme.font.label
+                font.weight: Font.Bold
+              }
+            }
+
+            // The gauge: an outline with a nub, filled to the level
+            Item {
+              width: 22
+              height: 11
+              anchors.verticalCenter: parent.verticalCenter
+
+              Rectangle {
+                id: shell
+                width: 19
+                height: parent.height
+                radius: Theme.r(3)
+                color: "transparent"
+                border.width: 1.5
+                border.color: Theme.alpha(Theme.text, 0.45)
+
+                Rectangle {
+                  x: 2.5
+                  y: 2.5
+                  height: parent.height - 5
+                  width: Math.max(oneBattery.level > 0 ? 2 : 0, (parent.width - 5) * oneBattery.level)
+                  radius: Theme.r(1.5)
+                  color: oneBattery.tone
+                  Behavior on width { NumberAnimation { duration: Theme.anim.stack } }
+                }
+              }
+              Rectangle {
+                anchors.left: shell.right
+                anchors.leftMargin: 1
+                anchors.verticalCenter: shell.verticalCenter
+                width: 2
+                height: 5
+                radius: 1
+                color: Theme.alpha(Theme.text, 0.45)
+              }
+            }
+
+            Label {
+              text: Battery.levelOf(oneBattery.modelData)
+              color: oneBattery.charging ? Theme.good : Theme.text
+              font.weight: Font.Bold
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
         }
       }
     }
