@@ -4,7 +4,8 @@
 // (`active`), so it costs nothing when the panel is closed.
 //
 // CPU and memory come from /proc, CPU temperature from hwmon (k10temp or
-// coretemp), the GPU from nvidia-smi or the amdgpu files in /sys, and the
+// coretemp), the GPU from nvidia-smi, the amdgpu files in /sys or, for Intel
+// (i915 and xe), how long the GPU sat idle (no busy figure exists there), and the
 // processes from `top` (its second sample, so the numbers are current).
 pragma Singleton
 
@@ -31,7 +32,7 @@ Singleton {
   property var lastStat: null
 
   // --- GPU -------------------------------------------------------------------------
-  // "nvidia", "amd" or "" (none found)
+  // "nvidia", "amd", "intel" or "" (none found)
   property string gpuKind: ""
   property string gpuModel: ""
   property real gpu: 0
@@ -56,6 +57,9 @@ Singleton {
   // --- What this machine has (once) -----------------------------------------------------
   property string cpuTempPath: ""
   property string amdPath: ""
+  // Intel: the GPU's idle time in ms (rc6 on i915, gtidle on xe), and the last reading
+  property string intelIdlePath: ""
+  property var lastIdle: null
 
   Process {
     running: true
@@ -65,7 +69,11 @@ Singleton {
       "for h in /sys/class/hwmon/hwmon*; do n=$(cat $h/name 2>/dev/null);" +
       "  case $n in k10temp|coretemp|zenpower|cpu_thermal) echo $h/temp1_input; break;; esac; done | head -1;" +
       "if command -v nvidia-smi >/dev/null && nvidia-smi -L >/dev/null 2>&1; then echo nvidia; nvidia-smi --query-gpu=name --format=csv,noheader | head -1;" +
-      "else for c in /sys/class/drm/card*/device; do [ -f $c/gpu_busy_percent ] && echo amd && echo $c && break; done; fi"]
+      "else g=; for c in /sys/class/drm/card*/device; do [ -f $c/gpu_busy_percent ] && echo amd && echo $c && g=1 && break; done;" +
+      // No NVIDIA or AMD card: an Intel one (card1, not its connectors such as card1-eDP-1)
+      "  [ -z \"$g\" ] && for c in /sys/class/drm/card[0-9] /sys/class/drm/card[0-9][0-9]; do" +
+      "    r=$c/gt/gt0/rc6_residency_ms; [ -f $r ] || r=$c/device/tile0/gt0/gtidle/idle_residency_ms; [ -f $r ] || continue;" +
+      "    echo intel; echo $r; lspci -s \"$(basename \"$(readlink -f $c/device)\")\" 2>/dev/null | sed 's/.*: //'; break; done; fi"]
     stdout: StdioCollector {
       onStreamFinished: {
         const lines = text.split("\n").map(l => l.trim());
@@ -79,6 +87,15 @@ Singleton {
           root.gpuKind = "amd";
           root.amdPath = lines[4] ?? "";
           root.gpuModel = "AMD GPU";
+        } else if (lines[3] === "intel") {
+          root.gpuKind = "intel";
+          root.intelIdlePath = lines[4] ?? "";
+          // "Intel Corporation Kaby Lake-R GT2 [UHD Graphics 620] (rev 07)" → "Intel UHD Graphics 620"
+          const name = lines[5] ?? "";
+          const marketing = name.match(/\[([^\]]+)\]/);
+          root.gpuModel = marketing ? "Intel " + marketing[1]
+            : name !== "" ? name.replace(/^Intel Corporation /, "Intel ").replace(/\s*\(rev [^)]*\)$/, "")
+            : "Intel GPU";
         }
       }
     }
@@ -100,6 +117,7 @@ Singleton {
       if (root.ticks % 2 === 0) {
         if (root.gpuKind === "nvidia") nvidiaProc.running = true;
         else if (root.gpuKind === "amd") amdProc.running = true;
+        else if (root.gpuKind === "intel") intelProc.running = true;
         topProc.running = true;
       }
       if (root.ticks % 30 === 0) diskProc.running = true;
@@ -123,6 +141,7 @@ Singleton {
       if (root.cpuTempPath !== "") tempProc.running = true;
       if (root.gpuKind === "nvidia") nvidiaProc.running = true;
       else if (root.gpuKind === "amd") amdProc.running = true;
+      else if (root.gpuKind === "intel") intelProc.running = true;
     }
   }
 
@@ -143,6 +162,7 @@ Singleton {
     ticks = 0;
     lastStat = null;
     lastNet = null;
+    lastIdle = null;
     cpuHistory = [];
     gpuHistory = [];
   }
@@ -257,6 +277,24 @@ Singleton {
         root.vramUsed = f[1] || 0;
         root.vramTotal = f[2] || 0;
         root.gpuTemp = f[3] ? f[3] / 1000 : -1;
+      }
+    }
+  }
+
+  // Intel: busy = the part of the time since the last reading that the GPU wasn't idle.
+  // It shares the CPU's memory and temperature, so there's no video memory or own temperature.
+  Process {
+    id: intelProc
+    command: ["cat", root.intelIdlePath]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const idle = parseFloat(text);
+        const now = Date.now();
+        if (isNaN(idle)) return;
+        const last = root.lastIdle;
+        root.lastIdle = { t: now, idle: idle };
+        if (!last || now <= last.t) return;
+        root.gpu = Math.max(0, Math.min(1, 1 - (idle - last.idle) / (now - last.t)));
       }
     }
   }
