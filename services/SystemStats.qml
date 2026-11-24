@@ -132,7 +132,7 @@ Singleton {
     interval: 5000
     repeat: true
     onTriggered: {
-      const hot = root.cpu >= 90 || root.gpu >= 90 || root.hottest >= 85;
+      const hot = root.cpu >= 0.9 || root.gpu >= 0.9 || root.hottest >= 85;  // cpu and gpu run 0–1
       root.hotSamples = hot ? Math.min(root.hotSamples + 1, 2) : 0;
     }
   }
