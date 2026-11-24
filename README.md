@@ -25,7 +25,11 @@ Or from a clone: `./install.sh`. It asks before every step:
 1. installs the packages below with pacman (`--minimal`: only the required ones);
 2. puts this config in `~/.config/quickshell` (an existing other config is moved to a backup first);
 3. adds the line for the shell's rules and keys to `hyprland.lua`, and starts the shell with Hyprland unless something already does;
-4. turns on NetworkManager, Bluetooth and power profiles.
+4. turns on NetworkManager, Bluetooth and power profiles;
+5. with SDDM: gives it the shell's login screen (`apps/sddm/install.sh`, see [Other apps follow the theme](#other-apps-follow-the-theme));
+6. with Spotify (`spotify-launcher` or `spotify`): installs Spicetify from the AUR (yay or paru), points it at Spotify, downloads its `text` theme and makes its backup, so Spotify follows the theme from the shell's next start.
+
+Steps 5 and 6 are skipped with `--minimal`.
 
 `--dry-run` shows what it would do without changing anything, `--yes` answers yes to everything. Running it again is safe: what's already done is skipped.
 
@@ -51,14 +55,16 @@ Start it like this, not with `qs -p <folder>`: the keybinds call `qs ipc call â€
 
 ### Programs it uses
 
-Arch package names, all in the official repos. Everything except the first group is optional: a feature whose program is missing is hidden or says what to install.
+Arch package names, all in the official repos except `spicetify-cli`. Everything except the first group is optional: a feature whose program is missing is hidden or says what to install.
 
 | For | Packages |
 |---|---|
 | The basics | `quickshell`, `hyprland`, `networkmanager`, `pipewire` + `wireplumber`, `upower`, `libnotify` (`notify-send`), `wl-clipboard`, `curl` |
 | Bluetooth | `bluez`, `bluez-utils` (and `systemctl enable --now bluetooth`) |
 | Clipboard history | `cliphist` |
-| Screenshots and recording | `grim`, `slurp`, `gpu-screen-recorder` |
+| Screenshots and recording | `grim`, `slurp`, `gpu-screen-recorder`, `jq` (window screenshots) |
+| Login screen | `sddm` (the theme is in `apps/sddm`) |
+| Spotify following the theme | `spicetify-cli` (AUR) |
 | Wallpapers | `awww` (or `swww`); videos play in the shell itself (`qt6-multimedia`, `qt6-multimedia-ffmpeg`), with `ffmpeg` for their thumbnails |
 | Night light | `hyprsunset` |
 | Brightness | `brightnessctl` |
@@ -145,10 +151,11 @@ Settings (Super + ,) changes everything right away and saves it in `settings.jso
 
 ### Other apps follow the theme
 
-Whenever the theme, accent or wallpaper palette changes, `scripts/app-theme.py` passes the colours on (`services/AppTheme.qml` runs it):
+Whenever the theme, accent, font, corners or wallpaper changes, `scripts/app-theme.py` passes them on (`services/AppTheme.qml` runs it):
 
 - **GTK 3 and 4**: colours in `~/.config/gtk-{3,4}.0/quickshell-colors.css`, imported from your `gtk.css` (the rest of that file stays yours), and dark or light for apps that ask.
 - **Spotify**: with [Spicetify](https://spicetify.app) and its `text` theme installed, it builds a theme **Glass** (the text theme's lined, labelled panes, fixed for Spotify 1.3, plus `apps/spicetify/glass.css`) with a colour scheme **Quickshell**. The first run switches Spicetify to it and runs `spicetify apply`; after that, the `quickshell-live.js` extension reloads the colours in a running Spotify. Hyprland makes the window glass (`spotify-glass` in `hyprland/quickshell.lua`); Blur off makes it solid.
+- **The SDDM login screen**: `apps/sddm/quickshell` is an SDDM theme with the lock screen's look (blurred wallpaper, big clock, the glass card, power buttons). `sudo apps/sddm/install.sh` installs it and turns it on (`--remove` goes back to your old theme; run it again after the theme's files change). SDDM can't read your home folder, so the script also makes `/var/lib/quickshell-sddm`, owned by you, where the shell keeps the colours, font, corners, wallpaper and avatar (`~/.face`). Try it without logging out: `sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/quickshell`.
 
 Monitor and input settings are written to `hyprland/monitors.lua` and `hyprland/input.lua` (per machine, not in git), loaded after your own Hyprland config. Delete them to go back to yours.
 
